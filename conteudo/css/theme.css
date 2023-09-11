@@ -11,8 +11,7 @@
         display: block;
         width: 100%;
         border: none;
-        z-index: 999999; /* Isso define a ordem de sobreposição, quanto maior o valor, mais acima na pilha de sobreposição. */
-      }
+       }
     h1 {
     font-size: 32px;
     text-align: center;
@@ -302,7 +301,6 @@
     color: white;
     position: fixed;
     width: 100%;
-    z-index: 1000;
 }
 
 .header h1 {
