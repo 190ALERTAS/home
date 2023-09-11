@@ -13,7 +13,10 @@
         border: none;
       }
 #meuIframe {
-  z-index: 999999; /* Isso define a ordem de sobreposição, quanto maior o valor, mais acima na pilha de sobreposição. */
+        display: block;
+        width: 100%;
+        border: none;
+        z-index: 999999; /* Isso define a ordem de sobreposição, quanto maior o valor, mais acima na pilha de sobreposição. */
 }
     h1 {
     font-size: 32px;
