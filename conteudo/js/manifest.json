@@ -6,12 +6,9 @@
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "version": "3.0",
-  "developer": {
-  "name": "SD Ferrão - 32BPM",
-}
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/stefanoferrao/alertas/main/js%26css/Logo%20190BM.png",
+      "src": "https://raw.githubusercontent.com/190ALERTAS/190/main/conteudo/img/Logo%20190ALERTAS.png",
       "sizes": "192x192",
       "type": "image/png"
     }
