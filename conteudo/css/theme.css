@@ -259,9 +259,9 @@
   }
   
   #themeToggle {
-  position: fixed;
-  top: 20px;
-  left: 20px;
+  margin-right: 30px;
+  float: right;
+  top: 50px;
   width: 20px;
   height: 40px;
   border-radius: 50%;
