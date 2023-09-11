@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Formulário de Contato</title>
+    <link rel="stylesheet" type="text/css" href="css/theme.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+  </head>
+  <body>
+    <h1></h1>
+
+    <button id="themeToggle">
+  <span class="theme-icon light-icon">💡</span>
+</button>
+
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfdlIIcfScBCkobJGqkdPvSsg6_gyetDMhVd4zHxZQJQGSgVg/viewform?embedded=true" width="650" height="572" frameborder="0" scrolling="no" marginheight="0" marginwidth="0">Carregando…</iframe>
+
+<script>
+const themeToggle = document.getElementById("themeToggle");
+const body = document.body;
+const form = document.querySelector("form");
+const iframe = document.querySelector('iframe');
+
+  themeToggle.addEventListener("click", function() {
+    iframe.classList.toggle('dark-mode');
+    body.classList.toggle("darkmode");
+    form.classList.toggle("darkmode");
+  });
+</script>
+  </body>
+</html>

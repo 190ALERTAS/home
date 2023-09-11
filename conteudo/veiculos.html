@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>ALERTA DE VEÍCULO</title>
+    <link rel="stylesheet" type="text/css" href="css/theme.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
+    </head>
+  <body>
+    <h1>ALERTA DE VEÍCULO</h1>
+<button id="themeToggle">
+  <span class="theme-icon light-icon">💡</span>
+
+</button>
+    <form>
+      
+      <label for="fato">FATO:</label>
+        <select id="fato" name="fato">
+        <option value="">PREENCHER MANUALMENTE</option>
+        <option value="FURTO DE VEÍCULO">FURTO </option>
+        <option value="ROUBO DE VEÍCULO">ROUBO</option>
+        <option value="ROUBO DE VEÍCULO COM SEQUESTRO">ROUBO DE VEICULO COM SEQUESTRO</option>
+        </select>
+
+      <label for="cidade">CIDADE DO FATO:</label>
+        <textarea id="cidade" name="cidade" rows="1" cols="1"></textarea>
+
+      <label for="modelo">MARCA/MODELO:</label>
+        <textarea id="modelo" name="modelo" rows="1" cols="1"></textarea>
+
+    <form>
+      <label for="cor">COR:</label>
+        <select id="cor" name="cor">
+        <option value="">PREENCHER MANUALMENTE</option>
+        <option value="AMARELA">AMARELA</option>
+        <option value="AZUL">AZUL</option>
+        <option value="BEGE">BEGE</option>
+        <option value="BRANCA">BRANCA</option>
+        <option value="CINZA">CINZA</option>
+        <option value="DOURADA">DOURADA</option>
+        <option value="GRENÁ">GRENÁ</option>
+        <option value="LARANJA">LARANJA</option>
+        <option value="MARROM">MARROM</option>
+        <option value="PRATA">PRATA</option>
+        <option value="PRETA">PRETA</option>
+        <option value="ROSA">ROSA</option>
+        <option value="ROXA">ROXA</option>
+        <option value="VERDE">VERDE</option>
+        <option value="VERMELHA">VERMELHA</option>
+        <option value="FANTASIA">FANTASIA</option>
+        </select>
+      
+      <label for="placa">PLACA:</label>
+        <textarea id="placa" name="placa" rows="1" cols="1"></textarea>
+
+      <label for="data">DATA:</label>
+      <input type="date" id="data" name="data">
+
+      <label for="hora">HORA:</label>
+      <input type="time" id="hora" name="hora">
+      
+      <label for="endereco">ENDEREÇO:</label>
+      <input type="text" style="width: 100%;" id="endereco" name="endereco" placeholder="RUA, NÚMERO, BAIRRO" required>
+
+      <label for="historico">HISTÓRICO:</label>
+      <textarea id="historico" name="historico" placeholder="VOCÊ PODE USAR A DIGITAÇÃO POR VOZ" rows="5" cols="30"></textarea>
+    <button type="button" onclick="copiarCampos();ga('send', 'event', 'Botão', 'Clique', 'Botão Copiar ALERTA');">COPIAR</button>
+    
+    </form>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
+<script src="js/VeiculoScript.js"></script>
+</body>
+</html>

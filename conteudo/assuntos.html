@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>ASSUNTOS CORRENTES</title>
+    <link rel="stylesheet" type="text/css" href="css/theme.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
+    </head>
+  <body>
+    <h1>ASSUNTOS CORRENTES</h1>
+<button id="themeToggle">
+  <span class="theme-icon light-icon">💡</span>
+
+</button>
+    <form>
+      
+        <label for="fato">FATO:</label>
+       <textarea id="fato" name="fato" rows="1" cols="1"></textarea>
+
+       <label for="cidade">CIDADE DO FATO:</label>
+       <textarea id="cidade" name="cidade" rows="1" cols="1"></textarea>
+
+       <div class="checkbox-wrapper-34" style="float: right;">
+      <input class='tgl tgl-ios' id="veiculoCheckbox" name="opcao" type='checkbox'>
+      <label for="veiculoCheckbox"; class='tgl-btn' for='toggle-34'></label>
+      </div>
+
+      <label for="veiculo">VEICULO EM EVIDENCIA:</label>
+      <textarea id="veiculo" name="veiculo" placeholder="PLACA BRA2E23 - GOL BRANCO 2011" rows="1" cols="1"></textarea>
+
+      <label for="endereco">ENDEREÇO:</label>
+      <textarea type="text" rows="1" id="endereco" name="endereco" placeholder="RUA, NÚMERO, BAIRRO" required></textarea>
+
+      <label for="data">DATA:</label>
+      <input type="date" id="data" name="data">
+
+      <label for="hora">HORA:</label>
+      <input type="time" id="hora" name="hora">
+            
+      <div class="checkbox-wrapper-34" style="float: right;">
+      <input class='tgl tgl-ios' id="materialidadeCheckbox" name="opcao" type='checkbox'>
+      <label for="materialidadeCheckbox"; class='tgl-btn' for='toggle-34'></label>
+      </div>
+
+      <label for="materialidade">MATERIALIDADE ENVOLVIDA:</label>
+      <textarea id="materialidade" name="materialidade" rows="3" cols="30"></textarea>
+
+      <label for="historico">HISTÓRICO PRELIMINAR:</label>
+      <textarea id="historico" name="historico" placeholder="VOCÊ PODE USAR A DIGITAÇÃO POR VOZ" rows="5" cols="30"></textarea>
+
+      <button type="button" onclick="copiarCampos(); ga('send', 'event', 'Botão', 'Clique', 'Botão Copiar ALERTA');">COPIAR</button>
+  </form>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
+<script src="js/AssuntosScript.js"></script>
+</body>
+</html>

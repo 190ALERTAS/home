@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .menu {
+            position: relative;
+        }
+
+        #menu-button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #menu-list {
+            list-style: none;
+            padding: 0;
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 100%;
+            background-color: #333;
+        }
+
+        #menu-list li {
+            padding: 10px;
+        }
+
+        #menu-list li a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        #menu-button:hover + #menu-list,
+        #menu-list:hover {
+            display: block;
+        }
+    </style>
+    <title>Menu Suspenso</title>
+</head>
+<body>
+    <div class="menu">
+        <button id="menu-button">Menu</button>
+        <ul id="menu-list">
+            <li><a href="pagina1.html">INÍCIO</a></li>
+            <li><a href="pagina2.html">RELEASE</a></li>
+            <li><a href="pagina3.html">VEÍCULOS</a></li>
+            <li><a href="pagina4.html">ASSUNTOS CORRENTES</a></li>
+            <li><a href="pagina5.html">SUGESTÕES</a></li>
+        </ul>
+    </div>
+    <script>
+        const menuButton = document.getElementById('menu-button');
+        const menuList = document.getElementById('menu-list');
+
+        menuButton.addEventListener('click', () => {
+            menuList.style.display = menuList.style.display === 'block' ? 'none' : 'block';
+        });
+
+        menuList.addEventListener('click', () => {
+            menuList.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
