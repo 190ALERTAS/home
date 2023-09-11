@@ -1,10 +1,14 @@
 {
-  "name": "190 BM ALERTAS",
-  "short_name": "190",
-  "start_url": "https://stefanoferrao.github.io/alertas/release.html",
+  "name": "190 ALERTAS",
+  "short_name": "190 ALERTAS",
+  "start_url": "https://190alertas.github.io/190/home",
   "display": "fullscreen",
   "background_color": "#ffffff",
   "theme_color": "#000000",
+  "version": "3.0",
+  "developer": {
+  "name": "SD Ferrão - 32BPM",
+}
   "icons": [
     {
       "src": "https://raw.githubusercontent.com/stefanoferrao/alertas/main/js%26css/Logo%20190BM.png",
