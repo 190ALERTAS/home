@@ -7,20 +7,17 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-3Q72PBZVYP');
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="https://190alertas.github.io/home/conteudo/js/manifest.json">
 <link rel="stylesheet" type="text/css" href="https://190alertas.github.io/home/conteudo/css/theme.css">
-<!-- INICIO DO MENU -->
+    <!-- INICIO DO MENU -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/theme.css">
+    <title>190 🚨 ALERTAS</title>
 </head>
 <body>
     <div class="nav">
@@ -45,6 +42,24 @@
     </div>
 </body>
 </html>
+
+<script>
+    // Adicione um evento de clique no checkbox
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkbox = document.getElementById('nav-check');
+        var body = document.body;
+
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                // Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+                body.classList.add('scroll-lock');
+            } else {
+                // Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+                body.classList.remove('scroll-lock');
+            }
+        });
+    });
+</script>
 <!-- FIM DO MENU -->
     <title> 190 🚨 ALERTAS</title>
     <style>
@@ -98,7 +113,6 @@
         <div class="container"><p><img src="https://raw.githubusercontent.com/190ALERTAS/190/main/conteudo/img/Logo%20190ALERTAS.png"><h5>Aqui você poderá formatar facilmente informações para difundir nos canais de WhatsApp adequados. Elas ficarão organizadas, concisas e completas.</p></h5>
         <h5>Para utilizar a plataforma, selecione uma das guias acima, insira os dados desejados, clique em copiar e divulgue a informação para quem achar necessário.</p>
         <p>É importante ressaltar que esta plataforma não armazena nenhum tipo de banco de dados, portanto as informações inseridas <b>NÃO</b> serão armazenadas.</p></h5></div>
-
 <div class="container"><p><h5>Agora é possível fazer o download do app em
 dispositivos Android e Win10 utilizando o navegador Google Chrome.<p>Funciona estando nessa página, clique nos 3 pontos na parte superior e vá em "Instalar 190 🚨 ALERTAS"</h5></p></div>
 <script src="main.js"></script>
