@@ -392,9 +392,13 @@ body {
 
     .nav > #nav-check:checked ~ .nav-links {
         width: 100vw;
-        height: 50vh;
+        height: 100vh;
         overflow-y: hidden;
         z-index: 999;
+        background-color: rgba(0, 0, 0, 0.9); /* Cor do fundo do menu */
     }
 }
+    body.scroll-lock {
+        overflow: hidden;
+    }
 /* FIM DO MENU */
