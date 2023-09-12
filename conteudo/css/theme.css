@@ -109,7 +109,6 @@
     
     label {
       font-size: 16px;
-      margin-top: 10px;
       margin-bottom: 5px;
     }
     
@@ -291,7 +290,7 @@
         filter: invert(100%) grayscale(1);
       }
 
-  /* INICIO DO MENU */
+  /* CSS INICIO DO MENU */
   * {
     box-sizing: border-box;
 }
@@ -331,7 +330,7 @@ body {
 
 .nav > .nav-links > a {
     display: inline-block;
-    padding: 13px 10px 13px 10px;
+    padding: 20px 10px 20px 10px;
     text-decoration: none;
     color: #efefef;
 }
@@ -356,7 +355,7 @@ body {
         display: inline-block;
         width: 50px;
         height: 50px;
-        padding: 13px;
+        
     }
 
     .nav > .nav-btn > label:hover,
@@ -368,7 +367,7 @@ body {
         display: block;
         width: 25px;
         height: 10px;
-        border-top: 2px solid #eee;
+        border-top: 3px solid #eee;
     }
 
     .nav > .nav-links {
@@ -394,8 +393,9 @@ body {
     }
 
     .nav > #nav-check:checked ~ .nav-links {
-        height: calc(130vh - 10px);
+        height: 100vh;
         overflow-y: auto;
+        z-index: 999;
     }
 }
-/* FIM DO MENU */
+/* CSS FIM DO MENU */
