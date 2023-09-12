@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="https://190alertas.github.io/home/conteudo/js/manifest.json">
+<!-- INICIO DO MENU -->
+<body>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<style>
+        #alertas {
+            font-size: 18px; /* Ajuste o valor para o tamanho desejado */
+        }
+        .container {
+            font-family: system-ui;
+            font-size: 25;
+        }
+
+        .container img {
+            width: 80px;
+            height: 80px;
+            vertical-align: middle;
+        }
+
+        .nav-wrapper {
+        }
+        .nav-wrapper img {
+            height: 50px;
+            vertical-align: middle;
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+        .logo {
+            float: left;
+        }
+         /* Estilos para telas pequenas (mobile) */
+        @media screen and (max-width: 768px) {
+            .nav-wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .nav-wrapper a.logo {
+                float: right;
+                margin-left: 30px;
+                margin-right: 50px;
+            }
+            .nav-wrapper a.logo img {
+                margin-right: 10px; /* Adicione um espaçamento entre a imagem e o texto */
+            }
+            }
+        }
+</style>
+<nav>
+    <div class="nav-wrapper black">
+         <img class="logo" src="https://raw.githubusercontent.com/190ALERTAS/190/main/conteudo/img/Logo%20190ALERTAS.png"></a>
+         <a id="alertas">190 🚨 ALERTAS</a>
+        <a data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">&#8801;</i></a>
+
+        <ul id="nav-desktop" class="right hide-on-med-and-down">
+            <li><a href="https://190alertas.github.io/home">INÍCIO</a></li>
+            <li><a href="https://190alertas.github.io/home/conteudo/release">RELEASE</a></li>
+            <li><a href="https://190alertas.github.io/home/conteudo/veiculos">VEÍCULOS</a></li>
+            <li><a href="https://190alertas.github.io/home/conteudo/assuntos">ASSUNTOS CORRENTES</a></li>
+             <li><a href="https://190alertas.github.io/home/conteudo/feedback">SUGESTÕES</a></li>
+        </ul>
+        <ul class="sidenav" id="mobile-demo">
+            <li><a href="https://190alertas.github.io/home">INÍCIO</a></li>
+            <li><a href="https://190alertas.github.io/home/conteudo/release">RELEASE</a></li>
+            <li><a href="https://190alertas.github.io/home/conteudo/veiculos">VEÍCULOS</a></li>
+            <li><a href="https://190alertas.github.io/home/conteudo/assuntos">ASSUNTOS CORRENTES</a></li>
+            <li><a href="https://190alertas.github.io/home/conteudo/feedback">SUGESTÕES</a></li>
+            <li><a href="#">190ALERTAS V3.0</a></li>
+        </ul>
+    </div>
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    // Inicialize o Materialize
+    document.addEventListener('DOMContentLoaded', function() {
+        M.Sidenav.init(document.querySelectorAll('.sidenav'));
+    });
+</script>
+</body>
+<!-- FIM DO MENU -->
+    <title>Plataforma de Apoio às Forças de Segurança Pública</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #cfcfcf;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #cfcfcf;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        h3 {
+            color: #333;
+            text-align: center;
+            font-family: 'Trebuchet MS', sans-serif;
+        }
+        h5 {
+            color: #333;
+        }
+        p {
+            color: #333;
+        }
+        img {
+            height: 200px;
+            float: right;
+        }
+        b {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+        <div class="header">
+        <h3>PLATAFORMA CRIADA PARA AUXILIAR FORÇAS DE SEGURANÇA PÚBLICA</h1>
+    </div>
+    <div class="container">
+        <h3>Disseminação da informação correta e organizada.</h3> </div>
+        
+        <div class="container"><p><img src="https://raw.githubusercontent.com/190ALERTAS/190/main/conteudo/img/Logo%20190ALERTAS.png"><h5>Aqui você poderá formatar facilmente informações para difundir nos canais de WhatsApp adequados. Elas ficarão organizadas, concisas e completas.</p></h5>
+    </div>
+    <div class="container">
+        <h5>Para utilizar a plataforma, selecione uma das guias acima, insira os dados desejados, clique em copiar e divulgue a informação para quem achar necessário.</p>
+        <p>É importante ressaltar que esta plataforma não armazena nenhum tipo de banco de dados, portanto as informações inseridas <b>NÃO</b> serão armazenadas.</p>
+    </div>
+</body>
+</html>
