@@ -1,80 +1,33 @@
 <!-- INICIO DO MENU -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
+    <title>190 🚨 ALERTAS</title>
+</head>
 <body>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-<style>
-        #alertas {
-            font-size: 18px; /* Ajuste o valor para o tamanho desejado */
-        }
-        .container {
-            font-family: system-ui;
-            font-size: 25;
-        }
-
-        .container img {
-            width: 80px;
-            height: 80px;
-            vertical-align: middle;
-        }
-
-        .nav-wrapper {
-        }
-        .nav-wrapper img {
-            height: 50px;
-            vertical-align: middle;
-            margin-left: 30px;
-            margin-top: 10px;
-        }
-        .logo {
-            float: left;
-        }
-         /* Estilos para telas pequenas (mobile) */
-        @media screen and (max-width: 768px) {
-            .nav-wrapper {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .nav-wrapper a.logo {
-                float: right;
-                margin-left: 30px;
-                margin-right: 50px;
-            }
-            .nav-wrapper a.logo img {
-                margin-right: 10px; /* Adicione um espaçamento entre a imagem e o texto */
-            }
-            }
-        }
-</style>
-<nav>
-    <div class="nav-wrapper black">
-         <img class="logo" src="https://raw.githubusercontent.com/190ALERTAS/190/main/conteudo/img/Logo%20190ALERTAS.png"></a>
-         <a id="alertas">190 🚨 ALERTAS</a>
-        <a data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">&#8801;</i></a>
-
-        <ul id="nav-desktop" class="right hide-on-med-and-down">
-            <li><a href="https://190alertas.github.io/home/conteudo/home">INÍCIO</a></li>
-            <li><a href="https://190alertas.github.io/home/conteudo/release">RELEASE</a></li>
-            <li><a href="https://190alertas.github.io/home/conteudo/veiculos">VEÍCULOS</a></li>
-            <li><a href="https://190alertas.github.io/home/conteudo/assuntos">ASSUNTOS CORRENTES</a></li>
-             <li><a href="https://190alertas.github.io/home/conteudo/feedback">SUGESTÕES</a></li>
-        </ul>
-        <ul class="sidenav" id="mobile-demo">
-            <li><a href="https://190alertas.github.io/home/conteudo/home">INÍCIO</a></li>
-            <li><a href="https://190alertas.github.io/home/conteudo/release">RELEASE</a></li>
-            <li><a href="https://190alertas.github.io/home/conteudo/veiculos">VEÍCULOS</a></li>
-            <li><a href="https://190alertas.github.io/home/conteudo/assuntos">ASSUNTOS CORRENTES</a></li>
-            <li><a href="https://190alertas.github.io/home/conteudo/feedback">SUGESTÕES</a></li>
-            <li><a href="#">190ALERTAS V3.0</a></li>
-        </ul>
+    <div class="nav">
+        <input type="checkbox" id="nav-check">
+        <div class="nav-header">
+            <div class="nav-title">190 🚨 ALERTAS</div>
+        </div>
+        <div class="nav-btn">
+            <label for="nav-check">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+        </div>
+        <div class="nav-links">
+            <a href="https://190alertas.github.io/home" target="_parent">INÍCIO</a></li>
+            <a href="https://190alertas.github.io/home/conteudo/release" target="_parent">RELEASE</a></li>
+            <a href="https://190alertas.github.io/home/conteudo/veiculos" target="_parent">VEÍCULOS</a></li>
+            <a href="https://190alertas.github.io/home/conteudo/assuntos" target="_parent">ASSUNTOS CORRENTES</a></li>
+            <a href="https://190alertas.github.io/home/conteudo/feedback" target="_parent">SUGESTÕES</a></li>
+        </div>
     </div>
-</nav>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-<script>
-    // Inicialize o Materialize
-    document.addEventListener('DOMContentLoaded', function() {
-        M.Sidenav.init(document.querySelectorAll('.sidenav'));
-    });
-</script>
 </body>
+</html>
 <!-- FIM DO MENU -->
