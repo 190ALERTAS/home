@@ -94,14 +94,6 @@ const themeToggle = document.getElementById("themeToggle");
 const body = document.body;
 const form = document.querySelector("form");
 
-const themeToggle = document.getElementById("themeToggle");
-const body = document.body;
-const form = document.querySelector("form");
-
-const themeToggle = document.getElementById("themeToggle");
-const body = document.body;
-const form = document.querySelector("form");
-
 // Verifique se o tema escuro já está definido no localStorage
 if (localStorage.getItem('darkTheme') === 'enabled') {
   body.classList.add('darkmode');
