@@ -12,7 +12,6 @@ const cacheFiles = [
     'https://190alertas.github.io/home/conteudo/js/AssuntosScript.js',
     'https://190alertas.github.io/home/conteudo/js/VeiculoScript.js',
     'https://190alertas.github.io/home/conteudo/css/theme.css', // Se você tiver um arquivo CSS
-    'https://190alertas.github.io/home/conteudo/js/base.js', // Salvar tema escuro para index e sugestões
     'https://raw.githubusercontent.com/190ALERTAS/190/main/conteudo/img/Logo%20190ALERTAS.png', // Se você tiver imagens
 ];
 
