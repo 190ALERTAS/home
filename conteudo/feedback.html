@@ -71,6 +71,31 @@
 </button>
 
     <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfdlIIcfScBCkobJGqkdPvSsg6_gyetDMhVd4zHxZQJQGSgVg/viewform?embedded=true" width="650" height="572" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" class="form-iframe">Carregando…</iframe>
-<script src="https://190alertas.github.io/home/conteudo/js/base.js"></script>
+<script>
+const themeToggle = document.getElementById("themeToggle");
+const body = document.body;
+const form = document.querySelector("form");
+const iframe = document.querySelector('iframe');
+
+// Verifique se o tema escuro já está definido no localStorage
+if (localStorage.getItem('darkTheme') === 'enabled') {
+  body.classList.add('darkmode');
+  form.classList.add('darkmode');
+  iframe.classList.add('dark-mode');
+}
+
+themeToggle.addEventListener("click", function() {
+  iframe.classList.toggle('dark-mode');
+  body.classList.toggle("darkmode");
+  form.classList.toggle("darkmode");
+
+  // Armazene a preferência do usuário no localStorage
+  if (body.classList.contains('darkmode')) {
+    localStorage.setItem('darkTheme', 'enabled');
+  } else {
+    localStorage.setItem('darkTheme', 'disabled');
+  }
+});
+</script>
   </body>
 </html>
