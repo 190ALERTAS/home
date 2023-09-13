@@ -53,7 +53,7 @@ function copiarCampos() {
     confirmButtonText: 'OK'
 }).then((result) => {
     if (result.isConfirmed) {
-        window.open('https://api.whatsapp.com/send?phone=', '_blank');
+        window.open('https://wa.me/?text=', '_blank');
     }
 });
 }
