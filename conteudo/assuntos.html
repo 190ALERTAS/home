@@ -1,111 +1,92 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ASSUNTOS CORRENTES</title>
-    <link rel="stylesheet" type="text/css" href="css/theme.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
-    </head>
-  <body>
-    <!-- INICIO DO MENU -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>190 🚨 ALERTAS</title>
-</head>
-<body>
-    <div class="nav">
-        <input type="checkbox" id="nav-check">
-        <div class="nav-header">
-            <div class="nav-title">190 🚨 ALERTAS</div>
-        </div>
-        <div class="nav-btn">
-            <label for="nav-check">
-                <span></span>
-                <span></span>
-                <span></span>
-            </label>
-        </div>
-        <div class="nav-links">
-            <a href="https://190alertas.github.io/home" target="_parent">INÍCIO</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/release" target="_parent">RELEASE</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/veiculos" target="_parent">VEÍCULOS</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/assuntos" target="_parent">ASSUNTOS CORRENTES</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/feedback" target="_parent">SUGESTÕES</a></li>
-        </div>
-    </div>
-</body>
-</html>
-
-<script>
-    // Adicione um evento de clique no checkbox
-    document.addEventListener('DOMContentLoaded', function () {
-        var checkbox = document.getElementById('nav-check');
-        var body = document.body;
-
-        checkbox.addEventListener('change', function () {
-            if (checkbox.checked) {
-                // Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
-                body.classList.add('scroll-lock');
-            } else {
-                // Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
-                body.classList.remove('scroll-lock');
-            }
-        });
-    });
-</script>
-<!-- FIM DO MENU -->
-    <h1>ASSUNTOS CORRENTES</h1>
-<button id="themeToggle">
-  <span class="theme-icon light-icon">💡</span>
-
-</button>
-    <form>
-      
-        <label for="fato">FATO:</label>
-       <textarea id="fato" name="fato" rows="1" cols="1"></textarea>
-
-       <label for="cidade">CIDADE DO FATO:</label>
-       <textarea id="cidade" name="cidade" rows="1" cols="1"></textarea>
-
-       <div class="checkbox-wrapper-34" style="float: right;">
-      <input class='tgl tgl-ios' id="veiculoCheckbox" name="opcao" type='checkbox'>
-      <label for="veiculoCheckbox"; class='tgl-btn' for='toggle-34'></label>
-      </div>
-
-      <label for="veiculo">VEICULO EM EVIDENCIA:</label>
-      <textarea id="veiculo" name="veiculo" placeholder="PLACA BRA2E23 - GOL BRANCO 2011" rows="1" cols="1"></textarea>
-
-      <label for="endereco">ENDEREÇO:</label>
-      <textarea type="text" rows="1" id="endereco" name="endereco" placeholder="RUA, NÚMERO, BAIRRO" required></textarea>
-
-      <label for="data">DATA:</label>
-      <input type="date" id="data" name="data">
-
-      <label for="hora">HORA:</label>
-      <input type="time" id="hora" name="hora">
-            
-      <div class="checkbox-wrapper-34" style="float: right;">
-      <input class='tgl tgl-ios' id="materialidadeCheckbox" name="opcao" type='checkbox'>
-      <label for="materialidadeCheckbox"; class='tgl-btn' for='toggle-34'></label>
-      </div>
-
-      <label for="materialidade">MATERIALIDADE ENVOLVIDA:</label>
-      <textarea id="materialidade" name="materialidade" rows="3" cols="30"></textarea>
-
-      <label for="historico">HISTÓRICO PRELIMINAR:</label>
-      <textarea id="historico" name="historico" placeholder="VOCÊ PODE USAR A DIGITAÇÃO POR VOZ" rows="5" cols="30"></textarea>
-
-      <button type="button" onclick="copiarCampos(); ga('send', 'event', 'Botão', 'Clique', 'Botão Copiar ALERTA');">COPIAR</button>
- <!-- inicio crédito na página -->
-<footer>
-  <font size="1"> Versão 3.0 </font> <br />
-  <font size="1"> Criado por Sd Ferrão - 32BPM </font> <br />
-</footer>
-  <!-- fim o crédito na página -->
-</form>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
-<script src="js/AssuntosScript.js"></script>
-</body>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>ASSUNTOS CORRENTES</title>
+		<link rel="stylesheet" type="text/css" href="https://190alertas.github.io/home/conteudo/css/theme.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
+	</head>
+	<body>
+		<!-- INICIO DO MENU -->
+		<title>190 🚨 ALERTAS</title>
+		<div class="nav">
+			<input type="checkbox" id="nav-check">
+			<div class="nav-header">
+				<div class="nav-title">190 🚨 ALERTAS</div>
+			</div>
+			<div class="nav-btn">
+				<label for="nav-check">
+					<span></span>
+					<span></span>
+					<span></span>
+				</label>
+			</div>
+			<div class="nav-links">
+				<a href="https://190alertas.github.io/home" target="_parent">INÍCIO</a>
+				<a href="https://190alertas.github.io/home/conteudo/release" target="_parent">RELEASE</a>
+				<a href="https://190alertas.github.io/home/conteudo/veiculos" target="_parent">VEÍCULOS</a>
+				<a href="https://190alertas.github.io/home/conteudo/assuntos" target="_parent">ASSUNTOS CORRENTES</a>
+				<a href="https://190alertas.github.io/home/conteudo/feedback" target="_parent">SUGESTÕES</a>
+			</div>
+		</div>
+		<script>
+			// Adicione um evento de clique no checkbox
+			document.addEventListener('DOMContentLoaded', function() {
+				var checkbox = document.getElementById('nav-check');
+				var body = document.body;
+				checkbox.addEventListener('change', function() {
+					if (checkbox.checked) {
+						// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+						body.classList.add('scroll-lock');
+					} else {
+						// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+						body.classList.remove('scroll-lock');
+					}
+				});
+			});
+		</script>
+		<!-- FIM DO MENU -->
+		<h1>ASSUNTOS CORRENTES</h1>
+		<button id="themeToggle">
+			<span class="theme-icon light-icon">💡</span>
+		</button>
+		<form>
+			<label for="fato">FATO:</label>
+			<textarea id="fato" name="fato" rows="1" cols="1"></textarea>
+			<label for="cidade">CIDADE DO FATO:</label>
+			<textarea id="cidade" name="cidade" rows="1" cols="1"></textarea>
+			<div class="checkbox-wrapper-34" style="float: right;">
+				<input class='tgl tgl-ios' id="veiculoCheckbox" name="opcao" type='checkbox'>
+				<label for="veiculoCheckbox" class='tgl-btn'></label>
+			</div>
+			<label for="veiculo">VEÍCULO EM EVIDENCIA:</label>
+			<textarea id="veiculo" name="veiculo" placeholder="PLACA BRA2E23 - GOL BRANCO 2011" rows="1" cols="1"></textarea>
+			<label for="endereco">ENDEREÇO:</label>
+			<textarea type="text" rows="1" id="endereco" name="endereco" placeholder="RUA, NÚMERO, BAIRRO" required></textarea>
+			<label for="data">DATA:</label>
+			<input type="date" id="data" name="data">
+			<label for="hora">HORA:</label>
+			<input type="time" id="hora" name="hora">
+			<div class="checkbox-wrapper-34" style="float: right;">
+				<input class='tgl tgl-ios' id="materialidadeCheckbox" name="opcao" type='checkbox'>
+				<label for="materialidadeCheckbox" class='tgl-btn'></label>
+			</div>
+			<label for="materialidade">MATERIALIDADE ENVOLVIDA:</label>
+			<textarea id="materialidade" name="materialidade" rows="3" cols="30"></textarea>
+			<label for="historico">HISTÓRICO PRELIMINAR:</label>
+			<textarea id="historico" name="historico" placeholder="VOCÊ PODE USAR A DIGITAÇÃO POR VOZ" rows="5" cols="30"></textarea>
+			<button type="button" onclick="copiarCampos(); ga('send', 'event', 'Botão', 'Clique', 'Botão Copiar ALERTA');">COPIAR</button>
+			<!-- inicio crédito na página -->
+			<footer>
+				<font size="1"> Versão 3.0 </font>
+				<br />
+				<font size="1"> Criado por Sd Ferrão - 32BPM </font>
+				<br />
+			</footer>
+			<!-- fim o crédito na página -->
+		</form>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
+		<script src="https://190alertas.github.io/home/conteudo/js/AssuntosScript.js"></script>
+	</body>
 </html>
