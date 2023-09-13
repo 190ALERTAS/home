@@ -277,15 +277,14 @@ body {
     height: 60px;
     width: 100%;
     background-color: #000000;
-    position: relative;
+    display: flex;
+    justify-content: space-between; /* Alinha os elementos à esquerda e à direita */
+    align-items: center; /* Alinha verticalmente no centro */
+    padding: 0 20px; /* Adicione algum espaço entre os elementos, se necessário */
 }
 .nav > .nav-header {
-    display: inline-block;
     font-size: 22px;
     color: #fff;
-    vertical-align: middle;
-    margin-right: 10px;
-    margin: 0 auto;
 }
 .nav > .nav-header > .nav-title {
     display: inline-block;
@@ -298,10 +297,8 @@ body {
     display: none;
 }
 .nav > .nav-links {
-    display: inline;
-    float: right;
     font-size: 18px;
-    overflow-y: hidden;
+    color: #fff;
 }
 .nav > .nav-links > a {
     display: inline-block;
