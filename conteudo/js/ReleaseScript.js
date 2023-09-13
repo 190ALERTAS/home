@@ -1,7 +1,4 @@
 // script.js
-
-
-
 const materialidadeCheckbox = document.getElementById("materialidadeCheckbox");
 const materialidadeLabel = document.querySelector("label[for='materialidade']");
 const materialidadeTextarea = document.getElementById("materialidade");
@@ -56,7 +53,7 @@ function copiarCampos() {
     confirmButtonText: 'OK'
 }).then((result) => {
     if (result.isConfirmed) {
-        window.open('https://api.whatsapp.com/', '_blank');
+        window.open('https://api.whatsapp.com/send?phone=', '_blank');
     }
 });
 }
@@ -73,7 +70,6 @@ function formatMessage(dataInput, hora, endereco, historico, fato, cidade, detid
   const mensagem = `*FATO:* ${fato}\n*DATA:* ${dataText}\n*HORA:* ${hora}\n*ENDEREÇO:* ${cidade}, ${endereco}\n\n*HISTÓRICO:* \n${historico}\n${materialidadeText}\n*INDIVÍDUOS DETIDOS:* \n${detidos}`;
   return mensagem.toUpperCase(); // Converter a mensagem inteira para maiúsculas
 }
-
 
 const themeToggle = document.getElementById("themeToggle");
 const body = document.body;
