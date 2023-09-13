@@ -98,3 +98,19 @@ themeToggle.addEventListener("click", function() {
   body.classList.toggle("darkmode");
   form.classList.toggle("darkmode");
 });
+
+    // Adicione um evento de clique no checkbox
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkbox = document.getElementById('nav-check');
+        var body = document.body;
+
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                // Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+                body.classList.add('scroll-lock');
+            } else {
+                // Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+                body.classList.remove('scroll-lock');
+            }
+        });
+    });
