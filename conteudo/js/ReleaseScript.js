@@ -53,7 +53,7 @@ function copiarCampos() {
     confirmButtonText: 'OK'
 }).then((result) => {
     if (result.isConfirmed) {
-        window.open('https://wa.me/?text=Gostaria%20de%20saber%2sobre%20o%20preço%20do%20apartamento', '_blank');
+        window.open('https://api.whatsapp.com/', '_blank');
     }
 });
 }
