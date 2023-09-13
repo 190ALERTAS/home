@@ -23,8 +23,7 @@
   .form-iframe {
         margin: 0 auto;
         display: block;
-      }
-  
+      }  
   form {
     max-width: 600px;
     margin: 0 auto;
@@ -32,8 +31,7 @@
     background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
+  }  
   label {
     display: block;
     font-size: 18px;
@@ -43,11 +41,9 @@
     color: #333;
     text-transform: uppercase;
   }
-
   input {
     text-transform: uppercase;
   }
-
   input[type="date"],
   input[type="time"],
   textarea {
@@ -62,8 +58,7 @@
     resize: vertical;
     background-color: #fff;
     color: #333;
-  }
-  
+  }  
   select {
     display: block;
     width: 100%;
@@ -74,8 +69,7 @@
     margin-top: 5px;
     background-color: #fff;
     color: #333;
-  }
-  
+  }  
   button {
     background-color: #694f43;
     color: white;
@@ -86,39 +80,32 @@
     cursor: pointer;
     float: right;
     transition: background-color 0.2s ease-in-out;
-  }
-  
+  }  
   button:hover {
     background-color: #7c7565;
   }
-
   @media screen and (max-width: 600px) {
     form {
       padding: 10px;
-    }
-    
+    }    
     button {
       float: none;
-    }
-    
+    }    
     h1 {
       font-size: 28px;
       margin-top: 20px;
       margin-bottom: 20px;
-    }
-    
+    }    
     label {
       font-size: 16px;
       margin-bottom: 5px;
-    }
-    
+    }    
     input[type="date"],
     input[type="time"],
     textarea,
     select {
       font-size: 14px;
-    }
-    
+    }    
     button {
       margin-top: 20px;
       float: right;
@@ -129,21 +116,17 @@
       background-color: #222;
       color: #eee;
     }
-
     body.darkmode h1 {
       color: #eee;
     }
-
     form.darkmode {
       background-color: #333;
       color: #eee;
       box-shadow: none;
     }
-
     form.darkmode label {
       color: #eee;
     }
-
     input[type="date"].darkmode,
     input[type="time"].darkmode,
     textarea.darkmode {
@@ -151,19 +134,16 @@
       color: #eee;
       border-color: #eee;
     }
-
     button.darkmode {
       background-color: #222;
       color: #eee;
     }
-
   .checkbox-wrapper-34 {
     --blue: #694f43;
     --g08: #d4d4d4;
     --g04: #000000;
       float: right;
   }
-
   .checkbox-wrapper-34 .tgl {
     display: none;
     float: right;
@@ -217,7 +197,6 @@
   .checkbox-wrapper-34 .tgl:checked + .tgl-btn:after {
     left: 56.5%;
   }
-
   .checkbox-wrapper-34 .tgl-ios + .tgl-btn {
     background: var(--g08);
     border-radius: 20rem;
@@ -256,8 +235,7 @@
     content: "SIM";
     left: 4px;
     color: #fff;
-  }
-  
+  }  
   #themeToggle {
   margin-right: 20%;
   float: right;
@@ -267,20 +245,17 @@
   background-color: #694f43;
   box-shadow: 0 5px 2px rgba(0, 0, 0, 0.3);
   z-index: 999;
-  }
-  
+  }  
     #themeToggle .theme-icon {
   font-size: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  }
-  
+  }  
   #themeToggle .light-icon {
   color: #000000;
-  }
-  
+  }  
   /* Adicione um estilo hover para o botão */
   #themeToggle:hover {
   cursor: pointer;
@@ -289,12 +264,10 @@
   .dark-mode {
         filter: invert(100%) grayscale(1);
       }
-
   /* INICIO DO MENU */
   * {
     box-sizing: border-box;
 }
-
 body {
     margin: 0px;
     font-family: 'segoe ui';
@@ -306,30 +279,30 @@ body {
     background-color: #000000;
     position: relative;
 }
-
 .nav > .nav-header {
-    display: inline;
+    display: inline-block;
+    font-size: 22px;
+    color: #fff;
+    vertical-align: middle;
+    margin-right: 10px;
+    margin: 0 auto;
 }
-
 .nav > .nav-header > .nav-title {
     display: inline-block;
     font-size: 22px;
     color: #fff;
-    margin-top: 15px;
-    margin-left: 30px;
+    vertical-align: middle;
+    margin-right: 10px;
 }
-
 .nav > .nav-btn {
     display: none;
 }
-
 .nav > .nav-links {
     display: inline;
     float: right;
     font-size: 18px;
     overflow-y: hidden;
 }
-
 .nav > .nav-links > a {
     display: inline-block;
     padding: 20px 10px 20px 10px;
@@ -339,11 +312,9 @@ body {
 .nav > .nav-links > a:hover {
     background-color: rgba(192,192,192,0.3);
 }
-
 .nav > #nav-check {
     display: none;
 }
-
 @media (max-width: 800px) {
     .nav > .nav-btn {
         display: inline-block;
@@ -356,7 +327,6 @@ body {
         width: 50px;
         height: 50px;
     }
-
     .nav > .nav-btn > label:hover,
     .nav #nav-check:checked ~ .nav-btn > label {
         background-color: rgba(0, 0, 0, 0); /* COR DA SOMBRA DO MENU */
@@ -368,7 +338,6 @@ body {
         height: 10px;
         border-top: 3px solid #eee;
     }
-
      .nav > .nav-links {
         position: absolute;
         display: block;
@@ -380,16 +349,13 @@ body {
         top: 60px;
         left: 0px;
     }
-
     .nav > .nav-links > a {
         display: block;
         width: 100%;
     }
-
     .nav > #nav-check:not(:checked) ~ .nav-links {
         height: 0px;
     }
-
     .nav > #nav-check:checked ~ .nav-links {
         width: 100vw;
         height: 100vh;
