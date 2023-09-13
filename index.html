@@ -134,29 +134,7 @@ dispositivos Android e Win10 utilizando o navegador Google Chrome.<p>Funciona es
 <div class="container" style="text-align: center;">
   <a href="https://190alertas.github.io/home/conteudo/termos">Acesse os Termos de Uso para mais detalhes</a>
 </div>
-<script>
-const themeToggle = document.getElementById("themeToggle");
-const body = document.body;
-const form = document.querySelector("form");
-
-// Verifique se o tema escuro já está definido no localStorage
-if (localStorage.getItem('darkTheme') === 'enabled') {
-  body.classList.add('darkmode');
-  form.classList.add('darkmode');
-}
-
-themeToggle.addEventListener("click", function() {
-  body.classList.toggle("darkmode");
-  form.classList.toggle("darkmode");
-
-  // Armazene a preferência do usuário no localStorage
-  if (body.classList.contains('darkmode')) {
-    localStorage.setItem('darkTheme', 'enabled');
-  } else {
-    localStorage.setItem('darkTheme', 'disabled');
-  }
-});
-</script>
+<script src="https://190alertas.github.io/home/conteudo/js/ReleaseScript.js"></script>
 <script src="https://190alertas.github.io/home/conteudo/js/main.js"></script>
 </body>
 </html>
