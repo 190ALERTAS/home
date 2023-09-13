@@ -26,7 +26,7 @@
 
 4. **Links Externos:** Nossa plataforma pode conter links para sites externos. Não somos responsáveis pelas práticas de privacidade desses sites.
 
-5. **Contato:** Se você tiver alguma dúvida ou preocupação sobre nossa Política de Privacidade ou Termos de Uso, entre em contato conosco através da [guia Sugestões](https://190alertas.github.io/home/conteudo/feedback).
+5. **Contato:** Se você tiver alguma dúvida ou preocupação sobre nossa Política de Privacidade ou Termos de Uso, entre em contato conosco através da guia [Sugestões](https://190alertas.github.io/home/conteudo/feedback).
 
 Ao utilizar o 190 🚨 ALERTAS, você concorda com os Termos de Uso e a Política de Privacidade aqui estabelecidos. Se não concordar com estes termos, por favor, não utilize nossa plataforma.
 
