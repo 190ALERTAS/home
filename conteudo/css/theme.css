@@ -278,23 +278,23 @@ body {
     width: 100%;
     background-color: #000000;
     display: flex;
-    justify-content: space-between; /* Alinha os elementos à esquerda e à direita */
-    align-items: center; /* Alinha verticalmente no centro */
-    padding: 0 20px; /* Adicione algum espaço entre os elementos, se necessário */
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
 .nav > .nav-header {
-    font-size: 22px;
-    color: #fff;
+    display: flex;
+    align-items: center; /* Alinha verticalmente os elementos dentro de nav-header */
+}
+.nav > .nav-header > .imagem-menu {
+    width: 50px; /* Ajuste o tamanho da imagem conforme necessário */
+    height: auto;
+    margin-right: 10px; /* Adicione um espaço entre a imagem e o título, se necessário */
 }
 .nav > .nav-header > .nav-title {
-    display: inline-block;
     font-size: 22px;
     color: #fff;
-    vertical-align: middle;
-    margin-right: 10px;
-}
-.nav > .nav-btn {
-    display: none;
+    margin: 0; /* Remova margin-top e margin-left */
 }
 .nav > .nav-links {
     font-size: 18px;
@@ -312,7 +312,7 @@ body {
 .nav > #nav-check {
     display: none;
 }
-@media (max-width: 820px) {
+@media (max-width: 900px) {
     .nav > .nav-btn {
         display: inline-block;
         position: absolute;
