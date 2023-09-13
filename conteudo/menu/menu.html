@@ -1,48 +1,39 @@
-    <!-- INICIO DO MENU -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>190 🚨 ALERTAS</title>
-</head>
-<body>
-    <div class="nav">
-        <input type="checkbox" id="nav-check">
-        <div class="nav-header">
-            <div class="nav-title">190 🚨 ALERTAS</div>
-        </div>
-        <div class="nav-btn">
-            <label for="nav-check">
-                <span></span>
-                <span></span>
-                <span></span>
-            </label>
-        </div>
-        <div class="nav-links">
-            <a href="https://190alertas.github.io/home" target="_parent">INÍCIO</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/release" target="_parent">RELEASE</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/veiculos" target="_parent">VEÍCULOS</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/assuntos" target="_parent">ASSUNTOS CORRENTES</a></li>
-            <a href="https://190alertas.github.io/home/conteudo/feedback" target="_parent">SUGESTÕES</a></li>
-        </div>
-    </div>
-</body>
-</html>
-
-<script>
-    // Adicione um evento de clique no checkbox
-    document.addEventListener('DOMContentLoaded', function () {
-        var checkbox = document.getElementById('nav-check');
-        var body = document.body;
-
-        checkbox.addEventListener('change', function () {
-            if (checkbox.checked) {
-                // Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
-                body.classList.add('scroll-lock');
-            } else {
-                // Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
-                body.classList.remove('scroll-lock');
-            }
-        });
-    });
-</script>
-<!-- FIM DO MENU -->
+		<!-- INICIO DO MENU -->
+		<title>190 🚨 ALERTAS</title>
+		<div class="nav">
+			<input type="checkbox" id="nav-check">
+			<div class="nav-header">
+				<div class="nav-title">190 🚨 ALERTAS</div>
+			</div>
+			<div class="nav-btn">
+				<label for="nav-check">
+					<span></span>
+					<span></span>
+					<span></span>
+				</label>
+			</div>
+			<div class="nav-links">
+				<a href="https://190alertas.github.io/home" target="_parent">INÍCIO</a>
+				<a href="https://190alertas.github.io/home/conteudo/release" target="_parent">RELEASE</a>
+				<a href="https://190alertas.github.io/home/conteudo/veiculos" target="_parent">VEÍCULOS</a>
+				<a href="https://190alertas.github.io/home/conteudo/assuntos" target="_parent">ASSUNTOS CORRENTES</a>
+				<a href="https://190alertas.github.io/home/conteudo/feedback" target="_parent">SUGESTÕES</a>
+			</div>
+		</div>
+		<script>
+			// Adicione um evento de clique no checkbox
+			document.addEventListener('DOMContentLoaded', function() {
+				var checkbox = document.getElementById('nav-check');
+				var body = document.body;
+				checkbox.addEventListener('change', function() {
+					if (checkbox.checked) {
+						// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+						body.classList.add('scroll-lock');
+					} else {
+						// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+						body.classList.remove('scroll-lock');
+					}
+				});
+			});
+		</script>
+		<!-- FIM DO MENU -->
