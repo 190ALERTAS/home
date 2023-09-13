@@ -54,18 +54,15 @@ function formatMessage(modelo, placa, cor, dataInput, hora, endereco, historico,
 const themeToggle = document.getElementById("themeToggle");
 const body = document.body;
 const form = document.querySelector("form");
-const iframe = document.querySelector('iframe');
 
 // Verifique se o tema escuro já está definido no localStorage
 if (localStorage.getItem('darkTheme') === 'enabled') {
   body.classList.add('darkmode');
   form.classList.add('darkmode');
-  iframe.classList.add('dark-mode');
   themeToggle.querySelector(".theme-icon").classList.add("dark-icon");
 }
 
 themeToggle.addEventListener("click", function() {
-  iframe.classList.toggle('dark-mode');
   body.classList.toggle("darkmode");
   form.classList.toggle("darkmode");
   themeToggle.querySelector(".theme-icon").classList.toggle("dark-icon");
