@@ -3,11 +3,11 @@ function toggleDarkMode() {
   const icon = document.getElementById('icon');
   if (body.classList.contains('dark-mode')) {
       body.classList.remove('dark-mode');
-      icon.src = 'http://127.0.0.1:3000/Plataforma%20190/img/sun-solid-24.png'; // Altere para o ícone do sol
+      icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png'; // Altere para o ícone do sol
       localStorage.setItem('darkMode', 'false'); // Salve a preferência como "false"
   } else {
       body.classList.add('dark-mode');
-      icon.src = 'http://127.0.0.1:3000/Plataforma%20190/img/moon-solid-24.png'; // Altere para o ícone da lua
+      icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png'; // Altere para o ícone da lua
       localStorage.setItem('darkMode', 'true'); // Salve a preferência como "true"
   }
 }
