@@ -297,6 +297,16 @@
         /* Efeito de transição suave para a cor de fundo */
       }
 
+@media screen and (max-width: 899px) {
+        #themeToggle {
+          border: none;
+          position: fixed;
+          top: 20px;
+          right: 70px;
+          background-color: transparent;
+        }
+      }
+
       /* Estilo para o ícone do sol (tema claro) */
       .theme-icon.light-icon:before {
         content: url(https://i.ibb.co/Qjt5kkS/sun-solid-24.png);
