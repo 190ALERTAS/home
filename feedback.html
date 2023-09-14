@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- INICIO Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'G-3Q72PBZVYP');
+	</script>
+	<!-- FIM Google tag (gtag.js) -->
+	<title>Formulário de Contato</title>
+	<link rel="stylesheet" type="text/css" href="css/theme.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- INICIO DO MENU -->
+	<title>190 🚨 ALERTAS</title>
+</head>
+
+<body>
+	<div class="nav">
+		<input type="checkbox" id="nav-check">
+		<div class="nav-header">
+			<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png"
+				class="imagem-menu">
+			<div class="nav-title">190 🚨 ALERTAS</div>
+		</div>
+		<div class="nav-btn">
+			<label for="nav-check">
+				<span></span>
+				<span></span>
+				<span></span>
+			</label>
+		</div>
+		<div class="nav-links">
+			<a href="index.html" target="_parent">INÍCIO</a>
+			<a href="release.html" target="_parent">RELEASE</a>
+			<a href="veiculos.html" target="_parent">VEÍCULOS</a>
+			<a href="assuntos.html" target="_parent">ASSUNTOS CORRENTES</a>
+			<a href="feedback.html" target="_parent">SUGESTÕES</a>
+			<luasol id="themeToggle">
+			<span class="theme-icon light-icon"></span>
+			</luasol>
+		</div>
+	</div>
+	<script>
+		// Adicione um evento de clique no checkbox
+		document.addEventListener('DOMContentLoaded', function () {
+			var checkbox = document.getElementById('nav-check');
+			var body = document.body;
+			checkbox.addEventListener('change', function () {
+				if (checkbox.checked) {
+					// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+					body.classList.add('scroll-lock');
+				} else {
+					// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+					body.classList.remove('scroll-lock');
+				}
+			});
+		});
+	</script>
+	<!-- FIM DO MENU -->
+	</head>
+
+	<body>
+		<h1></h1>
+		<form>
+			<iframe
+				src="https://docs.google.com/forms/d/e/1FAIpQLSfdlIIcfScBCkobJGqkdPvSsg6_gyetDMhVd4zHxZQJQGSgVg/viewform?embedded=true"
+				width="650" height="572" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+				class="form-iframe">Carregando…</iframe>
+			<script src="js/base.js"></script>
+		</form>
+	</body>
+
+</html>

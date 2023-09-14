@@ -1,0 +1,449 @@
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        border: none;
+      }
+
+      h1 {
+        font-size: 32px;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        color: #694f43;
+        text-transform: uppercase;
+      }
+
+      .form-iframe {
+        margin: 0 auto;
+        display: block;
+      }
+
+      form {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      label {
+        display: block;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #333;
+        text-transform: uppercase;
+      }
+
+      input {
+        text-transform: uppercase;
+      }
+
+      input[type="date"],
+      input[type="time"],
+      textarea {
+        text-transform: uppercase;
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-top: 5px;
+        resize: vertical;
+        background-color: #fff;
+        color: #333;
+      }
+
+      select {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-top: 5px;
+        background-color: #fff;
+        color: #333;
+      }
+
+      button {
+        background-color: #694f43;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 20px;
+        cursor: pointer;
+        float: right;
+        transition: background-color 0.2s ease-in-out;
+      }
+
+      button:hover {
+        background-color: #7c7565;
+      }
+
+      @media screen and (max-width: 600px) {
+        form {
+          padding: 10px;
+        }
+
+        button {
+          float: none;
+        }
+
+        h1 {
+          font-size: 28px;
+          margin-top: 20px;
+          margin-bottom: 20px;
+        }
+
+        label {
+          font-size: 16px;
+          margin-bottom: 5px;
+        }
+
+        input[type="date"],
+        input[type="time"],
+        textarea,
+        select {
+          font-size: 14px;
+        }
+
+        button {
+          margin-top: 20px;
+          float: right;
+        }
+      }
+
+      /* Darkmode CSS */
+      body.darkmode {
+        background-color: #222;
+        color: #eee;
+      }
+
+      body.darkmode h1 {
+        color: #eee;
+      }
+
+      form.darkmode {
+        background-color: #333;
+        color: #eee;
+        box-shadow: none;
+      }
+
+      form.darkmode label {
+        color: #eee;
+      }
+
+      input[type="date"].darkmode,
+      input[type="time"].darkmode,
+      textarea.darkmode {
+        background-color: #333;
+        color: #eee;
+        border-color: #eee;
+      }
+
+      button.darkmode {
+        background-color: #222;
+        color: #eee;
+      }
+
+      .checkbox-wrapper-34 {
+        --blue: #694f43;
+        --g08: #d4d4d4;
+        --g04: #000000;
+        float: right;
+      }
+
+      .checkbox-wrapper-34 .tgl {
+        display: none;
+        float: right;
+      }
+
+      .checkbox-wrapper-34 .tgl,
+      .checkbox-wrapper-34 .tgl:after,
+      .checkbox-wrapper-34 .tgl:before,
+      .checkbox-wrapper-34 .tgl *,
+      .checkbox-wrapper-34 .tgl *:after,
+      .checkbox-wrapper-34 .tgl *:before,
+      .checkbox-wrapper-34 .tgl+.tgl-btn {
+        box-sizing: border-box;
+      }
+
+      .checkbox-wrapper-34 .tgl::selection,
+      .checkbox-wrapper-34 .tgl:after::selection,
+      .checkbox-wrapper-34 .tgl:before::selection,
+      .checkbox-wrapper-34 .tgl *::selection,
+      .checkbox-wrapper-34 .tgl *:after::selection,
+      .checkbox-wrapper-34 .tgl *:before::selection,
+      .checkbox-wrapper-34 .tgl+.tgl-btn::selection {
+        background: none;
+      }
+
+      .checkbox-wrapper-34 .tgl+.tgl-btn {
+        outline: 0;
+        display: block;
+        width: 57px;
+        height: 27px;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        font-size: 12px;
+        font-weight: 400;
+        color: #fff;
+      }
+
+      .checkbox-wrapper-34 .tgl+.tgl-btn:after,
+      .checkbox-wrapper-34 .tgl+.tgl-btn:before {
+        position: relative;
+        display: block;
+        content: "";
+        width: 44%;
+        height: 100%;
+      }
+
+      .checkbox-wrapper-34 .tgl+.tgl-btn:after {
+        left: 0;
+      }
+
+      .checkbox-wrapper-34 .tgl+.tgl-btn:before {
+        display: inline;
+        position: absolute;
+        top: 7px;
+      }
+
+      .checkbox-wrapper-34 .tgl:checked+.tgl-btn:after {
+        left: 56.5%;
+      }
+
+      .checkbox-wrapper-34 .tgl-ios+.tgl-btn {
+        background: var(--g08);
+        border-radius: 20rem;
+        padding: 2px;
+        transition: all 0.4s ease;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+      }
+
+      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:after {
+        border-radius: 2em;
+        background: #fff;
+        transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease, margin 0.3s ease;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+      }
+
+      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:before {
+        content: "NÃO";
+        left: 28px;
+        color: var(--g04);
+        transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:active {
+        box-shadow: inset 0 0 0 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:active:after {
+        padding-right: 0.4em;
+      }
+
+      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn {
+        background: var(--blue);
+      }
+
+      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn:active {
+        box-shadow: inset 0 0 0 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn:active:after {
+        margin-left: -0.4em;
+      }
+
+      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn:before {
+        content: "SIM";
+        left: 4px;
+        color: #fff;
+      }
+
+      /* Estilo base do botão */
+
+      luasol {
+        color: white;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        vertical-align: middle;
+        background-color: transparent;
+      }
+
+      #themeToggle {
+        background-color: transparent;
+        cursor: pointer;
+        color: #fff;
+        vertical-align: auto;
+        /* Efeito de transição suave para a cor de fundo */
+      }
+
+      /* Estilo para o ícone do sol (tema claro) */
+      .theme-icon.light-icon:before {
+        content: url(https://i.ibb.co/Qjt5kkS/sun-solid-24.png);
+        color: #fff;
+        background-color: transparent;
+      }
+
+      /* Estilo para o ícone da lua (tema escuro) */
+      .theme-icon.dark-icon:before {
+        content: url(https://i.ibb.co/M6ZFhRC/moon-solid-24.png);
+        color: #fff;
+        background-color: transparent;
+      }
+
+      /* Adicione um estilo hover para o botão */
+      #themeToggle:hover {
+        cursor: pointer;
+        background-color: transparent;
+      }
+
+      .dark-mode {
+        filter: invert(100%) grayscale(1);
+      }
+
+      /* INICIO DO MENU */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0px;
+        font-family: 'segoe ui';
+        overflow-y: auto;
+      }
+
+      .nav {
+        height: 60px;
+        width: 100%;
+        background-color: #000000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
+
+      .nav>.nav-header {
+        display: flex;
+        align-items: center;
+        /* Alinha verticalmente os elementos dentro de nav-header */
+      }
+
+      .nav>.nav-header>.imagem-menu {
+        width: 50px;
+        /* Ajuste o tamanho da imagem conforme necessário */
+        height: auto;
+        margin-right: 10px;
+        /* Adicione um espaço entre a imagem e o título, se necessário */
+      }
+
+      .nav>.nav-header>.nav-title {
+        font-size: 22px;
+        color: #fff;
+        margin: 0;
+        /* Remova margin-top e margin-left */
+      }
+
+      .nav>.nav-links {
+        font-size: 18px;
+        color: #fff;
+      }
+
+      .nav>.nav-links>a {
+        display: inline-block;
+        padding: 20px 10px 20px 10px;
+        text-decoration: none;
+        color: #efefef;
+      }
+
+      .nav>.nav-links>a:hover {
+        background-color: rgba(192, 192, 192, 0.3);
+      }
+
+      .nav>#nav-check {
+        display: none;
+      }
+
+      @media (max-width: 900px) {
+        .nav>.nav-btn {
+          display: inline-block;
+          position: absolute;
+          right: 0px;
+          top: 0px;
+        }
+
+        .nav>.nav-btn>label {
+          display: inline-block;
+          width: 50px;
+          height: 50px;
+        }
+
+        .nav>.nav-btn>label:hover,
+        .nav #nav-check:checked~.nav-btn>label {
+          background-color: rgba(0, 0, 0, 0);
+          /* COR DA SOMBRA DO MENU */
+        }
+
+        .nav>.nav-btn>label>span {
+          display: block;
+          width: 25px;
+          height: 10px;
+          border-top: 3px solid #eee;
+        }
+
+        .nav>.nav-links {
+          position: absolute;
+          display: block;
+          width: 100%;
+          height: auto;
+          /* Alterado para "auto" */
+          background-color: #333;
+          transition: all 0.3s ease-in;
+          overflow-y: hidden;
+          top: 60px;
+          left: 0px;
+        }
+
+        .nav>.nav-links>a {
+          display: block;
+          width: 100%;
+        }
+
+        .nav>#nav-check:not(:checked)~.nav-links {
+          height: 0px;
+        }
+
+        .nav>#nav-check:checked~.nav-links {
+          width: 100vw;
+          height: 100vh;
+          overflow-y: hidden;
+          z-index: 999;
+          background-color: rgba(0, 0, 0, 0.9);
+          /* Cor do fundo do menu */
+        }
+      }
+
+      body.scroll-lock {
+        overflow: hidden;
+      }
+
+      /* FIM DO MENU */
