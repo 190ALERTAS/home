@@ -198,7 +198,7 @@
         outline: 0;
         display: block;
         width: 57px;
-        height: 27px;
+        height: 24px;
         position: relative;
         cursor: pointer;
         user-select: none;
@@ -223,7 +223,7 @@
       .checkbox-wrapper-34 .tgl+.tgl-btn:before {
         display: inline;
         position: absolute;
-        top: 7px;
+        top: 5px;
       }
 
       .checkbox-wrapper-34 .tgl:checked+.tgl-btn:after {
@@ -232,14 +232,14 @@
 
       .checkbox-wrapper-34 .tgl-ios+.tgl-btn {
         background: var(--g08);
-        border-radius: 20rem;
+        border-radius: 3px;
         padding: 2px;
         transition: all 0.4s ease;
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
       }
 
       .checkbox-wrapper-34 .tgl-ios+.tgl-btn:after {
-        border-radius: 2em;
+        border-radius: 3px;
         background: #fff;
         transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease, margin 0.3s ease;
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
@@ -297,7 +297,7 @@
         /* Efeito de transição suave para a cor de fundo */
       }
 
-@media screen and (max-width: 899px) {
+      @media screen and (max-width: 899px) {
         #themeToggle {
           border: none;
           position: fixed;
@@ -309,14 +309,14 @@
 
       /* Estilo para o ícone do sol (tema claro) */
       .theme-icon.light-icon:before {
-        content: url(https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png);
+        content: url(https://i.ibb.co/Qjt5kkS/sun-solid-24.png);
         color: #fff;
         background-color: transparent;
       }
 
       /* Estilo para o ícone da lua (tema escuro) */
       .theme-icon.dark-icon:before {
-        content: url(https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png);
+        content: url(https://i.ibb.co/M6ZFhRC/moon-solid-24.png);
         color: #fff;
         background-color: transparent;
       }
