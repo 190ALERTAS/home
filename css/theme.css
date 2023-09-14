@@ -309,14 +309,14 @@
 
       /* Estilo para o ícone do sol (tema claro) */
       .theme-icon.light-icon:before {
-        content: url(https://i.ibb.co/Qjt5kkS/sun-solid-24.png);
+        content: url(https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png);
         color: #fff;
         background-color: transparent;
       }
 
       /* Estilo para o ícone da lua (tema escuro) */
       .theme-icon.dark-icon:before {
-        content: url(https://i.ibb.co/M6ZFhRC/moon-solid-24.png);
+        content: url(https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png);
         color: #fff;
         background-color: transparent;
       }
