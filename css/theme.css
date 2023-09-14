@@ -6,7 +6,7 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f5f5f5;
+        background-color: #d6d6d6;
       }
 
       iframe {
@@ -33,7 +33,7 @@
         max-width: 600px;
         margin: 0 auto;
         padding: 20px;
-        background-color: #fff;
+        background-color: #e7e7e7;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
@@ -124,42 +124,10 @@
         }
 
         button {
-          margin-top: 20px;
-          float: right;
+          position: absolute;
+          right: 50px;
+          margin-left: 20px;
         }
-      }
-
-      /* Darkmode CSS */
-      body.darkmode {
-        background-color: #222;
-        color: #eee;
-      }
-
-      body.darkmode h1 {
-        color: #eee;
-      }
-
-      form.darkmode {
-        background-color: #333;
-        color: #eee;
-        box-shadow: none;
-      }
-
-      form.darkmode label {
-        color: #eee;
-      }
-
-      input[type="date"].darkmode,
-      input[type="time"].darkmode,
-      textarea.darkmode {
-        background-color: #333;
-        color: #eee;
-        border-color: #eee;
-      }
-
-      button.darkmode {
-        background-color: #222;
-        color: #eee;
       }
 
       .checkbox-wrapper-34 {
@@ -278,59 +246,6 @@
         color: #fff;
       }
 
-      /* Estilo base do botão */
-
-      luasol {
-        color: white;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-        vertical-align: middle;
-        background-color: transparent;
-      }
-
-      #themeToggle {
-        background-color: transparent;
-        cursor: pointer;
-        color: #fff;
-        vertical-align: auto;
-        /* Efeito de transição suave para a cor de fundo */
-      }
-
-      @media screen and (max-width: 899px) {
-        #themeToggle {
-          border: none;
-          position: fixed;
-          top: 20px;
-          right: 70px;
-          background-color: transparent;
-        }
-      }
-
-      /* Estilo para o ícone do sol (tema claro) */
-      .theme-icon.light-icon:before {
-        content: url(https://i.ibb.co/Qjt5kkS/sun-solid-24.png);
-        color: #fff;
-        background-color: transparent;
-      }
-
-      /* Estilo para o ícone da lua (tema escuro) */
-      .theme-icon.dark-icon:before {
-        content: url(https://i.ibb.co/M6ZFhRC/moon-solid-24.png);
-        color: #fff;
-        background-color: transparent;
-      }
-
-      /* Adicione um estilo hover para o botão */
-      #themeToggle:hover {
-        cursor: pointer;
-        background-color: transparent;
-      }
-
-      .dark-mode {
-        filter: invert(100%) grayscale(1);
-      }
-
       /* INICIO DO MENU */
       * {
         box-sizing: border-box;
@@ -345,11 +260,14 @@
       .nav {
         height: 60px;
         width: 100%;
-        background-color: #000000;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: flex;
+        text-align: right;
       }
 
       .nav>.nav-header {
@@ -393,7 +311,7 @@
         display: none;
       }
 
-      @media (max-width: 900px) {
+      @media (max-width: 2000px) {
         .nav>.nav-btn {
           display: inline-block;
           position: absolute;
@@ -425,7 +343,6 @@
           display: block;
           width: 100%;
           height: auto;
-          /* Alterado para "auto" */
           background-color: #333;
           transition: all 0.3s ease-in;
           overflow-y: hidden;
@@ -450,6 +367,17 @@
           background-color: rgba(0, 0, 0, 0.9);
           /* Cor do fundo do menu */
         }
+
+        button {
+          right: 50px;
+          margin-left: 20px;
+        }
+
+        botao-dark-mode {
+          position: absolute;
+          right: 70px;
+          margin-left: 20px;
+        }
       }
 
       body.scroll-lock {
@@ -457,3 +385,76 @@
       }
 
       /* FIM DO MENU */
+      /* DEFINIÇÕES DO TEMA ESCURO */
+      body {
+        transition: background-color 1s, color 1s;
+      }
+
+      .nav {
+        background-color: #000000;
+        /* Cor de fundo da barra de navegação no modo claro */
+        padding: 10px;
+      }
+
+      button#dark-mode-toggle {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+      }
+
+      #icon {
+        width: 24px;
+        height: 24px;
+        transition: transform 1.5s;
+        vertical-align: middle;
+
+      }
+
+      body.dark-mode #icon {
+        transform: rotate(360deg);
+      }
+
+      body.dark-mode {
+        background-color: #222;
+        color: #ffffff;
+      }
+
+      body.dark-mode form {
+        background-color: #333;
+      }
+
+      body.dark-mode label {
+        color: #eee;
+      }
+
+      body.dark-mode h1 {
+        color: #eee;
+      }
+
+      form.dark-mode {
+        background-color: #333;
+        color: #eee;
+        box-shadow: none;
+      }
+
+      form.dark-mode label {
+        color: #ffffff;
+      }
+
+      input[type="date"].dark-mode,
+      input[type="time"].dark-mode,
+      textarea.dark-mode {
+        background-color: #333;
+        color: #eee;
+        border-color: #eee;
+      }
+
+      button.dark-mode {
+        background-color: #222;
+        color: #eee;
+      }
+
+      iframe.dark-mode {
+        filter: invert(100%) grayscale(1);
+    }
+      /* FIM DEFINIÇÕES DO TEMA ESCURO */

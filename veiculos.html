@@ -14,7 +14,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>ALERTA DE VEÍCULO</title>
-	<link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico"
+		type="image/x-icon">
 	<link rel="stylesheet" type="text/css" href="css/theme.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
 </head>
@@ -22,109 +23,110 @@
 <body>
 	<!-- INICIO DO MENU -->
 	<title>190 🚨 ALERTAS</title>
-</head>
+	</head>
 
-<body>
-	<div class="nav">
-		<input type="checkbox" id="nav-check">
-		<div class="nav-header">
-			<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png"
-				class="imagem-menu">
-			<div class="nav-title">190 🚨 ALERTAS</div>
+	<body>
+		<div class="nav">
+			<input type="checkbox" id="nav-check">
+			<div class="nav-header">
+				<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png"
+					class="imagem-menu">
+				<div class="nav-title">190 🚨 ALERTAS</div>
+			</div>
+			<div class="nav-btn">
+				<label for="nav-check">
+					<span></span>
+					<span></span>
+					<span></span>
+				</label>
+			</div>
+			<div class="nav-links">
+				<a href="index.html" target="_parent">INÍCIO</a>
+				<a href="release.html" target="_parent">RELEASE</a>
+				<a href="veiculos.html" target="_parent">VEÍCULOS</a>
+				<a href="assuntos.html" target="_parent">ASSUNTOS CORRENTES</a>
+				<a href="feedback.html" target="_parent">SUGESTÕES</a>
+			</div>
+			<botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
+				<img id="icon" src="http://127.0.0.1:3000/Plataforma%20190/img/sun-solid-24.png" alt="Ícone do sol">
+			</botao-dark-mode>
 		</div>
-		<div class="nav-btn">
-			<label for="nav-check">
-				<span></span>
-				<span></span>
-				<span></span>
-			</label>
 		</div>
-		<div class="nav-links">
-			<a href="index.html" target="_parent">INÍCIO</a>
-			<a href="release.html" target="_parent">RELEASE</a>
-			<a href="veiculos.html" target="_parent">VEÍCULOS</a>
-			<a href="assuntos.html" target="_parent">ASSUNTOS CORRENTES</a>
-			<a href="feedback.html" target="_parent">SUGESTÕES</a>
-			<luasol id="themeToggle">
-			<span class="theme-icon light-icon"></span>
-			</luasol>
-		</div>
-	</div>
-	<script>
-		// Adicione um evento de clique no checkbox
-		document.addEventListener('DOMContentLoaded', function () {
-			var checkbox = document.getElementById('nav-check');
-			var body = document.body;
-			checkbox.addEventListener('change', function () {
-				if (checkbox.checked) {
-					// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
-					body.classList.add('scroll-lock');
-				} else {
-					// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
-					body.classList.remove('scroll-lock');
-				}
+		<script>
+			// Adicione um evento de clique no checkbox
+			document.addEventListener('DOMContentLoaded', function () {
+				var checkbox = document.getElementById('nav-check');
+				var body = document.body;
+				checkbox.addEventListener('change', function () {
+					if (checkbox.checked) {
+						// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+						body.classList.add('scroll-lock');
+					} else {
+						// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+						body.classList.remove('scroll-lock');
+					}
+				});
 			});
-		});
-	</script>
-	<!-- FIM DO MENU -->
-	<h1>ALERTA DE VEÍCULO</h1>
-	<form>
-		<label for="fato">FATO:</label>
-		<select id="fato" name="fato">
-			<option value="">PREENCHER MANUALMENTE</option>
-			<option value="FURTO DE VEÍCULO">FURTO </option>
-			<option value="ROUBO DE VEÍCULO">ROUBO</option>
-			<option value="ROUBO DE VEÍCULO COM SEQUESTRO">ROUBO DE VEICULO COM SEQUESTRO</option>
-		</select>
-		<label for="cidade">CIDADE DO FATO:</label>
-		<textarea id="cidade" name="cidade" rows="1" cols="1"></textarea>
-		<label for="modelo">MARCA/MODELO:</label>
-		<textarea id="modelo" name="modelo" rows="1" cols="1"></textarea>
-		<label for="cor">COR:</label>
-		<select id="cor" name="cor">
-			<option value="">PREENCHER MANUALMENTE</option>
-			<option value="AMARELA">AMARELA</option>
-			<option value="AZUL">AZUL</option>
-			<option value="BEGE">BEGE</option>
-			<option value="BRANCA">BRANCA</option>
-			<option value="CINZA">CINZA</option>
-			<option value="DOURADA">DOURADA</option>
-			<option value="GRENÁ">GRENÁ</option>
-			<option value="LARANJA">LARANJA</option>
-			<option value="MARROM">MARROM</option>
-			<option value="PRATA">PRATA</option>
-			<option value="PRETA">PRETA</option>
-			<option value="ROSA">ROSA</option>
-			<option value="ROXA">ROXA</option>
-			<option value="VERDE">VERDE</option>
-			<option value="VERMELHA">VERMELHA</option>
-			<option value="FANTASIA">FANTASIA</option>
-		</select>
-		<label for="placa">PLACA:</label>
-		<textarea id="placa" name="placa" rows="1" cols="1"></textarea>
-		<label for="data">DATA:</label>
-		<input type="date" id="data" name="data">
-		<label for="hora">HORA:</label>
-		<input type="time" id="hora" name="hora">
-		<label for="endereco">ENDEREÇO:</label>
-		<input type="text" style="width: 100%;" id="endereco" name="endereco" placeholder="RUA, NÚMERO, BAIRRO"
-			required>
-		<label for="historico">HISTÓRICO:</label>
-		<textarea id="historico" name="historico" placeholder="VOCÊ PODE USAR A DIGITAÇÃO POR VOZ" rows="5"
-			cols="30"></textarea>
-		<button type="button"
-			onclick="copiarCampos();ga('send', 'event', 'Botão', 'Clique', 'Botão Copiar ALERTA');">COPIAR</button>
-		<!-- inicio crédito na página -->
-		<footer>
-			<font size="1"> Versão 3.10 </font>
-			<br />
-			<font size="1"> Criado por Sd Ferrão - 32BPM </font>
-			<br />
-		</footer>
-		<!-- fim o crédito na página -->
-	</form>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
-	<script src="js/VeiculoScript.js"></script>
-</body>
+		</script>
+		<!-- FIM DO MENU -->
+		<h1>ALERTA DE VEÍCULO</h1>
+		<form>
+			<label for="fato">FATO:</label>
+			<select id="fato" name="fato">
+				<option value="">PREENCHER MANUALMENTE</option>
+				<option value="FURTO DE VEÍCULO">FURTO </option>
+				<option value="ROUBO DE VEÍCULO">ROUBO</option>
+				<option value="ROUBO DE VEÍCULO COM SEQUESTRO">ROUBO DE VEICULO COM SEQUESTRO</option>
+			</select>
+			<label for="cidade">CIDADE DO FATO:</label>
+			<textarea id="cidade" name="cidade" rows="1" cols="1"></textarea>
+			<label for="modelo">MARCA/MODELO:</label>
+			<textarea id="modelo" name="modelo" rows="1" cols="1"></textarea>
+			<label for="cor">COR:</label>
+			<select id="cor" name="cor">
+				<option value="">PREENCHER MANUALMENTE</option>
+				<option value="AMARELA">AMARELA</option>
+				<option value="AZUL">AZUL</option>
+				<option value="BEGE">BEGE</option>
+				<option value="BRANCA">BRANCA</option>
+				<option value="CINZA">CINZA</option>
+				<option value="DOURADA">DOURADA</option>
+				<option value="GRENÁ">GRENÁ</option>
+				<option value="LARANJA">LARANJA</option>
+				<option value="MARROM">MARROM</option>
+				<option value="PRATA">PRATA</option>
+				<option value="PRETA">PRETA</option>
+				<option value="ROSA">ROSA</option>
+				<option value="ROXA">ROXA</option>
+				<option value="VERDE">VERDE</option>
+				<option value="VERMELHA">VERMELHA</option>
+				<option value="FANTASIA">FANTASIA</option>
+			</select>
+			<label for="placa">PLACA:</label>
+			<textarea id="placa" name="placa" rows="1" cols="1"></textarea>
+			<label for="data">DATA:</label>
+			<input type="date" id="data" name="data">
+			<label for="hora">HORA:</label>
+			<input type="time" id="hora" name="hora">
+			<label for="endereco">ENDEREÇO:</label>
+			<input type="text" style="width: 100%;" id="endereco" name="endereco" placeholder="RUA, NÚMERO, BAIRRO"
+				required>
+			<label for="historico">HISTÓRICO:</label>
+			<textarea id="historico" name="historico" placeholder="VOCÊ PODE USAR A DIGITAÇÃO POR VOZ" rows="5"
+				cols="30"></textarea>
+			<button type="button"
+				onclick="copiarCampos();ga('send', 'event', 'Botão', 'Clique', 'Botão Copiar ALERTA');">COPIAR</button>
+			<!-- inicio crédito na página -->
+			<footer>
+				<font size="1"> Versão 3.12 </font>
+				<br />
+				<font size="1"> Criado por Sd Ferrão - 32BPM </font>
+				<br />
+			</footer>
+			<!-- fim o crédito na página -->
+		</form>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
+		<script src="js/VeiculoScript.js"></script>
+	</body>
 
 </html>

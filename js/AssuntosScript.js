@@ -90,26 +90,22 @@ function formatMessage(dataInput, hora, endereco, historico, fato, cidade, mostr
   return mensagem.toUpperCase(); // Converter a mensagem inteira para maiúsculas
 }
 
-const themeToggle = document.getElementById("themeToggle");
-const body = document.body;
-const form = document.querySelector("form");
-
-// Verifique se o tema escuro já está definido no localStorage
-if (localStorage.getItem('darkTheme') === 'enabled') {
-  body.classList.add('darkmode');
-  form.classList.add('darkmode');
-  themeToggle.querySelector(".theme-icon").classList.add("dark-icon");
-}
-
-themeToggle.addEventListener("click", function () {
-  body.classList.toggle("darkmode");
-  form.classList.toggle("darkmode");
-  themeToggle.querySelector(".theme-icon").classList.toggle("dark-icon");
-
-  // Armazene a preferência do usuário no localStorage
-  if (body.classList.contains('darkmode')) {
-    localStorage.setItem('darkTheme', 'enabled');
+function toggleDarkMode() {
+  const body = document.body;
+  const icon = document.getElementById('icon');
+  if (body.classList.contains('dark-mode')) {
+      body.classList.remove('dark-mode');
+      icon.src = 'http://127.0.0.1:3000/Plataforma%20190/img/sun-solid-24.png'; // Altere para o ícone do sol
+      localStorage.setItem('darkMode', 'false'); // Salve a preferência como "false"
   } else {
-    localStorage.setItem('darkTheme', 'disabled');
+      body.classList.add('dark-mode');
+      icon.src = 'http://127.0.0.1:3000/Plataforma%20190/img/moon-solid-24.png'; // Altere para o ícone da lua
+      localStorage.setItem('darkMode', 'true'); // Salve a preferência como "true"
   }
-});
+}
+// Verificar se o usuário já tem uma preferência salva no localStorage
+const storedDarkMode = localStorage.getItem('darkMode');
+if (storedDarkMode === 'true') {
+  // Se a preferência for "true", ativar o modo escuro
+  toggleDarkMode();
+}

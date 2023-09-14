@@ -23,7 +23,6 @@
 		href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon-16x16.png">
 	<link rel="manifest" href="https://190alertas.github.io/home/js/manifest.json">
 	<link rel="stylesheet" type="text/css" href="css/theme.css">
-	<link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico" type="image/x-icon">
 	<!-- INICIO DO MENU -->
 	<title>190 🚨 ALERTAS</title>
 </head>
@@ -48,10 +47,10 @@
 			<a href="veiculos.html" target="_parent">VEÍCULOS</a>
 			<a href="assuntos.html" target="_parent">ASSUNTOS CORRENTES</a>
 			<a href="feedback.html" target="_parent">SUGESTÕES</a>
-			<luasol id="themeToggle">
-			<span class="theme-icon light-icon"></span>
-			</luasol>
 		</div>
+		<botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
+			<img id="icon" src="http://127.0.0.1:3000/Plataforma%20190/img/sun-solid-24.png" alt="Ícone do sol">
+		</botao-dark-mode>
 	</div>
 	<script>
 		// Adicione um evento de clique no checkbox
@@ -71,6 +70,7 @@
 	</script>
 	<!-- FIM DO MENU -->
 	<title> 190 🚨 ALERTAS</title>
+	<link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico" type="image/x-icon">
 	<style>
 		body {
 			background-color: #f0f0f0;
@@ -120,7 +120,6 @@
 		img {
 			max-height: 150px;
 			float: left;
-			margin-right: 20px;
 		}
 
 		b {
@@ -128,7 +127,6 @@
 		}
 	</style>
 	<form>
-
 		<div class="header">
 			<h3>PLATAFORMA CRIADA PARA AUXILIAR FORÇAS DE SEGURANÇA PÚBLICA</h3>
 		</div>
