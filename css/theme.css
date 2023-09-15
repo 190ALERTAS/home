@@ -13,6 +13,8 @@
         display: block;
         width: 100%;
         border: none;
+        min-height: 575px;
+        max-height: 700px;
       }
 
       h1 {
