@@ -13,6 +13,9 @@ const cacheFiles = [
     'https://190alertas.github.io/home/js/VeiculoScript.js',
     'https://190alertas.github.io/home/css/theme.css', // Se você tiver um arquivo CSS
     'https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png', // Se você tiver imagens
+    'https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png'
+    'https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png'
+	'https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico'
 ];
 
 self.addEventListener('install', function(event) {
