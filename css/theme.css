@@ -452,7 +452,9 @@
         color: #eee;
       }
 
-      iframe.dark-mode {
+       iframe.dark-mode {
         filter: invert(100%) grayscale(1);
+        width: 100%;
+        border: none;
     }
       /* FIM DEFINIÇÕES DO TEMA ESCURO */
