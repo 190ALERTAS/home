@@ -83,9 +83,9 @@
       button {
         background-color: #694f43;
         color: white;
-        padding: 10px 20px;
+        padding: 4px 10px;
         border: none;
-        border-radius: 5px;
+        border-radius: 3px;
         font-size: 20px;
         cursor: pointer;
         float: right;
@@ -124,9 +124,7 @@
         }
 
         button {
-          position: absolute;
-          right: 50px;
-          margin-left: 20px;
+          float: right;
         }
       }
 
