@@ -409,6 +409,7 @@
         vertical-align: middle;
         filter: invert();
         float: none;
+        margin-top: 3px;
       }
 
       body.dark-mode #icon {
