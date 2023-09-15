@@ -1,458 +1,167 @@
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #d6d6d6;
-      }
-
-      iframe {
-        display: block;
-        width: 100%;
-        border: none;
-      }
-
-      h1 {
-        font-size: 32px;
-        text-align: center;
-        margin-top: 30px;
-        margin-bottom: 30px;
-        color: #694f43;
-        text-transform: uppercase;
-      }
-
-      .form-iframe {
-        margin: 0 auto;
-        display: block;
-      }
-
-      form {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #e7e7e7;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-
-      label {
-        display: block;
-        font-size: 18px;
-        font-weight: bold;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        color: #333;
-        text-transform: uppercase;
-      }
-
-      input {
-        text-transform: uppercase;
-      }
-
-      input[type="date"],
-      input[type="time"],
-      textarea {
-        text-transform: uppercase;
-        display: block;
-        width: 100%;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
-        margin-top: 5px;
-        resize: vertical;
-        background-color: #fff;
-        color: #333;
-      }
-
-      select {
-        display: block;
-        width: 100%;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
-        margin-top: 5px;
-        background-color: #fff;
-        color: #333;
-      }
-
-      button {
-        background-color: #694f43;
-        color: white;
-        padding: 4px 10px;
-        border: none;
-        border-radius: 3px;
-        font-size: 20px;
-        cursor: pointer;
-        float: right;
-        transition: background-color 0.2s ease-in-out;
-      }
-
-      button:hover {
-        background-color: #7c7565;
-      }
-
-      @media screen and (max-width: 600px) {
-        form {
-          padding: 10px;
-        }
-
-        button {
-          float: none;
-        }
-
-        h1 {
-          font-size: 28px;
-          margin-top: 20px;
-          margin-bottom: 20px;
-        }
-
-        label {
-          font-size: 16px;
-          margin-bottom: 5px;
-        }
-
-        input[type="date"],
-        input[type="time"],
-        textarea,
-        select {
-          font-size: 14px;
-        }
-
-        button {
-          float: right;
-        }
-      }
-
-      .checkbox-wrapper-34 {
-        --blue: #694f43;
-        --g08: #d4d4d4;
-        --g04: #000000;
-        float: right;
-      }
-
-      .checkbox-wrapper-34 .tgl {
-        display: none;
-        float: right;
-      }
-
-      .checkbox-wrapper-34 .tgl,
-      .checkbox-wrapper-34 .tgl:after,
-      .checkbox-wrapper-34 .tgl:before,
-      .checkbox-wrapper-34 .tgl *,
-      .checkbox-wrapper-34 .tgl *:after,
-      .checkbox-wrapper-34 .tgl *:before,
-      .checkbox-wrapper-34 .tgl+.tgl-btn {
-        box-sizing: border-box;
-      }
-
-      .checkbox-wrapper-34 .tgl::selection,
-      .checkbox-wrapper-34 .tgl:after::selection,
-      .checkbox-wrapper-34 .tgl:before::selection,
-      .checkbox-wrapper-34 .tgl *::selection,
-      .checkbox-wrapper-34 .tgl *:after::selection,
-      .checkbox-wrapper-34 .tgl *:before::selection,
-      .checkbox-wrapper-34 .tgl+.tgl-btn::selection {
-        background: none;
-      }
-
-      .checkbox-wrapper-34 .tgl+.tgl-btn {
-        outline: 0;
-        display: block;
-        width: 57px;
-        height: 24px;
-        position: relative;
-        cursor: pointer;
-        user-select: none;
-        font-size: 12px;
-        font-weight: 400;
-        color: #fff;
-      }
-
-      .checkbox-wrapper-34 .tgl+.tgl-btn:after,
-      .checkbox-wrapper-34 .tgl+.tgl-btn:before {
-        position: relative;
-        display: block;
-        content: "";
-        width: 44%;
-        height: 100%;
-      }
-
-      .checkbox-wrapper-34 .tgl+.tgl-btn:after {
-        left: 0;
-      }
-
-      .checkbox-wrapper-34 .tgl+.tgl-btn:before {
-        display: inline;
-        position: absolute;
-        top: 5px;
-      }
-
-      .checkbox-wrapper-34 .tgl:checked+.tgl-btn:after {
-        left: 56.5%;
-      }
-
-      .checkbox-wrapper-34 .tgl-ios+.tgl-btn {
-        background: var(--g08);
-        border-radius: 3px;
-        padding: 2px;
-        transition: all 0.4s ease;
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-      }
-
-      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:after {
-        border-radius: 3px;
-        background: #fff;
-        transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease, margin 0.3s ease;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-      }
-
-      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:before {
-        content: "NÃO";
-        left: 28px;
-        color: var(--g04);
-        transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      }
-
-      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:active {
-        box-shadow: inset 0 0 0 30px rgba(0, 0, 0, 0.1);
-      }
-
-      .checkbox-wrapper-34 .tgl-ios+.tgl-btn:active:after {
-        padding-right: 0.4em;
-      }
-
-      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn {
-        background: var(--blue);
-      }
-
-      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn:active {
-        box-shadow: inset 0 0 0 30px rgba(0, 0, 0, 0.1);
-      }
-
-      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn:active:after {
-        margin-left: -0.4em;
-      }
-
-      .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn:before {
-        content: "SIM";
-        left: 4px;
-        color: #fff;
-      }
-
-      /* INICIO DO MENU */
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0px;
-        font-family: 'segoe ui';
-        overflow-y: auto;
-      }
-
-      .nav {
-        height: 60px;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .nav-links {
-        display: flex;
-        text-align: right;
-      }
-
-      .nav>.nav-header {
-        display: flex;
-        align-items: center;
-        /* Alinha verticalmente os elementos dentro de nav-header */
-      }
-
-      .nav>.nav-header>.imagem-menu {
-        width: 50px;
-        /* Ajuste o tamanho da imagem conforme necessário */
-        height: auto;
-        margin-right: 10px;
-        /* Adicione um espaço entre a imagem e o título, se necessário */
-      }
-
-      .nav>.nav-header>.nav-title {
-        font-size: 22px;
-        color: #fff;
-        margin: 0;
-        /* Remova margin-top e margin-left */
-      }
-
-      .nav>.nav-links {
-        font-size: 18px;
-        color: #fff;
-      }
-
-      .nav>.nav-links>a {
-        display: inline-block;
-        padding: 20px 10px 20px 10px;
-        text-decoration: none;
-        color: #efefef;
-      }
-
-      .nav>.nav-links>a:hover {
-        background-color: rgba(192, 192, 192, 0.3);
-      }
-
-      .nav>#nav-check {
-        display: none;
-      }
-
-      @media (max-width: 2000px) {
-        .nav>.nav-btn {
-          display: inline-block;
-          position: absolute;
-          right: 0px;
-          top: 0px;
-        }
-
-        .nav>.nav-btn>label {
-          display: inline-block;
-          width: 50px;
-          height: 50px;
-        }
-
-        .nav>.nav-btn>label:hover,
-        .nav #nav-check:checked~.nav-btn>label {
-          background-color: rgba(0, 0, 0, 0);
-          /* COR DA SOMBRA DO MENU */
-        }
-
-        .nav>.nav-btn>label>span {
-          display: block;
-          width: 25px;
-          height: 10px;
-          border-top: 3px solid #eee;
-        }
-
-        .nav>.nav-links {
-          position: absolute;
-          display: block;
-          width: 100%;
-          height: auto;
-          background-color: #333;
-          transition: all 0.3s ease-in;
-          overflow-y: hidden;
-          top: 60px;
-          left: 0px;
-        }
-
-        .nav>.nav-links>a {
-          display: block;
-          width: 100%;
-        }
-
-        .nav>#nav-check:not(:checked)~.nav-links {
-          height: 0px;
-        }
-
-        .nav>#nav-check:checked~.nav-links {
-          width: 100vw;
-          height: 100vh;
-          overflow-y: hidden;
-          z-index: 999;
-          background-color: rgba(0, 0, 0, 0.9);
-          /* Cor do fundo do menu */
-        }
-
-        button {
-          right: 50px;
-          margin-left: 20px;
-        }
-
-        botao-dark-mode {
-          position: absolute;
-          right: 70px;
-          margin-left: 20px;
-        }
-      }
-
-      body.scroll-lock {
-        overflow: hidden;
-      }
-
-      /* FIM DO MENU */
-      /* DEFINIÇÕES DO TEMA ESCURO */
-      body {
-        transition: background-color 1s, color 1s;
-      }
-
-      .nav {
-        background-color: #000000;
-        /* Cor de fundo da barra de navegação no modo claro */
-        padding: 10px;
-      }
-
-      button#dark-mode-toggle {
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-      }
-
-      #icon {
-        width: 24px;
-        height: 24px;
-        transition: transform 1.5s;
-        vertical-align: middle;
-
-      }
-
-      body.dark-mode #icon {
-        transform: rotate(360deg);
-      }
-
-      body.dark-mode {
-        background-color: #222;
-        color: #ffffff;
-      }
-
-      body.dark-mode form {
-        background-color: #333;
-      }
-
-      body.dark-mode label {
-        color: #eee;
-      }
-
-      body.dark-mode h1 {
-        color: #eee;
-      }
-
-      form.dark-mode {
-        background-color: #333;
-        color: #eee;
-        box-shadow: none;
-      }
-
-      form.dark-mode label {
-        color: #ffffff;
-      }
-
-      input[type="date"].dark-mode,
-      input[type="time"].dark-mode,
-      textarea.dark-mode {
-        background-color: #333;
-        color: #eee;
-        border-color: #eee;
-      }
-
-      button.dark-mode {
-        background-color: #222;
-        color: #eee;
-      }
-
-      iframe.dark-mode {
-        filter: invert(100%) grayscale(1);
-    }
-      /* FIM DEFINIÇÕES DO TEMA ESCURO */
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+	<!-- INICIO Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+
+		function gtag() {
+			dataLayer.push(arguments);
+		}
+		gtag('js', new Date());
+		gtag('config', 'G-3Q72PBZVYP');
+	</script>
+	<!-- FIM Google tag (gtag.js) -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="apple-touch-icon" sizes="180x180"
+		href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/android-chrome-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32"
+		href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16"
+		href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon-16x16.png">
+	<link rel="manifest" href="https://190alertas.github.io/home/js/manifest.json">
+	<link rel="stylesheet" type="text/css" href="css/theme.css">
+	<!-- INICIO DO MENU -->
+	<title>190 🚨 ALERTAS</title>
+</head>
+
+<body>
+	<div class="nav">
+		<input type="checkbox" id="nav-check">
+		<div class="nav-header">
+			<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png"
+				class="imagem-menu">
+			<div class="nav-title">190 🚨 ALERTAS</div>
+		</div>
+		<div class="nav-btn">
+			<label for="nav-check">
+				<span></span>
+				<span></span>
+				<span></span>
+			</label>
+		</div>
+		<div class="nav-links">
+			<a href="index.html" target="_parent">INÍCIO</a>
+			<a href="release.html" target="_parent">RELEASE</a>
+			<a href="veiculos.html" target="_parent">VEÍCULOS</a>
+			<a href="assuntos.html" target="_parent">ASSUNTOS CORRENTES</a>
+			<a href="feedback.html" target="_parent">SUGESTÕES</a>
+		</div>
+		<botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
+			<img id="icon" src="http://127.0.0.1:3000/Plataforma%20190/img/sun-solid-24.png" alt="Ícone do sol">
+		</botao-dark-mode>
+	</div>
+	<script>
+		// Adicione um evento de clique no checkbox
+		document.addEventListener('DOMContentLoaded', function () {
+			var checkbox = document.getElementById('nav-check');
+			var body = document.body;
+			checkbox.addEventListener('change', function () {
+				if (checkbox.checked) {
+					// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+					body.classList.add('scroll-lock');
+				} else {
+					// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+					body.classList.remove('scroll-lock');
+				}
+			});
+		});
+	</script>
+	<!-- FIM DO MENU -->
+	<title> 190 🚨 ALERTAS</title>
+	<link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico"
+		type="image/x-icon">
+	<style>
+		body {
+			background-color: #f0f0f0;
+			margin: 0;
+			padding: 0;
+		}
+
+		.header {
+			background-color: #e1e1e1;
+			color: #fff;
+			text-align: center;
+			padding: 20px 0;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #e1e1e1;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			margin-top: 20px;
+		}
+
+		h3 {
+			color: #333;
+			text-align: center;
+			font-family: 'Trebuchet MS', sans-serif;
+		}
+
+		h3 {
+			color: #333;
+			text-align: center;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		h5,
+		p {
+			color: #333;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		p {
+			color: #333;
+		}
+
+		img {
+			max-height: 150px;
+			float: left;
+		}
+
+		b {
+			font-weight: bold;
+		}
+	</style>
+	<form>
+		<div class="header">
+			<h3>PLATAFORMA CRIADA PARA AUXILIAR FORÇAS DE SEGURANÇA PÚBLICA</h3>
+		</div>
+		<div class="container">
+			<h3>Disseminação da informação correta e organizada.</h3>
+		</div>
+		<div class="container">
+			<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png">
+			<h5>Aqui você poderá formatar facilmente informações para difundir nos canais de WhatsApp adequados. Elas
+				ficarão organizadas, concisas e completas.</h5>
+			<h5>Para utilizar a plataforma, selecione uma das guias acima, insira os dados desejados, clique em copiar e
+				divulgue a informação para quem achar necessário. É importante ressaltar que esta plataforma não
+				armazena nenhum tipo de banco de dados, portanto as informações inseridas <b>NÃO</b> serão armazenadas.
+			</h5>
+		</div>
+		<div class="container">
+			<p>
+			<h5>Agora é possível fazer o download do app em dispositivos Android e Win10 utilizando o navegador Google
+				Chrome. <p>Funciona estando nessa página, clique nos 3 pontos na parte superior e vá em "Instalar 190 🚨
+					ALERTAS"
+			</h5>
+		</div>
+		<div class="container" style="text-align: center;">
+			Ferramenta em desenvolvimento desde janeiro de 2023
+			<p>
+			<h6>Idealizado e criado por Sd Ferrão - 32BPM</p>
+			</h6>
+			<p><a href="https://190alertas.github.io/home/termos">Acesse os Termos de Uso para mais detalhes</a>
+		</div>
+		<script src="js/base.js"></script>
+		<script src="https://190alertas.github.io/home/js/main.js"></script>
+	</form>
+</body>
+
+</html>
