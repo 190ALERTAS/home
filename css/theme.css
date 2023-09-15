@@ -407,7 +407,7 @@
         height: 24px;
         transition: transform 1.5s;
         vertical-align: middle;
-
+        filter: invert();
       }
 
       body.dark-mode #icon {
