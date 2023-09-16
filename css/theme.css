@@ -3,10 +3,11 @@
       }
 
       body {
-        font-family: 'segoe ui';
-        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0px;
         padding: 0;
         background-color: #d6d6d6;
+        overflow-y: auto;
       }
 
       iframe {
@@ -243,12 +244,6 @@
       /* INICIO DO MENU */
       * {
         box-sizing: border-box;
-      }
-
-      body {
-        margin: 0px;
-        font-family: 'segoe ui';
-        overflow-y: auto;
       }
 
       .nav {
