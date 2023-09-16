@@ -239,6 +239,7 @@
       .checkbox-wrapper-34 .tgl-ios:checked+.tgl-btn:before {
         content: "SIM";
         left: 6px;
+        top: 4px;
         color: #fff;
       }
 
