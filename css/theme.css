@@ -130,6 +130,7 @@
         --g08: #d4d4d4;
         --g04: #000000;
         float: right;
+        margin-left: -2000px; /* Gambiarra pra travar o botão de "materialidade envolvida" na direita */
       }
 
       .checkbox-wrapper-34 .tgl {
