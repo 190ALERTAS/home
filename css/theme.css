@@ -187,7 +187,7 @@
       .checkbox-wrapper-34 .tgl+.tgl-btn:before {
         display: inline;
         position: absolute;
-        top: 5px;
+        top: 4px;
       }
 
       .checkbox-wrapper-34 .tgl:checked+.tgl-btn:after {
