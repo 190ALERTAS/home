@@ -1,4 +1,3 @@
-// script.js
 const materialidadeCheckbox = document.getElementById("materialidadeCheckbox");
 const materialidadeLabel = document.querySelector("label[for='materialidade']");
 const materialidadeTextarea = document.getElementById("materialidade");
@@ -44,6 +43,12 @@ function copiarCampos() {
   // Remover o elemento temporário da página
   document.body.removeChild(temp);
 
+  // Registre o evento no Google Analytics
+  gtag('event', 'copiar_release', {
+    event_category: 'Botão',
+    event_label: 'Clique em Copiar Release',
+  });
+
   // Exibir um alerta de sucesso
   Swal.fire({
     confirmButtonColor: "#694f43",
@@ -75,15 +80,22 @@ function toggleDarkMode() {
   const body = document.body;
   const icon = document.getElementById('icon');
   if (body.classList.contains('dark-mode')) {
-      body.classList.remove('dark-mode');
-      icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png'; // Altere para o ícone do sol
-      localStorage.setItem('darkMode', 'false'); // Salve a preferência como "false"
+    body.classList.remove('dark-mode');
+    icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png'; // Altere para o ícone do sol
+    localStorage.setItem('darkMode', 'false'); // Salve a preferência como "false"
   } else {
-      body.classList.add('dark-mode');
-      icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png'; // Altere para o ícone da lua
-      localStorage.setItem('darkMode', 'true'); // Salve a preferência como "true"
+    body.classList.add('dark-mode');
+    icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png'; // Altere para o ícone da lua
+    localStorage.setItem('darkMode', 'true'); // Salve a preferência como "true"
   }
+
+  // Registre o evento no Google Analytics
+  gtag('event', 'dark_mode_toggle', {
+    event_category: 'Tema',
+    event_label: 'Alternar Tema Escuro',
+  });
 }
+
 // Verificar se o usuário já tem uma preferência salva no localStorage
 const storedDarkMode = localStorage.getItem('darkMode');
 if (storedDarkMode === 'true') {
