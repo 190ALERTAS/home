@@ -67,9 +67,10 @@
         display: none;
       }
 
-      /* input#importar {
+      input#importar {
+        text-transform: none;
     }
-*/
+    
       iframe {
         display: block;
         width: 100%;
