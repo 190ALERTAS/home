@@ -13,45 +13,61 @@
       table {
         width: 100%;
         border-collapse: collapse;
-        margin: 10px;
-    }
-    table, th, td {
+      }
+
+      table,
+      th,
+      td {
         border: 1px solid #ccc;
-    }
-    th, td {
-        padding: 10px;
+      }
+
+      th,
+      td {
+        padding: 4px;
         text-align: center;
-    }
-    th {
+      }
+
+      th {
         background-color: #694f43;
         color: #fff;
-    }
-    #resumoMes {
+      }
+
+      #resumoMes {
         font-size: 20px;
         font-weight: bold;
-    }
-    
-    #salvar {
+      }
+
+      #salvar {
         background-color: #27ae60;
         font-size: 14px;
         border-radius: 2px;
-    }
-    #salvarPDF {
-      font-size: 14px;
-      border-radius: 2px;
-       }
+      }
 
-    #excluirbtn {
-      font-size: 12px;
+      #salvar:hover {
+        background-color: #588660;
+      }
 
-    }
+      #salvarPDF {
+        font-size: 14px;
+        border-radius: 2px;
+      }
 
-    .botoes {
-      display: inline;
-      vertical-align: middle;
-    }
+      #excluirbtn {
+        font-size: 11px;
+        float: none;
+        border-radius: 1px;
+      }
 
-   /* input#importar {
+      .botoes {
+        display: inline;
+        vertical-align: middle;
+      }
+
+      thdark-mode {
+        display: none;
+      }
+
+      /* input#importar {
     }
 */
       iframe {
@@ -131,7 +147,7 @@
         color: white;
         padding: 4px 10px;
         border: none;
-        border-radius: 1px;
+        border-radius: 2px;
         font-size: 15px;
         cursor: pointer;
         float: right;
@@ -151,7 +167,7 @@
         border-radius: 3px;
         font-size: 20px;
         cursor: pointer;
-        
+
         transition: background-color 0.2s ease-in-out;
       }
 
@@ -191,7 +207,8 @@
         --g08: #d4d4d4;
         --g04: #000000;
         float: right;
-        margin-left: -2000px; /* Gambiarra pra travar o botão de "materialidade envolvida" na direita */
+        margin-left: -2000px;
+        /* Gambiarra pra travar o botão de "materialidade envolvida" na direita */
       }
 
       .checkbox-wrapper-34 .tgl {
@@ -508,9 +525,10 @@
         color: #eee;
       }
 
-       iframe.dark-mode {
+      iframe.dark-mode {
         filter: invert(100%) grayscale(1);
         width: 100%;
         border: none;
-    }
+      }
+
       /* FIM DEFINIÇÕES DO TEMA ESCURO */
