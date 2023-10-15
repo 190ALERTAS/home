@@ -164,7 +164,7 @@
             });
         
             // Gere o PDF e abra-o em uma nova janela
-            pdfMake.createPdf(documentDefinition).download("registro.pdf");
+            pdfMake.createPdf(documentDefinition).open();
         });
         
 
