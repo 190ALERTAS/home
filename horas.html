@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/home/css/theme.css">
+<head>
+    	<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-PG7JJRKB');</script>
+	<!-- End Google Tag Manager -->
+	<!-- INICIO Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'G-3Q72PBZVYP');
+	</script>
+    <title>Registro de Horas Trabalhadas</title>
+</head>
+<body>
+    		<!-- INICIO DO MENU -->
+		<title>190 🚨 ALERTAS</title>
+	</head>
+	<body>
+		<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PG7JJRKB"
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
+		<div class="nav">
+			<input type="checkbox" id="nav-check">
+			<div class="nav-header">
+				<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png"
+					class="imagem-menu">
+				<div class="nav-title">190 🚨 ALERTAS</div>
+			</div>
+			<div class="nav-btn">
+				<label for="nav-check">
+					<span></span>
+					<span></span>
+					<span></span>
+				</label>
+			</div>
+			<div class="nav-links">
+				<a href="index" target="_parent">INÍCIO</a>
+				<a href="release" target="_parent">RELEASE</a>
+				<a href="veiculos" target="_parent">VEÍCULOS</a>
+				<a href="assuntos" target="_parent">ASSUNTOS CORRENTES</a>
+				<a href="horas" target="_parent">HORAS TRABALHADAS</a>
+                <a href="feedback" target="_parent">SUGESTÕES</a>
+				<a href="termos" target="_parent">TERMOS DE USO</a>
+			</div>
+			<botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
+				<img id="icon" src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png" alt="Ícone do sol">
+			</botao-dark-mode>
+		</div>
+		<script>
+			// Adicione um evento de clique no checkbox
+			document.addEventListener('DOMContentLoaded', function () {
+				var checkbox = document.getElementById('nav-check');
+				var body = document.body;
+				checkbox.addEventListener('change', function () {
+					if (checkbox.checked) {
+						// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+						body.classList.add('scroll-lock');
+					} else {
+						// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+						body.classList.remove('scroll-lock');
+					}
+				});
+			});
+		</script>
+		<!-- FIM DO MENU -->
+    <h1>Registro de Horas Trabalhadas</h1>
+    
+    <form>
+    <label for="dataInicio">Data de Início:</label>
+    <input type="date" id="dataInicio">
+    
+    <label for="horaInicio">Hora de Início:</label>
+    <input type="time" id="horaInicio">
+    
+    <label for="horaFim">Hora do Fim:</label>
+    <input type="time" id="horaFim">
+    
+    <button id="adicionar">Adicionar</button>
+        
+    <div>
+        <h2>Registros de Horas Trabalhadas</h2>
+        <table id="tabela">
+            <tr>
+                <th>Data</th>
+                <th>Início</th>
+                <th>Fim</th>
+                <th>Horas Trabalhadas</th>
+                <th>Ação</th>
+            </tr>
+        </table>
+    </div>
+    <buttonclear id="limpar">Limpar Todos os Dados</buttonclear>
+    <div>
+        <h2>Resumo do Mês:</h2>
+        <span id="resumoMes">0 horas</span>
+    </div><p>
+    <div class="botoes">
+    <button id="salvarPDF">Exportar para PDF</button>
+    <button id="salvar">Salvar</button>
+    <input type="file" id="importar" accept=".json">
+    </div>
+</form>
+</body>
+<script src="/home/js/horas.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+</html>
