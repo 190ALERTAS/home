@@ -3,13 +3,57 @@
       }
 
       body {
-        font-family: '', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0px;
         padding: 0;
         background-color: #d6d6d6;
         overflow-y: auto;
       }
 
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px;
+    }
+    table, th, td {
+        border: 1px solid #ccc;
+    }
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+    th {
+        background-color: #694f43;
+        color: #fff;
+    }
+    #resumoMes {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    #salvar {
+        background-color: #27ae60;
+        font-size: 14px;
+        border-radius: 2px;
+    }
+    #salvarPDF {
+      font-size: 14px;
+      border-radius: 2px;
+       }
+
+    #excluirbtn {
+      font-size: 12px;
+
+    }
+
+    .botoes {
+      display: inline;
+      vertical-align: middle;
+    }
+
+   /* input#importar {
+    }
+*/
       iframe {
         display: block;
         width: 100%;
@@ -82,6 +126,23 @@
         color: #333;
       }
 
+      buttonclear {
+        background-color: #694f43;
+        color: white;
+        padding: 4px 10px;
+        border: none;
+        border-radius: 1px;
+        font-size: 15px;
+        cursor: pointer;
+        float: right;
+        transition: background-color 0.2s ease-in-out;
+      }
+
+      buttonclear:hover {
+        background-color: #7c7565;
+      }
+
+
       button {
         background-color: #694f43;
         color: white;
@@ -90,7 +151,7 @@
         border-radius: 3px;
         font-size: 20px;
         cursor: pointer;
-        float: right;
+        
         transition: background-color 0.2s ease-in-out;
       }
 
@@ -187,7 +248,7 @@
       .checkbox-wrapper-34 .tgl+.tgl-btn:before {
         display: inline;
         position: absolute;
-        top: 5px;
+        top: 4px;
       }
 
       .checkbox-wrapper-34 .tgl:checked+.tgl-btn:after {
@@ -361,13 +422,12 @@
 
         button {
           right: 50px;
-          margin-left: 20px;
+          float: right;
         }
 
         botao-dark-mode {
           position: absolute;
           right: 70px;
-          margin-left: 20px;
         }
       }
 
@@ -433,6 +493,7 @@
       form.dark-mode label {
         color: #ffffff;
       }
+
 
       input[type="date"].dark-mode,
       input[type="time"].dark-mode,
