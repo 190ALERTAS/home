@@ -163,7 +163,17 @@
             });
         
             // Gere o PDF e abra-o em uma nova janela
-            pdfMake.createPdf(documentDefinition).open();
+            pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
+                var blob = new Blob([buffer], { type: 'application/pdf' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'registro.pdf';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
         });
         
 
