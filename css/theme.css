@@ -63,13 +63,9 @@
         vertical-align: middle;
       }
 
-      thdark-mode {
-        display: none;
-      }
-
       input#importar {
         text-transform: none;
-    }
+      }
     
       iframe {
         display: block;
@@ -203,7 +199,8 @@
         }
 
         .botoes {
-          display: inline-grid;
+          display: grid;
+          justify-content: center;
         }  
       }
 
