@@ -168,16 +168,12 @@
                 var url = URL.createObjectURL(blob);
                 var a = document.createElement('a');
                 a.href = url;
-                a.download = 'registro.pdf';
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
             });
-        });
-        
-
-        
+        });        
     });
 
     function toggleDarkMode() {
