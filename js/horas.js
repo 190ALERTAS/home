@@ -7,7 +7,7 @@
         const tabela = document.getElementById("tabela");
         const resumoMes = document.getElementById("resumoMes");
         const salvar = document.getElementById("salvar");
-        const salvarPDF = document.getElementById("salvarPDF");
+        /* const salvarPDF = document.getElementById("salvarPDF"); */
         const importar = document.getElementById("importar");
         let registros = [];
 
@@ -135,8 +135,7 @@
         }
 
 
-        salvarPDF.addEventListener("click", function () {
-            // Defina as definições do documento
+        document.getElementById("salvarPDF").addEventListener("click", function () {            // Defina as definições do documento
             const documentDefinition = {
                 content: [
                     { text: 'Registros de Horas', style: 'header' },
