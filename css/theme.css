@@ -201,6 +201,10 @@
         button {
           float: right;
         }
+
+        .botoes {
+          display: inline-grid;
+        }  
       }
 
       .checkbox-wrapper-34 {
