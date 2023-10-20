@@ -135,7 +135,8 @@
         }
 
 
-        document.getElementById("salvarPDF").addEventListener("click", function () {            // Defina as definições do documento
+        document.getElementById("salvarPDF").addEventListener("click", function () {
+            // Defina as definições do documento
             const documentDefinition = {
                 content: [
                     { text: 'Registros de Horas', style: 'header' },
@@ -145,16 +146,15 @@
                             widths: ['auto', 'auto', 'auto', 'auto'],
                             body: [
                                 ['Data', 'Início', 'Fim', 'Horas Trabalhadas no dia'],
-                            ]
+                            ],
                         }
                     },
                     { text: `Total do mês: ${resumoMes.textContent}`, style: 'total' }
                 ],
-
-                
+        
                 styles: {
                     header: { fontSize: 16, bold: true, margin: [0, 0, 0, 10] },
-                    total: { fontSize: 14, bold: true, margin: [0, 20, 0, 0]}
+                    total: { fontSize: 14, bold: true, margin: [0, 20, 0, 0] }
                 }
             };
         
@@ -162,19 +162,15 @@
                 documentDefinition.content[1].table.body.push([data, inicio, fim, horasTrabalhadas]);
             });
         
-            // Gere o PDF e abra-o em uma nova janela
-                pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
+            // Gere o PDF e abra-o em uma nova aba
+            pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
                 var blob = new Blob([buffer], { type: 'application/pdf' });
                 var url = URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.href = url;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
+                window.open(url, '_blank');
             });
-        });        
+        });
     });
+        
 
     function toggleDarkMode() {
         const body = document.body;
