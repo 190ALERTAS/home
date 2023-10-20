@@ -163,11 +163,12 @@
             });
         
             // Gere o PDF e abra-o em uma nova janela
-            pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
+                pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
                 var blob = new Blob([buffer], { type: 'application/pdf' });
                 var url = URL.createObjectURL(blob);
                 var a = document.createElement('a');
-                a.href = url;  
+                a.href = url;
+                a.target = '_blank'
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
