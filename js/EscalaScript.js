@@ -39,13 +39,28 @@
         });
 
         limpar.addEventListener("click", function() {
-            registros = [];
-            // Limpe os registros no localStorage
-            localStorage.removeItem("registros");
-            atualizarTabela();
-            calcularResumoMes();
-            location.reload(); // Isso recarrega a página
+            Swal.fire({
+                title: "Tem certeza?",
+                text: "Esta ação irá limpar todos os registros. Você tem certeza que deseja continuar?",
+                icon: "warning",
+                iconColor: '#7c7565',
+                showCancelButton: true,
+                confirmButtonColor: "#694f43",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sim, limpar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    registros = [];
+                    // Limpe os registros no localStorage
+                    localStorage.removeItem("registros");
+                    atualizarTabela();
+                    calcularResumoMes();
+                    location.reload(); // Isso recarrega a página
+                }
+            });
         });
+        
 
         salvar.addEventListener("click", function() {
             const dataToSave = JSON.stringify(registros);
