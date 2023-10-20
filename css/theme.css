@@ -37,15 +37,7 @@
         font-weight: bold;
       }
 
-      #salvar {
-        background-color: #27ae60;
-        font-size: 14px;
-        border-radius: 2px;
-      }
-
-      #salvar:hover {
-        background-color: #588660;
-      }
+     
 
       #salvarPDF {
         font-size: 14px;
@@ -58,12 +50,29 @@
         border-radius: 1px;
       }
 
+      #limpar {
+        font-size: 12px;
+        border-radius: 2px;
+      }
+
       .botoes {
         display: inline;
         vertical-align: middle;
       }
 
-      input#importar {
+      #salvar {
+        display: none; /* Gambiarra pra sumir o botão salvar */
+        background-color: #27ae60;
+        font-size: 14px;
+        border-radius: 2px;
+      }
+
+      #salvar:hover {
+        background-color: #588660;
+      }
+
+      input#importar { 
+        display: none; /* Gambiarra pra sumir o botão importar */
         text-transform: none;
       }
     
