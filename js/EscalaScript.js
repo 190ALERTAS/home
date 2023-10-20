@@ -172,18 +172,9 @@
                 documentDefinition.content[1].table.body.push([data, inicio, fim, horasTrabalhadas]);
             });
         
-            // Gere o PDF e abra-o em uma nova janela
-            pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
-                var blob = new Blob([buffer], { type: 'application/pdf' });
-                var url = URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.href = url;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            });
-        });        
+// Gere o PDF e abra-o em uma nova janela pop-up
+pdfMake.createPdf(documentDefinition).open();
+});    
     });
 
     function toggleDarkMode() {
