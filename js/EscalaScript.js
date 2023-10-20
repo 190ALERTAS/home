@@ -41,9 +41,9 @@
         limpar.addEventListener("click", function() {
             Swal.fire({
                 title: "Tem certeza?",
-                text: "Esta ação irá limpar todos os registros. Você tem certeza que deseja continuar?",
+                text: "Cuidado com o PADM praça, não se atrase! Você tem certeza que deseja limpar todos os dados?",
                 icon: "warning",
-                iconColor: '#7c7565',
+                iconColor: '#d33',
                 showCancelButton: true,
                 confirmButtonColor: "#694f43",
                 cancelButtonColor: "#d33",
