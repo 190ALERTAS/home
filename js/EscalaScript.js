@@ -57,16 +57,6 @@
             a.click();
         });
 
-        salvar.addEventListener("touchend", function() {
-            const dataToSave = JSON.stringify(registros);
-            const blob = new Blob([dataToSave], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "registros.json";
-            a.click();
-        });
-
         importar.addEventListener("change", function(event) {
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -172,9 +162,18 @@
                 documentDefinition.content[1].table.body.push([data, inicio, fim, horasTrabalhadas]);
             });
         
-// Gere o PDF e abra-o em uma nova janela pop-up
-pdfMake.createPdf(documentDefinition).open();
-});    
+            // Gere o PDF e abra-o em uma nova janela
+            pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
+                var blob = new Blob([buffer], { type: 'application/pdf' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;  
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+        });        
     });
 
     function toggleDarkMode() {
