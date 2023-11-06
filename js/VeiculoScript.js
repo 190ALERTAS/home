@@ -47,7 +47,7 @@ function formatMessage(modelo, placa, cor, dataInput, hora, endereco, historico,
   date.setUTCHours(date.getUTCHours() + timezoneOffset);
   const formattedDate = ("0" + date.getDate()).slice(-2) + "/" + ("0" + (date.getMonth() + 1)).slice(-2) + "/" + date.getFullYear();
   const dataText = "" + formattedDate;
-  const mensagem = `🚨 *ALERTA DE ${fato} EM ${cidade}* 🚨\n\n*MODELO:* ${modelo}\n*PLACA:* ${placa}\n*COR:* ${cor}\n*DATA:* ${dataText}\n*HORA:* ${hora}\n*ENDEREÇO:* ${endereco}\n\n*HISTÓRICO:* \n${historico}`;
+  const mensagem = `🚨 *ALERTA DE ${fato}* 🚨\n *NA CIDADE DE: ${cidade}* \n\n*PLACA:* ${placa}\n*MODELO:* ${modelo}\n*COR:* ${cor}\n*DATA:* ${dataText} *HORA:* ${hora}\n*ENDEREÇO:* ${endereco}\n\n*HISTÓRICO:* \n${historico}`;
   return mensagem.toUpperCase(); // Converter a mensagem inteira para maiúsculas
 }
 
