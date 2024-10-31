@@ -64,9 +64,9 @@
       }
 
       #salvar {
-        display: none; /* Gambiarra pra sumir o botão salvar */
+        display: block; /* Gambiarra pra sumir o botão salvar */
         background-color: #27ae60;
-        font-size: 14px;
+        font-size: 11px;
         border-radius: 2px;
       }
 
@@ -75,7 +75,7 @@
       }
 
       input#importar { 
-        display: none; /* Gambiarra pra sumir o botão importar */
+        display: block; /* Gambiarra pra sumir o botão importar */
         text-transform: none;
       }
     
