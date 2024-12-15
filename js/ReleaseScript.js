@@ -130,7 +130,7 @@ document.getElementById('btnInserirDados').addEventListener('click', () => {
 // Função para limpar os dados e resetar o status
 function limparDados() {
   // Resetar o status na página
-  document.getElementById('statusDadosInseridos').innerText = "Nenhum dado inserido";
+  document.getElementById('statusDadosInseridos').innerText = "Status: Nenhum dado inserido";
   document.getElementById('loadingPage').style.display = 'none';
 
   // Limpar os dados armazenados globalmente
