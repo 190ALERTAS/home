@@ -30,12 +30,12 @@ function formatMessage(dataInput, hora, endereco, historico, fato, cidade, detid
 
   // Processar materialidade
   const materialidade = document.getElementById("materialidade").value;
-  const materialidadeList = materialidade.split(",").map(item => `- ${item.trim()}`).join("\n");
+  const materialidadeList = materialidade.split(";").map(item => `- ${item.trim()}`).join("\n");
   const materialidadeText = mostrarMaterialidade && materialidadeList ? `\n\n*APREENSÃO:* \n${materialidadeList}` : "";
 
   // Processar indivíduos detidos
   const detidosList = detidos
-    ? detidos.split(",").filter(individuo => individuo.trim() !== "").map(individuo => `- ${individuo.trim()}`).join("\n")
+    ? detidos.split(";").filter(individuo => individuo.trim() !== "").map(individuo => `- ${individuo.trim()}`).join("\n")
     : "";
   const detidosText = detidosList
     ? `\n*INDIVÍDUOS DETIDOS:* \n${detidosList}\n`

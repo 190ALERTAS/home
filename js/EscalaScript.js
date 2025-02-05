@@ -1,208 +1,435 @@
-    document.addEventListener("DOMContentLoaded", function() {
-        const dataInicio = document.getElementById("dataInicio");
-        const horaInicio = document.getElementById("horaInicio");
-        const horaFim = document.getElementById("horaFim");
-        const adicionar = document.getElementById("adicionar");
-        const limpar = document.getElementById("limpar");
-        const tabela = document.getElementById("tabela");
-        const resumoMes = document.getElementById("resumoMes");
-        const salvar = document.getElementById("salvar");
-        /* const salvarPDF = document.getElementById("salvarPDF"); */
-        const importar = document.getElementById("importar");
-        let registros = [];
+document.addEventListener("DOMContentLoaded", function () {
+    const dataInicio = document.getElementById("dataInicio");
+    const horaInicio = document.getElementById("horaInicio");
+    const horaFim = document.getElementById("horaFim");
+    const adicionar = document.getElementById("adicionar");
+    const limparTudo = document.getElementById("limparTudo");
+    const excluirMes = document.getElementById("excluirMes");
+    const resumoMes = document.getElementById("resumoMes");
+    const exportarPDF = document.getElementById("exportarPDF");
+    const listaRegistros = document.getElementById("listaRegistros");
+    const calendarioEl = document.getElementById("calendario");
+    const mesSelecionado = document.getElementById("mesSelecionado");
+    const atualizarResumo = document.getElementById("atualizarResumo");
+    let registros = JSON.parse(localStorage.getItem("registros")) || {};
+    let calendar;
 
-        // Verifique se há dados no localStorage e carregue-os se existirem
-        if (localStorage.getItem("registros")) {
-            registros = JSON.parse(localStorage.getItem("registros"));
-            atualizarTabela();
-            calcularResumoMes();
+    function inicializarCalendario() {
+        if (calendar) {
+            calendar.destroy();
+        }
+        // Criando o calendário com as configurações desejadas
+        calendar = new FullCalendar.Calendar(calendarioEl, {
+            initialView: "dayGridMonth",
+            locale: "pt-br", // Idioma configurado para português brasileiro
+            events: Object.values(registros)
+                .flat()
+                .map((registro) => ({
+                    title: `${registro.horasTrabalhadas}`,
+                    start: registro.data,
+                })),
+            // Configuração para formatar os meses com a primeira letra maiúscula
+            eventRender: function (info) {
+                // Caso queira alterar o título do evento (em horas trabalhadas, por exemplo)
+                info.el.innerHTML = info.event.title;
+            },
+            headerToolbar: {
+                // left: "prev,next today",
+                // center: "title",
+                // right: "dayGridMonth,dayGridWeek,dayGridDay",
+            },
+            // Formatação da exibição do título do mês
+            titleFormat: { year: "numeric", month: "short" }, // Exibir mês completo (ex: Janeiro, Fevereiro...)
+            dayHeaderFormat: { weekday: "short" }, // Exibe o dia da semana abreviado (ex: Seg, Ter...)
+            weekNumberCalculation: "local", // Calculando número da semana de acordo com a localidade
+            buttonText: {
+                today: "Hoje",
+                month: "Mês",
+                week: "Semana",
+                day: "Dia",
+            },
+        });
+        // Renderizando o calendário
+        calendar.render();
+    }
+
+    function atualizarMesesDisponiveis() {
+        mesSelecionado.innerHTML = "";
+        const mesesDisponiveis = Object.keys(registros).sort();
+        if (mesesDisponiveis.length === 0) {
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "Nenhum mês disponível";
+            mesSelecionado.appendChild(option);
+        } else {
+            mesesDisponiveis.forEach((mes) => {
+                const [ano, mesIndexado] = mes.split("-");
+                const option = document.createElement("option");
+                option.value = mes;
+                option.textContent = new Date(ano, mesIndexado - 1).toLocaleDateString("pt-BR", {
+                    month: "long",
+                    year: "numeric",
+                });
+                mesSelecionado.appendChild(option);
+            });
+        }
+    }
+
+    // Função para calcular o total de horas do mês
+    function calcularTotalDeMinutos(mes) {
+        const registrosMes = registros[mes] || [];
+        let totalMinutos = 0;
+
+        registrosMes.forEach((registro) => {
+            const [horas, minutos] = registro.horasTrabalhadas.match(/\d+/g).map(Number);
+            totalMinutos += horas * 60 + minutos; // Converte horas para minutos e soma
+        });
+
+        return totalMinutos;
+    }
+
+    // Função para verificar o limite de horas para o mês selecionado
+    function verificarLimiteMinutos(mes) {
+        const totalMinutos = calcularTotalDeMinutos(mes);
+
+        let limiteMinutos = 0;
+        const data = new Date(`${mes}-01`);
+        const mesIndexado = data.getMonth(); // Retorna 0 para Janeiro, 1 para Fevereiro, etc.
+
+        // Determinar o limite de minutos para o mês
+        if (mesIndexado === 1) { // Fevereiro
+            const ano = data.getFullYear();
+            limiteMinutos = (ano % 4 === 0 && (ano % 100 !== 0 || ano % 400 === 0)) ? 342 * 29 : 342 * 28; // Ano bissexto ou não
+        } else {
+            limiteMinutos = mesIndexado === 3 || mesIndexado === 5 || mesIndexado === 8 || mesIndexado === 10 ? 342 * 30 : 342 * 31;
         }
 
-        adicionar.addEventListener("click", function() {
-            const dataInput = dataInicio.value;
-            // Parse the date input in the format "DD/MM/YYYY"
-            const [day, month, year] = dataInput.split('-');
-            const data = `${year}/${month}/${day}`; // Convert to "YYYY/MM/DD" format
+        // Verificar se excedeu o limite
+        const minutosExtras = totalMinutos > limiteMinutos ? totalMinutos - limiteMinutos : 0;
+        return { totalMinutos, minutosExtras, limiteMinutos };
+    }
 
-            const inicio = horaInicio.value;
-            const fim = horaFim.value;
-            const horasTrabalhadas = calcularHorasTrabalhadas(inicio, fim);
+    function calcularResumoMes(mes) {
+        const registrosMes = registros[mes] || [];
+        let totalMinutos = registrosMes.reduce((acc, { horasTrabalhadas }) => {
+            const [horas, minutos] = horasTrabalhadas.match(/\d+/g).map(Number);
+            return acc + horas * 60 + minutos;
+        }, 0);
 
-            registros.push({ data, inicio, fim, horasTrabalhadas });
-            // Ordene os registros com base na data antes de atualizar a tabela
-            registros.sort((a, b) => a.data.localeCompare(b.data));
-            atualizarTabela();
-            calcularResumoMes();
+        const diasNoMes = new Date(mes.split("-")[0], mes.split("-")[1], 0).getDate();
+        const limiteMinutos = diasNoMes * 342;
 
-            // Atualize o localStorage
-            localStorage.setItem("registros", JSON.stringify(registros));
-        });
+        const horasLimite = Math.floor(limiteMinutos / 60);
+        const minutosLimite = limiteMinutos % 60;
 
-        limpar.addEventListener("click", function() {
-            Swal.fire({
-                title: "Tem certeza?",
-                text: "Cuidado com o PADM praça, não se atrase! Você tem certeza que deseja limpar todos os dados?",
-                icon: "warning",
-                iconColor: '#d33',
-                showCancelButton: true,
-                confirmButtonColor: "#694f43",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Sim, limpar",
-                cancelButtonText: "Cancelar"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    registros = [];
-                    // Limpe os registros no localStorage
-                    localStorage.removeItem("registros");
-                    atualizarTabela();
-                    calcularResumoMes();
-                    location.reload(); // Isso recarrega a página
-                }
-            });
-        });
+        const horasExtras = Math.max(0, totalMinutos - limiteMinutos);
+        const horasExtrasFormatadas = Math.floor(horasExtras / 60);
+        const minutosExtrasFormatados = horasExtras % 60;
+
+        const horas = Math.floor(totalMinutos / 60);
+        const minutos = totalMinutos % 60;
+
+        // Calcular Total ajustado (removendo extras)
+        const totalAjustadoMinutos = totalMinutos - horasExtras; // Subtrair os extras do total
+        const totalAjustadoHoras = Math.floor(totalAjustadoMinutos / 60);
+        const totalAjustadoMinutosRestantes = totalAjustadoMinutos % 60;
+
+        // Atualizar o texto do resumo
+        resumoMes.innerHTML = `
+        <span style="color: black;">|</span> 
+        <span style="color: #3788d8;">Horas Normais: ${totalAjustadoHoras}h${totalAjustadoMinutosRestantes}m</span> 
+        <span style="color: black;">|</span> <br>
+        <span style="color: black;">|</span> 
+        <span style="color: red;">Extras: ${horasExtrasFormatadas}h${minutosExtrasFormatados}m</span> 
+        <span style="color: black;">|</span> <br>
+        <span style="color: black;">|</span> 
+        <span style="color: green;">Total de Horas: ${horas}h${minutos}m</span> 
+        <span style="color: black;">|</span> <br>
+    `;
+    
+
         
+        // Adicionar a base de cálculo
+        const baseCalculoElemento = document.getElementById("baseCalculo");
+        baseCalculoElemento.innerHTML = `Base de Cálculo conforme NI 033.2: 342m por dia no mês`;
 
-        salvar.addEventListener("click", function() {
-            const dataToSave = JSON.stringify(registros);
-            const blob = new Blob([dataToSave], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "registros.json";
-            a.click();
+        // Definindo o estilo para o texto pequeno
+        baseCalculoElemento.style.fontSize = "12px";  // Define o tamanho do texto
+    }
+
+    function atualizarListaRegistros(mes) {
+        listaRegistros.innerHTML = "";
+        const registrosMes = registros[mes] || [];
+
+        // Criar a tabela
+        const table = document.createElement("table");
+        table.style.width = "100%";
+        table.style.borderCollapse = "collapse";
+
+        // Criar o cabeçalho da tabela
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        const headers = ["Data", "Início", "Fim", "Total", "Ações"];
+        headers.forEach((headerText) => {
+            const th = document.createElement("th");
+            th.textContent = headerText;
+            th.style.border = "1px solid black";
+            th.style.padding = "8px";
+            th.style.backgroundColor = "#694f43";
+            th.style.color = "white"; // Cor do texto
+            headerRow.appendChild(th);
         });
 
-        importar.addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                registros = JSON.parse(e.target.result);
-                atualizarTabela();
-                calcularResumoMes();
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
 
-                // Atualize o localStorage
+        // Criar o corpo da tabela
+        const tbody = document.createElement("tbody");
+
+        registrosMes.forEach((registro, index) => {
+            const row = document.createElement("tr");
+
+            // Formatar a data para DD/MM/YYYY
+            const dataFormatada = formatarData(registro.data);
+
+            const values = [dataFormatada, registro.inicio, registro.fim, registro.horasTrabalhadas];
+            values.forEach((value) => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                td.style.border = "1px solid black";
+                td.style.padding = "8px";
+                row.appendChild(td);
+            });
+
+            // Criar botão de excluir
+            const tdExcluir = document.createElement("td");
+            const btnExcluir = document.createElement("button");
+            btnExcluir.textContent = "X";
+
+            // Estilos diretos no botão
+            btnExcluir.style.backgroundColor = "red";
+            btnExcluir.style.fontSize = "10px";
+            btnExcluir.style.color = "white";
+            btnExcluir.style.border = "none";
+            btnExcluir.style.cursor = "pointer";
+
+            btnExcluir.addEventListener("click", function () {
+                registros[mes].splice(index, 1);
+                if (registros[mes].length === 0) {
+                    delete registros[mes];
+                }
                 localStorage.setItem("registros", JSON.stringify(registros));
-            };
-            reader.readAsText(file);
+                inicializarCalendario();
+                atualizarMesesDisponiveis();
+                calcularResumoMes(mesSelecionado.value);
+                atualizarListaRegistros(mesSelecionado.value);
+            });
+
+            tdExcluir.appendChild(btnExcluir);
+            tdExcluir.style.textAlign = "center";
+            row.appendChild(tdExcluir);
+
+            tbody.appendChild(row);
         });
 
-        function calcularHorasTrabalhadas(inicio, fim) {
-            const inicioTime = new Date(`1970-01-01T${inicio}`);
-            const fimTime = new Date(`1970-01-01T${fim}`);
-            
-            // Calcula a diferença em milissegundos
-            let diff = fimTime - inicioTime;
+        table.appendChild(tbody);
+        listaRegistros.appendChild(table);
+    }
 
-            // Verifica se a diferença é negativa, o que indica que passou para o dia seguinte
-            if (diff < 0) {
-                const umDia = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
-                diff += umDia;
-            }
-            
-            const horas = Math.floor(diff / 3600000);
-            const minutos = Math.round((diff % 3600000) / 60000);
-            
-            return `${horas} horas ${minutos} minutos`;
+    atualizarResumo.addEventListener("click", function () {
+        const mes = mesSelecionado.value;
+        if (!mes) {
+            Swal.fire("Erro", "Selecione um mês.", "error");
+            return;
         }
+        calcularResumoMes(mes);
+        atualizarListaRegistros(mes);
+    });
 
-        function atualizarTabela() {
-            tabela.innerHTML = `
-                <tr>
-                    <th>Data</th>
-                    <th>Início</th>
-                    <th>Fim</th>
-                    <th>Horas Trabalhadas</th>
-                    <th>Ação</th>
-                </tr>
-            `;
-            registros.forEach((registro, index) => {
-                tabela.innerHTML += `
-                    <tr>
-                        <td>${registro.data}</td>
-                        <td>${registro.inicio}</td>
-                        <td>${registro.fim}</td>
-                        <td>${registro.horasTrabalhadas}</td>
-                        <td><button id="excluirbtn" onclick="excluirRegistro(${index})">Excluir</button></td>
-                    </tr>
-                `;
-            });
+    exportarPDF.addEventListener("click", function () {
+        const mes = mesSelecionado.value;
+        if (!mes) {
+            Swal.fire("Erro", "Selecione um mês para exportar o PDF.", "error");
+            return;
         }
-
-        window.excluirRegistro = function(index) {
-            registros.splice(index, 1);
-            atualizarTabela();
-            calcularResumoMes();
-
-            // Atualize o localStorage
-            localStorage.setItem("registros", JSON.stringify(registros));
-        };
-
-        function calcularResumoMes() {
-            let total = 0;
-            registros.forEach(registro => {
-                const horas = Number(registro.horasTrabalhadas.split(" ")[0]);
-                const minutos = Number(registro.horasTrabalhadas.split(" ")[2]);
-                total += horas * 60 + minutos;
-            });
-            const horas = Math.floor(total / 60);
-            const minutos = total % 60;
-            resumoMes.textContent = `${horas} horas ${minutos} minutos`;
+        const registrosMes = registros[mes] || [];
+        if (registrosMes.length === 0) {
+            Swal.fire("Erro", "Não há registros para este mês.", "error");
+            return;
         }
-
-
-        document.getElementById("salvarPDF").addEventListener("click", function () {
-            // Defina as definições do documento
-            const documentDefinition = {
-                content: [
-                    { text: 'Registros de Horas', style: 'header' },
-                    {
-                        table: {
-                            headerRows: 1,
-                            widths: ['auto', 'auto', 'auto', 'auto'],
-                            body: [
-                                ['Data', 'Início', 'Fim', 'Horas Trabalhadas no dia'],
-                            ],
-                        }
+        const totalHoras = resumoMes.textContent;
+        const tabelaDados = registrosMes.map((registro) => [
+            formatarData(registro.data), // Usando a função formatarData para exibir a data corretamente
+            registro.inicio,
+            registro.fim,
+            registro.horasTrabalhadas,
+        ]);
+        const docDefinition = {
+            content: [
+                // Título em caixa alta com o mês
+                { text: `RELATÓRIO DE ESCALA - ${new Date(`${mes}-01T00:00:00`).toLocaleDateString("pt-BR", { month: "long", year: "numeric" }).toUpperCase()}`, style: "header" },
+                { text: `Total de Horas Trabalhadas: ${totalHoras}`, style: "subheader" },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ["*", "*", "*", "*"],
+                        body: [["Data", "Hora Início", "Hora Fim", "Horas Trabalhadas"], ...tabelaDados],
                     },
-                    { text: `Total do mês: ${resumoMes.textContent}`, style: 'total' }
-                ],
-        
-                styles: {
-                    header: { fontSize: 16, bold: true, margin: [0, 0, 0, 10] },
-                    total: { fontSize: 14, bold: true, margin: [0, 20, 0, 0] }
-                }
-            };
-        
-            registros.forEach(({ data, inicio, fim, horasTrabalhadas }) => {
-                documentDefinition.content[1].table.body.push([data, inicio, fim, horasTrabalhadas]);
-            });
-        
-            // Gere o PDF e abra-o em uma nova aba
-            pdfMake.createPdf(documentDefinition).getBuffer(function (buffer) {
-                var blob = new Blob([buffer], { type: 'application/pdf' });
-                var url = URL.createObjectURL(blob);
-                window.open(url, '_blank');
-            });
+                },
+            ],
+            styles: {
+                header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+                subheader: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
+            },
+        };
+        pdfMake.createPdf(docDefinition).download(`Relatorio_${mes}.pdf`);
+    });
+
+    excluirMes.addEventListener("click", function () {
+        const mes = mesSelecionado.value;
+        if (!mes) {
+            Swal.fire("Erro", "Selecione um mês.", "error");
+            return;
+        }
+        Swal.fire({
+            title: "Confirmação",
+            text: `Tem certeza que deseja excluir todos os registros do mês ${mes}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim",
+            cancelButtonText: "Não",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                delete registros[mes];
+                localStorage.setItem("registros", JSON.stringify(registros));
+                inicializarCalendario();
+                atualizarMesesDisponiveis();
+                calcularResumoMes("");
+                atualizarListaRegistros("");
+                Swal.fire("Sucesso", "Registros do mês excluídos.", "success");
+            }
         });
     });
-        
 
-    function toggleDarkMode() {
-        const body = document.body;
-        const icon = document.getElementById('icon');
-        if (body.classList.contains('dark-mode')) {
-            body.classList.remove('dark-mode');
-            icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png'; // Altere para o ícone do sol
-            localStorage.setItem('darkMode', 'false'); // Salve a preferência como "false"
-        } else {
-            body.classList.add('dark-mode');
-            icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png'; // Altere para o ícone da lua
-            localStorage.setItem('darkMode', 'true'); // Salve a preferência como "true"
+    limparTudo.addEventListener("click", function () {
+        Swal.fire({
+            title: "Tem certeza?",
+            text: "Isso irá apagar TODOS os registros.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim",
+            cancelButtonText: "Não",
+            customClass: {
+                confirmButton: 'btn-confirm', // Classe para o botão de confirmação
+                cancelButton: 'btn-cancel',  // Classe para o botão de cancelamento
+            },
+            buttonsStyling: false, // Necessário para usar estilos personalizados
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Segunda confirmação
+                Swal.fire({
+                    title: "Confirmação Final",
+                    text: "Esta ação é irreversível. NÃO SEJA BISONHO",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sim, apagar TUDO",
+                    cancelButtonText: "Cancelar",
+                    customClass: {
+                        confirmButton: 'btn-confirm',
+                        cancelButton: 'btn-cancel',
+                    },
+                    buttonsStyling: false,
+                }).then((finalResult) => {
+                    if (finalResult.isConfirmed) {
+                        // Ação de limpeza definitiva
+                        registros = {};
+                        localStorage.removeItem("registros");
+                        inicializarCalendario();
+                        atualizarMesesDisponiveis();
+                        calcularResumoMes("");
+                        atualizarListaRegistros("");
+                        Swal.fire("Sucesso", "Todos os registros foram apagados.", "success");
+                    }
+                });
+            }
+        });
+    });
+    
+    adicionar.addEventListener("click", function () {
+        const data = dataInicio.value; // Mantém a data como string no formato YYYY-MM-DD
+        const inicio = horaInicio.value;
+        const fim = horaFim.value;
+
+        if (!data || !inicio || !fim) {
+            Swal.fire("Erro", "Por favor, preencha todos os campos.", "error");
+            return;
         }
-      }
-      // Verificar se o usuário já tem uma preferência salva no localStorage
-      const storedDarkMode = localStorage.getItem('darkMode');
-      if (storedDarkMode === 'true') {
-        // Se a preferência for "true", ativar o modo escuro
-        toggleDarkMode();
-      }
+
+        const horasTrabalhadas = calcularHorasTrabalhadas(inicio, fim);
+        const mes = data.slice(0, 7); // Extrai o ano e mês da data fornecida
+
+        if (!registros[mes]) {
+            registros[mes] = [];
+        }
+
+        registros[mes].push({ data, inicio, fim, horasTrabalhadas });
+
+        // Ordena os registros do mês pela data como string (sem conversão para Date)
+        registros[mes].sort((a, b) => a.data.localeCompare(b.data));
+
+        localStorage.setItem("registros", JSON.stringify(registros));
+        inicializarCalendario();
+        atualizarMesesDisponiveis();
+
+        if (mesSelecionado.value === mes) {
+            calcularResumoMes(mes);
+            atualizarListaRegistros(mes);
+        }
+
+        Swal.fire("Sucesso", "Registro adicionado.", "success");
+    });
+
+    function calcularHorasTrabalhadas(inicio, fim) {
+        const [horaInicio, minInicio] = inicio.split(":").map(Number);
+        const [horaFim, minFim] = fim.split(":").map(Number);
+        let horas = horaFim - horaInicio;
+        let minutos = minFim - minInicio;
+        if (minutos < 0) {
+            minutos += 60;
+            horas -= 1;
+        }
+        if (horas < 0) {
+            horas += 24;
+        }
+        return `${horas}h${minutos}m`;
+    }
+    inicializarCalendario();
+    atualizarMesesDisponiveis();
+});
+
+function formatarData(data) {
+    const [ano, mes, dia] = data.split("-"); // Divide a string YYYY-MM-DD
+    return `${dia}/${mes}/${ano}`; // Retorna no formato DD/MM/YYYY
+}
+
+function toggleDarkMode() {
+    const body = document.body;
+    const icon = document.getElementById("icon");
+    if (body.classList.contains("dark-mode")) {
+        body.classList.remove("dark-mode");
+        icon.src = "https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png"; // Altere para o ícone do sol
+        localStorage.setItem("darkMode", "false"); // Salve a preferência como "false"
+    } else {
+        body.classList.add("dark-mode");
+        icon.src = "https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png"; // Altere para o ícone da lua
+        localStorage.setItem("darkMode", "true"); // Salve a preferência como "true"
+    }
+}
+
+// Verificar se o usuário já tem uma preferência salva no localStorage
+const storedDarkMode = localStorage.getItem("darkMode");
+if (storedDarkMode === "true") {
+    // Se a preferência for "true", ativar o modo escuro
+    toggleDarkMode();
+}
