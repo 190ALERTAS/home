@@ -182,7 +182,7 @@ label,
 }
 
 label {
-  margin-bottom: 5px;
+  margin-bottom: 0px;
   font-size: 14px;
 }
 
@@ -448,10 +448,6 @@ button:hover {
   textarea,
   select {
       font-size: 14px;
-  }
-
-  button {
-      float: right;
   }
 
   .botoes {
@@ -765,11 +761,6 @@ button:hover {
       cursor: pointer;
       transition: all 0.3s ease;
       margin-right: 5px;
-  }
-
-  button {
-      right: 50px;
-      /* float: right; */
   }
 
   botao-dark-mode {
