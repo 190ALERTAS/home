@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <link rel="stylesheet" type="text/css" href="/home/css/theme.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" type="text/css" href="/css/theme.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <head>
-    	<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-	})(window,document,'script','dataLayer','GTM-PG7JJRKB');</script>
+	<!-- Google Tag Manager -->
+	<script>(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-PG7JJRKB');</script>
 	<!-- End Google Tag Manager -->
 	<!-- INICIO Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
@@ -19,18 +24,20 @@
 		gtag('config', 'G-3Q72PBZVYP');
 	</script>
 	<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Horas Trabalhadas</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Registro de Horas Trabalhadas</title>
 </head>
+
 <body>
-    		<!-- INICIO DO MENU -->
-		<title>190 🚨 ALERTAS</title>
+	<!-- INICIO DO MENU -->
+	<title>190 🚨 ALERTAS</title>
 	</head>
+
 	<body>
 		<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PG7JJRKB"
-	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-	<!-- End Google Tag Manager (noscript) -->
+		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PG7JJRKB" height="0" width="0"
+				style="display:none;visibility:hidden"></iframe></noscript>
+		<!-- End Google Tag Manager (noscript) -->
 		<div class="nav">
 			<input type="checkbox" id="nav-check">
 			<div class="nav-header">
@@ -51,11 +58,12 @@
 				<a href="veiculos" target="_parent">VEÍCULOS</a>
 				<a href="assuntos" target="_parent">ASSUNTOS CORRENTES</a>
 				<a href="escala" target="_parent">MINHA ESCALA</a>
-                <a href="feedback" target="_parent">SUGESTÕES</a>
+				<a href="feedback" target="_parent">SUGESTÕES</a>
 				<a href="termos" target="_parent">TERMOS DE USO</a>
 			</div>
 			<botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
-				<img id="icon" src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png" alt="Ícone do sol">
+				<img id="icon" src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png"
+					alt="Ícone do sol">
 			</botao-dark-mode>
 		</div>
 		<script>
@@ -75,61 +83,68 @@
 			});
 		</script>
 		<!-- FIM DO MENU -->
-    <h1>MINHA ESCALA</h1>
-	<h5 style="text-align: center; color: red;"> Sistema de "Minha Escala" irá atualizar dia 05/02/2025, portanto, os dados inseridos podem ser perdidos.</h5>
-		<div style="text-align: center;">
-  <a href="https://i.imgur.com/0EK9YeD.png" target="_blank">Clique aqui para ver como vai ficar</a>
-</div>
+		<h1 class="title">Minha Escala</h1>
+		<form class="form">
+			<div class="form-group">
+				<label for="dataInicio">Data:</label>
+				<input type="date" id="dataInicio" class="input">
+			</div>
+			<div class="form-group">
+				<label for="horaInicio">Hora de Início:</label>
+				<input type="time" id="horaInicio" class="input">
+			</div>
+			<div class="form-group">
+				<label for="horaFim">Hora do Fim:</label>
+				<input type="time" id="horaFim" class="input">
+			</div>
+			<button type="button" id="adicionar" class="btn">Adicionar</button>
+		</form>
 
+		<div class="tabela">
+			<div class="controls">
+				<label for="mesSelecionado">Selecionar Mês:</label>
+				<select id="mesSelecionado" class="select"></select>
+				<button type="button" id="atualizarResumo" class="btn">Atualizar Registros</button>
+			</div>
 
-    
-    <form>
-    <label for="dataInicio">Data de Início:</label>
-    <input type="date" id="dataInicio">
-    
-    <label for="horaInicio">Hora de Início:</label>
-    <input type="time" id="horaInicio">
-    
-    <label for="horaFim">Hora do Fim:</label>
-    <input type="time" id="horaFim">
-    
-    <button id="adicionar">Adicionar</button>
-        
-    <div>
-        <h2>MINHA ESCALA</h2>
-        <table id="tabela">
-            <tr>
-                <th>Data</th>
-                <th>Início</th>
-                <th>Fim</th>
-                <th>Horas Trabalhadas</th>
-                <th>Ação</th>
-            </tr>
-        </table>
-    </div>
-    <buttonclear id="limpar">Limpar Todos os Dados</buttonclear>
-    <div id="resultadoMes">
-        <h2>Resumo do Mês:</h2>
-        <span id="resumoMes">0 horas</span><p>
-	</div>
-		<button id="salvarPDF" >Exportar para PDF</button>
-    </div><p>
-    <div class="botoes">
-    <button id="salvar">Salvar</button>
-    <input type="file" id="importar" accept=".json">
-    </div>
-				<!-- inicio crédito na página -->
-				<footer>
-					<font size="1"> Versão 3.30 </font>
-					<br />
-					<font size="1"> Criado por Sd Ferrão - 32BPM </font>
-					<br />
-				</footer>
-				<!-- fim o crédito na página -->
-</form>
-</body>
-<script src="/home/js/EscalaScript.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+			<h2>Registros do Mês Selecionado</h2>
+			<ul id="listaRegistros" class="registro-list"></ul>
+			<div id="resultadoMes">
+				<div class="resumo-container">
+					<div class="summary">
+						<div class="resumo-mensal">
+							<h2>Resumo Mensal</h2>
+							<span id="resumoMes" class="resumo-value">0 horas 0 minutos</span>
+						</div>
+					</div>
+					<div id="baseCalculo"></div>
+				</div>
+			</div>
+
+			<div class="button-container">
+				<button class="btn-especifico" id="excluirMes">Excluir Mês Selecionado</button>
+				<button class="btn-especifico" id="limparTudo">Apagar Todos os Registros</button>
+				<button class="btn-especifico" id="exportarPDF">Exportar PDF</button>
+			</div>
+
+		</div>
+
+		</div>
+		<div id="calendario" class="calendario">
+			<!-- inicio crédito na página -->
+			<footer>
+				<font size="1"> Versão 4.00 </font>
+				<br />
+				<font size="1"> Criado por Sd Ferrão - 32BPM </font>
+				<br />
+			</footer>
+			<!-- fim o crédito na página -->
+		</div>
+
+		<script src="/js/EscalaScript.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
+
 </html>
