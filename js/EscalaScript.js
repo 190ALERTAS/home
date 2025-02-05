@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const totalAjustadoMinutosRestantes = totalAjustadoMinutos % 60;
 
         // Atualizar o texto do resumo
-        resumoMes.innerHTML = `<br><br>
+        resumoMes.innerHTML = `
         <span style="color: #3788d8;">Horas Normais: ${totalAjustadoHoras}h${totalAjustadoMinutosRestantes}m</span>
         <span style="color: red;">Extras: ${horasExtrasFormatadas}h${minutosExtrasFormatados}m</span>
         <span style="color: green;">Total de Horas: ${horas}h${minutos}m</span>
