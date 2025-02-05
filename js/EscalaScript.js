@@ -135,20 +135,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const totalAjustadoMinutosRestantes = totalAjustadoMinutos % 60;
 
         // Atualizar o texto do resumo
-        resumoMes.innerHTML = `
-        <span style="color: black;">|</span> 
-        <span style="color: #3788d8;">Horas Normais: ${totalAjustadoHoras}h${totalAjustadoMinutosRestantes}m</span> 
-        <span style="color: black;">|</span> <br>
-        <span style="color: black;">|</span> 
-        <span style="color: red;">Extras: ${horasExtrasFormatadas}h${minutosExtrasFormatados}m</span> 
-        <span style="color: black;">|</span> <br>
-        <span style="color: black;">|</span> 
-        <span style="color: green;">Total de Horas: ${horas}h${minutos}m</span> 
-        <span style="color: black;">|</span> <br>
+        resumoMes.innerHTML = `<br><br>
+        <span style="color: #3788d8;">Horas Normais: ${totalAjustadoHoras}h${totalAjustadoMinutosRestantes}m</span>
+        <span style="color: red;">Extras: ${horasExtrasFormatadas}h${minutosExtrasFormatados}m</span>
+        <span style="color: green;">Total de Horas: ${horas}h${minutos}m</span>
     `;
     
-
-        
         // Adicionar a base de cálculo
         const baseCalculoElemento = document.getElementById("baseCalculo");
         baseCalculoElemento.innerHTML = `Base de Cálculo conforme NI 033.2: 342m por dia no mês`;
