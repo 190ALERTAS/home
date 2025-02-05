@@ -1,4 +1,7 @@
+/* Reset básico */
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -96,12 +99,24 @@ th {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.resumo-mes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px; /* Espaçamento entre os itens */
+  font-size: 18px; /* Ajuste conforme necessário */
+}
+
+#baseCalculo {
+  color: #7d7d7c;
+}
+
 .summary {
   margin-bottom: 20px;
 }
 
 .resumo-mensal {
-  display: flex;
   justify-content: space-between;
   align-items: center;
 }
