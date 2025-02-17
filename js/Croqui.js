@@ -145,10 +145,6 @@ function showControls(marker) {
     const sizeControl = document.createElement('div');
     sizeControl.className = 'control-group';
 
-    const sizeValue = document.createElement('span');
-    sizeValue.innerText = marker.options.icon.options.iconSize[0];
-    sizeControl.appendChild(sizeValue);
-
     const sizeLabel = document.createElement('label');
     sizeLabel.innerText = 'Tamanho: ';
     sizeControl.appendChild(sizeLabel);
@@ -175,6 +171,11 @@ function showControls(marker) {
     sizeControl.appendChild(sizeSlider);
 
     controls.appendChild(sizeControl);
+
+    const sizeValue = document.createElement('span');
+    sizeValue.className = 'size-value'; // Adiciona uma classe CSS
+    sizeValue.innerText = marker.options.icon.options.iconSize[0];
+    sizeControl.appendChild(sizeValue);
 
     // Botões de Ação
     const buttonGroup = document.createElement('div');
