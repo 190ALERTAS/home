@@ -145,13 +145,13 @@ function showControls(marker) {
     const sizeControl = document.createElement('div');
     sizeControl.className = 'control-group';
 
-    const sizeLabel = document.createElement('label');
-    sizeLabel.innerText = 'Tamanho: ';
-    sizeControl.appendChild(sizeLabel);
-
     const sizeValue = document.createElement('span');
     sizeValue.innerText = marker.options.icon.options.iconSize[0];
     sizeControl.appendChild(sizeValue);
+
+    const sizeLabel = document.createElement('label');
+    sizeLabel.innerText = 'Tamanho: ';
+    sizeControl.appendChild(sizeLabel);
 
     const sizeSlider = document.createElement('input');
     sizeSlider.type = 'range';
