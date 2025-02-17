@@ -266,6 +266,15 @@ h2 {
   flex-grow: 1;
 }
 
+.size-value {
+  font-weight: bold;
+  color: #000;
+  background-color: #bfbfbf;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 .button-group {
   display: flex;
   gap: 10px;
