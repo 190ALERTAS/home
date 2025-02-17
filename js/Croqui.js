@@ -7,11 +7,10 @@ const map = L.map('map', {
     doubleClickZoom: false
 });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-    maxZoom: 19,
-    detectRetina: true // Ativa imagens de alta resolução para dispositivos compatíveis
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
 }).addTo(map);
+
 
 const images = {
     'veiculo': 'https://raw.githubusercontent.com/190ALERTAS/home/refs/heads/main/img/croqui-img/ve%C3%ADculo.png',
@@ -243,6 +242,13 @@ L.control.locate = function(opts) {
 }
 
 L.control.locate({ position: 'topleft' }).addTo(map);
+
+window.addEventListener("resize", function() {
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 200);
+});
+
 
 function captureMap() {
     const mapElement = document.getElementById('map');
