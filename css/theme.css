@@ -168,6 +168,14 @@ h2 {
   justify-content: space-between;
 }
 
+.mescontrols {
+  margin-top: 20px;
+  display: block;
+  flex-wrap: inherit;
+  gap: 2px;
+  justify-content: space-between;
+}
+
 .controls button {
   padding: 5px 5px;
   max-width: 600px;
@@ -189,7 +197,7 @@ h2 {
   margin: 0 auto;
   padding: 20px;
   background-color: #e7e7e7;
-  border-radius: 2px;
+  border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   color: #000000;
   font-size: 24px;
@@ -1122,8 +1130,20 @@ body.dark-mode .resumo-container {
 body.dark-mode #calendario {
   background-color: #333;
 }
+
 body.dark-mode label {
-  color: #000000;
+  color: #ffffff;
+}
+
+body.dark-mode .controls-container {
+  background-color: #333;
+  color: #eee;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 body.dark-mode h1 {
