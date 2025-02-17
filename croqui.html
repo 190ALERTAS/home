@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- INICIO Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-3Q72PBZVYP');
+    </script>
+    <!-- FIM Google tag (gtag.js) -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ASSUNTOS CORRENTES</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico"
+        type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="css/theme.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <!-- INICIO DO MENU -->
+    <title>190 🚨 ALERTAS</title>
+    </head>
+
+    <body>
+        <div class="nav">
+            <input type="checkbox" id="nav-check">
+            <div class="nav-header">
+                <img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png"
+                    class="imagem-menu">
+                <div class="nav-title">190 🚨 ALERTAS</div>
+            </div>
+            <div class="nav-btn">
+                <label for="nav-check">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </label>
+            </div>
+            <div class="nav-links">
+                <a href="index" target="_parent">INÍCIO</a>
+                <a href="release" target="_parent">RELEASE</a>
+                <a href="croqui" target="_parent">CROQUI DIGITAL</a>
+                <a href="veiculos" target="_parent">VEÍCULOS</a>
+                <a href="assuntos" target="_parent">ASSUNTOS CORRENTES</a>
+                <a href="escala" target="_parent">MINHA ESCALA</a>
+                <a href="feedback" target="_parent">SUGESTÕES</a>
+                <a href="termos" target="_parent">TERMOS DE USO</a>
+            </div>
+            <botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
+                <img id="icon" src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png"
+                    alt="Ícone do sol">
+            </botao-dark-mode>
+        </div>
+        <script>
+            // Adicione um evento de clique no checkbox
+            document.addEventListener('DOMContentLoaded', function () {
+                var checkbox = document.getElementById('nav-check');
+                var body = document.body;
+                checkbox.addEventListener('change', function () {
+                    if (checkbox.checked) {
+                        // Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+                        body.classList.add('scroll-lock');
+                    } else {
+                        // Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+                        body.classList.remove('scroll-lock');
+                    }
+                });
+            });
+        </script>
+        <!-- FIM DO MENU -->
+        <title> 190 🚨 ALERTAS</title>
+        <link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico"
+            type="image/x-icon">
+    <head>
+        <br><br>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mapa de Acidente de Trânsito</title>
+        <link rel="stylesheet" href="css/theme.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.pm/dist/leaflet.pm.css" />
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script src="https://rawgit.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js"></script>
+        <script src="https://unpkg.com/leaflet.pm/dist/leaflet.pm.min.js"></script>
+        <script src="js/Croqui.js" defer></script>
+    </head>
+    <body>
+       <div id="progress-container">
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div class="step-indicators">
+                <div id="circle1" class="step-circle active" onclick="nextStep(1)">1</div>
+                <div id="circle2" class="step-circle" onclick="nextStep(2)">2</div>
+                <div id="circle3" class="step-circle" onclick="nextStep(3)">3</div>
+            </div>
+        </div>
+
+        <div id="step1" class="step" style="display: block;">
+            <h2>Passo 1: Selecionar o Local do Mapa</h2>
+        </div>
+        <div id="step2" class="step">
+            <h2>Passo 2: Posicionar os Objetos</h2>
+            <div id="marker-controls" class="controls">
+                <button onclick="addMarker('veiculo')">Veículo</button>
+                <button onclick="addMarker('moto')">Moto/Bicicleta</button>
+                <button onclick="addMarker('onibus')">Ônibus</button>
+                <button onclick="addMarker('caminhao')">Caminhão</button>
+                <button onclick="addMarker('carroça')">Carroça</button>
+                <button onclick="addMarker('carroça-tombada')">Carroça Tombada</button>
+                <button onclick="addMarker('veiculo-capotado')">Veículo Capotado</button>
+                <button onclick="addMarker('veiculo-tombado')">Veículo Tombado</button>
+            </div>
+        </div>
+        <div id="step3" class="step">
+            <h2>Passo 3: Capturar Imagem</h2><br>
+            <button onclick="captureMap()">Salvar</button>
+        </div><br>
+        <div id="map-container">
+            <div id="map"></div>
+            <div id="controls-container"></div>
+        			<!-- inicio crédito na página -->
+			<footer>
+				<font size="1"> Versão 4.00 </font>
+				<br />
+				<font size="1"> Criado por Sd Ferrão - 32BPM </font>
+				<br />
+			</footer>
+			<!-- fim o crédito na página -->
+        </div>
+        
+    </body>
+</html>
