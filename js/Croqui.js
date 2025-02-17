@@ -252,15 +252,19 @@ window.addEventListener("resize", function() {
 
 function captureMap() {
     const mapElement = document.getElementById('map');
+
+    // Atualiza o tamanho do mapa
+    map.invalidateSize();
+
     html2canvas(mapElement, {
-        useCORS: true, // Necessário para carregar imagens externas
-        logging: true, // Para depuração
-        scale: 10, // Aumente a escala para melhorar a qualidade da imagem
-        letterRendering: true, // Melhora o rendering de textos
-        backgroundColor: null, // Remove qualquer fundo para a imagem
-        width: 600, // Define a largura da captura
-        height: 600, // Define a altura da captura
-        x: 0, // Ajusta as coordenadas para a captura
+        useCORS: true,
+        logging: true,
+        scale: 10, // Reduz um pouco para melhorar performance sem perder qualidade
+        letterRendering: true,
+        backgroundColor: null,
+        width: mapElement.clientWidth,  // Captura o tamanho real do mapa
+        height: mapElement.clientHeight, 
+        x: 0,
         y: 0
     }).then(canvas => {
         const link = document.createElement('a');
@@ -271,7 +275,6 @@ function captureMap() {
         console.error('Erro ao capturar o mapa:', error);
     });
 }
-
 
 function nextStep(step) {
     // Esconder todos os passos
