@@ -60,6 +60,11 @@ function addMarker(type) {
                 marker.on('click', function() {
                     showControls(marker);
                 });
+
+                // Adiciona evento touchstart para prevenir comportamento padrão
+                marker.on('touchstart', function(e) {
+                    e.originalEvent.preventDefault();
+                });
             });
         };
     }
