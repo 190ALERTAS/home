@@ -278,6 +278,29 @@ button {
   font-size: 14px;
 }
 
+.btn-config {
+  padding: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 20px; /* Alinha à direita */
+  max-width: 600px;
+}
+
+body.dark-mode .btn-config img {
+  filter: invert(1);
+}
+
+.btn-config:hover {
+  background: none;
+}
+
+.btn-config img {
+  width: 24px;
+  height: 24px;
+}
+
 .delete-button {
   background-color: #ff4d4d;
   color: white;
@@ -1216,26 +1239,3 @@ body.dark-mode .footer {
 }
 
 /* FIM DEFINIÇÕES DO TEMA ESCURO */
-
-.btn-config {
-  padding: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  position: absolute;
-  right: 20px; /* Alinha à direita */
-  max-width: 600px;
-}
-
-body.dark-mode .btn-config img {
-  filter: invert(1);
-}
-
-.btn-config:hover {
-  background: none;
-}
-
-.btn-config img {
-  width: 24px;
-  height: 24px;
-}
