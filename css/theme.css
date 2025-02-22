@@ -1239,4 +1239,27 @@ body.dark-mode .footer {
   color: #eee;
 }
 
+body.dark-mode .swal2-popup {
+  background-color: #333;
+  color: #eee;
+}
+
+body.dark-mode .swal2-title {
+  color: #eee;
+}
+
+body.dark-mode .swal2-content {
+  color: #eee;
+}
+
+body.dark-mode .swal2-styled.swal2-confirm {
+  background-color: #444;
+  color: #eee;
+}
+
+body.dark-mode .swal2-styled.swal2-cancel {
+  background-color: #555;
+  color: #eee;
+}
+
 /* FIM DEFINIÇÕES DO TEMA ESCURO */
