@@ -279,7 +279,7 @@ button {
 }
 
 .btn-config {
-  padding: 5px;
+  padding: 0px;
   background: none;
   border: none;
   cursor: pointer;
@@ -297,8 +297,8 @@ body.dark-mode .btn-config img {
 }
 
 .btn-config img {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
 }
 
 .delete-button {
@@ -584,7 +584,8 @@ form {
   background-color: #e7e7e7;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  position: relative; /* Adicione esta linha */
+  position: relative;
+  /* Adicione esta linha */
 }
 
 #container {
