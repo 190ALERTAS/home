@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const calendarioEl = document.getElementById("calendario");
     const mesSelecionado = document.getElementById("mesSelecionado");
     const atualizarResumo = document.getElementById("atualizarResumo");
+    const configButton = document.getElementById("configButton");
     let registros = JSON.parse(localStorage.getItem("registros")) || {};
     let calendar;
 
@@ -392,6 +393,60 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         Swal.fire("Sucesso", "Registro adicionado.", "success");
+    });
+
+    configButton.addEventListener("click", function () {
+        Swal.fire({
+            title: 'Configurações',
+            showCancelButton: true,
+            showConfirmButton: false,
+            html: `
+                <button id="downloadRegistros" class="swal2-styled">Exportar registros ▲</button>
+                <button id="importRegistros" class="swal2-styled">Importar registros ▼</button>
+            `,
+            didOpen: () => {
+                const downloadButton = document.getElementById("downloadRegistros");
+                const importButton = document.getElementById("importRegistros");
+
+                downloadButton.addEventListener("click", function () {
+                    const registros = JSON.parse(localStorage.getItem("registros")) || {};
+                    const blob = new Blob([JSON.stringify(registros, null, 2)], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "registros.json";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    Swal.close();
+                });
+
+                importButton.addEventListener("click", function () {
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = "application/json";
+                    input.addEventListener("change", function (event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                const importedRegistros = JSON.parse(e.target.result);
+                                localStorage.setItem("registros", JSON.stringify(importedRegistros));
+                                registros = importedRegistros;
+                                inicializarCalendario();
+                                atualizarMesesDisponiveis();
+                                calcularResumoMes(mesSelecionado.value);
+                                atualizarListaRegistros(mesSelecionado.value);
+                                Swal.fire("Sucesso", "Registros importados com sucesso.", "success");
+                            };
+                            reader.readAsText(file);
+                        }
+                    });
+                    input.click();
+                    Swal.close();
+                });
+            }
+        });
     });
 
     function calcularHorasTrabalhadas(inicio, fim) {
