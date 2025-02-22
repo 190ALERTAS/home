@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let registros = JSON.parse(localStorage.getItem("registros")) || {};
     let calendar;
 
-    function inicializarCalendario() {
+    function inicializarCalendario(dataInicial) {
         if (calendar) {
             calendar.destroy();
         }
@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
         calendar = new FullCalendar.Calendar(calendarioEl, {
             initialView: "dayGridMonth",
             locale: "pt-br", // Idioma configurado para português brasileiro
+            initialDate: dataInicial, // Define a data inicial do calendário
             events: Object.values(registros)
                 .flat()
                 .map((registro) => ({
@@ -56,6 +57,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function atualizarMesesDisponiveis() {
         mesSelecionado.innerHTML = "";
         const mesesDisponiveis = Object.keys(registros).sort();
+        const mesAtual = new Date().toISOString().slice(0, 7); // Obtém o mês atual no formato YYYY-MM
+
         if (mesesDisponiveis.length === 0) {
             const option = document.createElement("option");
             option.value = "";
@@ -70,10 +73,29 @@ document.addEventListener("DOMContentLoaded", function () {
                     month: "long",
                     year: "numeric",
                 });
+                if (mes === mesAtual) {
+                    option.selected = true; // Seleciona o mês atual
+                }
                 mesSelecionado.appendChild(option);
             });
         }
+
+        // Atualiza os dados para o mês atual
+        if (mesSelecionado.value) {
+            calcularResumoMes(mesSelecionado.value);
+            atualizarListaRegistros(mesSelecionado.value);
+            inicializarCalendario(`${mesSelecionado.value}-01`); // Atualiza o calendário para o mês selecionado
+        }
     }
+
+    mesSelecionado.addEventListener("change", function () {
+        const mes = mesSelecionado.value;
+        if (mes) {
+            calcularResumoMes(mes);
+            atualizarListaRegistros(mes);
+            inicializarCalendario(`${mes}-01`); // Atualiza o calendário para o mês selecionado
+        }
+    });
 
     // Função para calcular o total de horas do mês
     function calcularTotalDeMinutos(mes) {
@@ -143,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
         // Adicionar a base de cálculo
         const baseCalculoElemento = document.getElementById("baseCalculo");
-        baseCalculoElemento.innerHTML = `Base de Cálculo conforme NI 033.2: 342m por dia no mês`;
+        baseCalculoElemento.innerHTML = `Base de Cálculo conforme NI 033.2: (342m) 5,7xdia/mês`;
 
         // Definindo o estilo para o texto pequeno
         baseCalculoElemento.style.fontSize = "12px";  // Define o tamanho do texto
@@ -228,16 +250,6 @@ document.addEventListener("DOMContentLoaded", function () {
         table.appendChild(tbody);
         listaRegistros.appendChild(table);
     }
-
-    atualizarResumo.addEventListener("click", function () {
-        const mes = mesSelecionado.value;
-        if (!mes) {
-            Swal.fire("Erro", "Selecione um mês.", "error");
-            return;
-        }
-        calcularResumoMes(mes);
-        atualizarListaRegistros(mes);
-    });
 
     exportarPDF.addEventListener("click", function () {
         const mes = mesSelecionado.value;
@@ -396,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         return `${horas}h${minutos}m`;
     }
-    inicializarCalendario();
+    inicializarCalendario(new Date().toISOString().slice(0, 10)); // Inicializa o calendário com a data atual
     atualizarMesesDisponiveis();
 });
 
