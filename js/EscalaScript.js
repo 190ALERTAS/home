@@ -401,8 +401,8 @@ document.addEventListener("DOMContentLoaded", function () {
             showCancelButton: true,
             showConfirmButton: false,
             html: `
-                <button id="downloadRegistros" class="swal2-styled">Exportar registros ▲</button>
-                <button id="importRegistros" class="swal2-styled">Importar registros ▼</button>
+                <button id="downloadRegistros" class="swal2-styled">Exportar registros 🡅</button>
+                <button id="importRegistros" class="swal2-styled">Importar registros 🡇</button>
             `,
             didOpen: () => {
                 const downloadButton = document.getElementById("downloadRegistros");
