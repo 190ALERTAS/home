@@ -392,7 +392,13 @@ document.addEventListener("DOMContentLoaded", function () {
             atualizarListaRegistros(mes);
         }
 
-        Swal.fire("Sucesso", "Registro adicionado.", "success");
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Registro adicionado",
+            showConfirmButton: false,
+            timer: 800
+          });
     });
 
     configButton.addEventListener("click", function () {
