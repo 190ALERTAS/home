@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <span style="color: red;">Extras: ${horasExtrasFormatadas}h${minutosExtrasFormatados}m</span>
         <span style="color: green;">Total de Horas: ${horas}h${minutos}m</span>
     `;
-    
+
         // Adicionar a base de cálculo
         const baseCalculoElemento = document.getElementById("baseCalculo");
         baseCalculoElemento.innerHTML = `Base de Cálculo conforme NI 033.2: (342m) 5,7xdia/mês`;
@@ -360,7 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
-    
+
     adicionar.addEventListener("click", function () {
         const data = dataInicio.value; // Mantém a data como string no formato YYYY-MM-DD
         const inicio = horaInicio.value;
@@ -477,6 +477,17 @@ function formatarData(data) {
     const [ano, mes, dia] = data.split("-"); // Divide a string YYYY-MM-DD
     return `${dia}/${mes}/${ano}`; // Retorna no formato DD/MM/YYYY
 }
+
+const configButton = document.getElementById('configButton');
+const img = configButton.querySelector('img');
+
+configButton.addEventListener('click', () => {
+    img.classList.add('animated');
+
+    setTimeout(() => {
+        img.classList.remove('animated');
+    }, 800); // Retorna ao original após 0.8s
+});
 
 function toggleDarkMode() {
     const body = document.body;
