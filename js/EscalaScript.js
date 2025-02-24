@@ -407,8 +407,15 @@ document.addEventListener("DOMContentLoaded", function () {
             showCancelButton: true,
             showConfirmButton: false,
             html: `
-                <button id="downloadRegistros" class="swal2-styled">Exportar registros 🡅</button>
-                <button id="importRegistros" class="swal2-styled">Importar registros 🡇</button>
+<button id="downloadRegistros" class="swal2-styled">
+    Exportar registros
+    <img src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/setas/seta-cima.png" alt="Seta para cima" style="width: 18px; margin-left: 8px; filter: invert(1);">
+</button>
+
+<button id="importRegistros" class="swal2-styled">
+    Importar registros
+    <img src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/setas/seta-baixo.png" alt="Seta para baixo" style="width: 18px; margin-left: 8px; filter: invert(1);">
+</button>
             `,
             didOpen: () => {
                 const downloadButton = document.getElementById("downloadRegistros");
