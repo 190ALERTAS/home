@@ -299,6 +299,12 @@ body.dark-mode .btn-config img {
 .btn-config img {
   width: 18px;
   height: 18px;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+
+.btn-config img.animated {
+  transform: scale(1.3) rotate(250deg);
+  opacity: 0.5;
 }
 
 .delete-button {
