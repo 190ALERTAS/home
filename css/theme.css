@@ -284,8 +284,8 @@ button {
   border: none;
   cursor: pointer;
   position: absolute;
-  right: 32px;
-  top: 32px;
+  right: 20px;
+  top: 20px;
   max-width: 600px;
 }
 
