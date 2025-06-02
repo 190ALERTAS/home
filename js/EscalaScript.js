@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const atualizarResumo = document.getElementById("atualizarResumo");
     const configButton = document.getElementById("configButton");
     let registros = JSON.parse(localStorage.getItem("registros")) || {};
+    let mesAtualSelecionado = localStorage.getItem("mesAtualSelecionado"); // Armazena o mês selecionado
     let calendar;
 
     function inicializarCalendario(dataInicial) {
@@ -74,14 +75,20 @@ document.addEventListener("DOMContentLoaded", function () {
                     month: "long",
                     year: "numeric",
                 });
-                if (mes === mesAtual) {
-                    option.selected = true; // Seleciona o mês atual
-                }
                 mesSelecionado.appendChild(option);
             });
+
+            // Seleciona o mês mais próximo do atual ou o mês armazenado
+            if (mesAtualSelecionado && mesesDisponiveis.includes(mesAtualSelecionado)) {
+                mesSelecionado.value = mesAtualSelecionado;
+            } else if (mesesDisponiveis.includes(mesAtual)) {
+                mesSelecionado.value = mesAtual;
+            } else {
+                mesSelecionado.value = mesesDisponiveis[mesesDisponiveis.length - 1]; // Último mês disponível
+            }
         }
 
-        // Atualiza os dados para o mês atual
+        // Atualiza os dados para o mês selecionado
         if (mesSelecionado.value) {
             calcularResumoMes(mesSelecionado.value);
             atualizarListaRegistros(mesSelecionado.value);
@@ -92,6 +99,8 @@ document.addEventListener("DOMContentLoaded", function () {
     mesSelecionado.addEventListener("change", function () {
         const mes = mesSelecionado.value;
         if (mes) {
+            mesAtualSelecionado = mes; // Atualiza o mês selecionado
+            localStorage.setItem("mesAtualSelecionado", mesAtualSelecionado); // Salva no localStorage
             calcularResumoMes(mes);
             atualizarListaRegistros(mes);
             inicializarCalendario(`${mes}-01`); // Atualiza o calendário para o mês selecionado
@@ -392,13 +401,18 @@ document.addEventListener("DOMContentLoaded", function () {
             atualizarListaRegistros(mes);
         }
 
+        // Limpa os campos após adicionar
+        dataInicio.value = "";
+        horaInicio.value = "";
+        horaFim.value = "";
+
         Swal.fire({
             position: "center",
             icon: "success",
             title: "Registro adicionado",
             showConfirmButton: false,
             timer: 800
-          });
+        });
     });
 
     configButton.addEventListener("click", function () {
