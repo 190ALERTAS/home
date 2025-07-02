@@ -1060,7 +1060,7 @@ footer {
   display: flex;
   justify-content: center;
   position: absolute;
-  bottom: 0;
+  bottom: -60px;
 }
 
 footer .footer-content {
