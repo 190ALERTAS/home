@@ -1,7 +1,6 @@
 # Termos de Uso e Política de Privacidade - 190 🚨 ALERTAS
 
-**Última atualização dos Termos de Uso: 13 de setembro de 2023** --- 
-**Última atualização do App: 15 de dezembro de 2024**
+**Última atualização: 13 de setembro de 2023**
 
 ## Termos de Uso:
 

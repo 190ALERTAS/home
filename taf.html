@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" type="text/css" href="css/theme.css">
+  <link rel="stylesheet" type="text/css" href="css/menu.css">
+  <link rel="stylesheet" type="text/css" href="css/dark-mode.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="css/taf.css">
+  <link rel="stylesheet" type="text/css" href="css/menu.css">
+  <link rel="stylesheet" type="text/css" href="css/dark-mode.css">
+  <title>CALCULADORA TAF</title>
+
+
+</head>
+
+<body>
+  <!-- INICIO DO MENU -->
+  <title>190 🚨 ALERTAS</title>
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PG7JJRKB" height="0" width="0"
+        style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div class="nav">
+      <input type="checkbox" id="nav-check">
+      <div class="nav-header">
+        <img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png" class="imagem-menu">
+        <div class="nav-title">190 🚨 ALERTAS</div>
+      </div>
+      <div class="nav-btn">
+        <label for="nav-check">
+          <span></span>
+          <span></span>
+          <span></span>
+        </label>
+      </div>
+      <div class="nav-links">
+        <a href="index" target="_parent">INÍCIO</a>
+        <a href="release" target="_parent">RELEASE</a>
+        <a href="croqui" target="_parent">CROQUI DIGITAL</a>
+        <a href="veiculos" target="_parent">VEÍCULOS</a>
+        <a href="assuntos" target="_parent">ASSUNTOS CORRENTES</a>
+        <a href="escala" target="_parent">MINHA ESCALA</a>
+        <a href="taf" target="_parent">CALCULADORA TAF</a>
+        <a href="feedback" target="_parent">SUGESTÕES</a>
+        <a href="termos" target="_parent">TERMOS DE USO</a>
+      </div>
+      <botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
+        <img id="icon" src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png"
+          alt="Ícone do sol">
+      </botao-dark-mode>
+    </div>
+    <script>
+      // Adicione um evento de clique no checkbox
+      document.addEventListener('DOMContentLoaded', function () {
+        var checkbox = document.getElementById('nav-check');
+        var body = document.body;
+        checkbox.addEventListener('change', function () {
+          if (checkbox.checked) {
+            // Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
+            body.classList.add('scroll-lock');
+          } else {
+            // Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
+            body.classList.remove('scroll-lock');
+          }
+        });
+      });
+    </script>
+
+    <!-- FIM DO MENU -->
+    <div class="container-fluid">
+
+      <!-- Abas tipo navegador -->
+      <div class="nav-browser-tabs" id="browserTabs">
+        <div class="nav-browser-tab active" data-tab="calc-content">Calculadora TAF</div>
+        <div class="nav-browser-tab" data-tab="tabela-content">Tabela</div>
+      </div>
+
+      <!-- Conteúdo das abas -->
+      <div id="calc-content" class="tab-browser-content active">
+        <form class="taf-form-linear" autocomplete="off">
+          <div class="taf-categorias">
+            <div class="taf-form-group">
+              <label for="filtro_sexo" class="taf-label">Gênero</label>
+              <select class="taf-select" id="filtro_sexo" name="filtro_sexo" onchange="listar_dados();">
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+              </select>
+            </div>
+            <div class="taf-form-group">
+              <label for="filtro_idade" class="taf-label">Idade</label>
+              <select class="taf-select" id="filtro_idade" name="filtro_idade" onchange="listar_dados();">
+                <option value="1">Até 27 anos</option>
+                <option value="2">28 a 35 anos</option>
+                <option value="3">36 a 44 anos</option>
+                <option value="4">45 a 50 anos</option>
+                <option value="5">Mais de 51</option>
+              </select>
+            </div>
+          </div>
+          <div class="taf-espaco-bloco"></div>
+          <div class="taf-exercicios-bloco">
+            <div class="taf-form-group" id="listar_dados"></div>
+          </div>
+          <div class="taf-form-group">
+            <div class="p-3 mb-2 bg-success text-white" style="display: none; text-align: center" id="div_excelente">
+              <span id="span_pontos_excelente"></span>
+            </div>
+            <div class="p-3 mb-2 bg-primary text-white" style="display: none; text-align: center" id="div_muito_bom">
+              <span id="span_pontos_muito_bom"></span>
+            </div>
+            <div class="p-3 mb-2 bg-info text-white" style="display: none; text-align: center" id="div_bom">
+              <span id="span_pontos_bom"></span>
+            </div>
+            <div class="p-3 mb-2 bg-secondary text-white" style="display: none; text-align: center" id="div_regular">
+              <span id="span_pontos_regular"></span>
+            </div>
+            <div class="p-3 mb-2 bg-danger text-white" style="display: none; text-align: center" id="div_insuficiente">
+              <span id="span_pontos_insuficiente"></span>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div id="tabela-content" class="tab-browser-content">
+        <div id="div_tabela_adaptada">
+          <table class="table-bordered mt-3" style="width: 100%; text-align: center">
+
+            <tr>
+              <th colspan="13" style="background-color: #878080">
+                TABELA TAF ANEXO “E” DA NOTA DE INSTRUÇÃO Nº 3.3/EMBM/2023
+              </th>
+            </tr>
+            <tr>
+              <th colspan="2">Barra</th>
+              <th colspan="2">Apoio</th>
+              <th colspan="2">Abdominal</th>
+              <th colspan="2">Corrida</th>
+              <th colspan="5">Pontos</th>
+            </tr>
+
+            <tr>
+              <th colspan="2">Até 35 anos</th>
+              <th colspan="2">36 anos ou mais</th>
+
+
+              <th colspan="2">60 Segundos</th>
+              <th colspan="2">12 Minutos</th>
+              <th rowspan="2">Até 27 anos</th>
+              <th rowspan="2">28 a 35 anos</th>
+              <th rowspan="2">36 a 44 anos</th>
+              <th rowspan="2">45 a 50 anos</th>
+              <th rowspan="2">51 anos ou mais</th>
+            </tr>
+
+            <tr>
+              <th>Masc</th>
+              <th>Fem</th>
+              <th>Masc</th>
+              <th>Fem</th>
+              <th>Masc</th>
+              <th>Fem</th>
+              <th>Masc</th>
+              <th>Fem</th>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio masc">18</td>
+              <td class="apoio fem">17</td>
+              <td class="abdominal masc">19</td>
+              <td class="abdominal fem">11</td>
+
+              <td class="corrida masc">1200</td>
+              <td class="corrida fem">800</td>
+              <td class="pontos_1"></td>
+              <td class="pontos_2"></td>
+              <td class="pontos_3"></td>
+              <td class="pontos_4">1</td>
+              <td class="pontos_4">5</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio masc">19</td>
+              <td class="apoio fem">18</td>
+              <td class="abdominal masc">21</td>
+              <td class="abdominal fem">13</td>
+              <td class="corrida masc">1250</td>
+              <td class="corrida fem">850</td>
+              <td class="pontos_1"></td>
+              <td class="pontos_2"></td>
+              <td class="pontos_3"></td>
+              <td class="pontos_4">10</td>
+              <td class="pontos_4">15</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio masc">20</td>
+              <td class="apoio fem">19</td>
+              <td class="abdominal masc">23</td>
+              <td class="abdominal fem">15</td>
+              <td class="corrida masc">1300</td>
+              <td class="corrida fem">900</td>
+              <td class="pontos_1"></td>
+              <td class="pontos_2"></td>
+              <td class="pontos_3">1</td>
+              <td class="pontos_4">20</td>
+              <td class="pontos_4">25</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio masc">21</td>
+              <td class="apoio fem">20</td>
+              <td class="abdominal masc">25</td>
+              <td class="abdominal fem">17</td>
+              <td class="corrida masc">1350</td>
+              <td class="corrida fem">950</td>
+              <td class="pontos_1"></td>
+              <td class="pontos_2"></td>
+              <td class="pontos_3">10</td>
+              <td class="pontos_4">25</td>
+              <td class="pontos_4">30</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio masc">22</td>
+              <td class="apoio fem">21</td>
+              <td class="abdominal masc">27</td>
+              <td class="abdominal fem">19</td>
+              <td class="corrida masc">1400</td>
+              <td class="corrida fem">1000</td>
+              <td class="pontos_1"></td>
+              <td class="pontos_2">1</td>
+              <td class="pontos_3">20</td>
+              <td class="pontos_4">30</td>
+              <td class="pontos_4">35</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio masc">23</td>
+              <td class="apoio fem">22</td>
+              <td class="abdominal masc">29</td>
+              <td class="abdominal fem">21</td>
+              <td class="corrida masc">1450</td>
+              <td class="corrida fem">1050</td>
+              <td class="pontos_1"></td>
+              <td class="pontos_2">10</td>
+              <td class="pontos_3">25</td>
+              <td class="pontos_4">35</td>
+              <td class="pontos_4">40</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio fem">24</td>
+              <td class="apoio masc">23</td>
+              <td class="abdominal masc">31</td>
+              <td class="abdominal fem">23</td>
+              <td class="corrida masc">1500</td>
+              <td class="corrida fem">1100</td>
+              <td class="pontos_1">1</td>
+              <td class="pontos_2">20</td>
+              <td class="pontos_3">30</td>
+              <td class="pontos_4">40</td>
+              <td class="pontos_4">45</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc"></td>
+              <td class="barra fem"></td>
+              <td class="apoio fem">25</td>
+              <td class="apoio masc">24</td>
+              <td class="abdominal masc">33</td>
+              <td class="abdominal fem">25</td>
+              <td class="corrida masc">1550</td>
+              <td class="corrida fem">1150</td>
+              <td class="pontos_1">10</td>
+              <td class="pontos_2">25</td>
+              <td class="pontos_3">35</td>
+              <td class="pontos_4">45</td>
+              <td class="pontos_4">50</td>
+            </tr>
+
+
+            <tr>
+              <td class="barra masc">1</td>
+              <td class="barra fem">5”00</td>
+              <td class="apoio fem">26</td>
+              <td class="apoio masc">25</td>
+              <td class="abdominal masc">35</td>
+              <td class="abdominal fem">27</td>
+              <td class="corrida masc">1600</td>
+              <td class="corrida fem">1200</td>
+              <td class="pontos_1">20</td>
+              <td class="pontos_2">30</td>
+              <td class="pontos_3">40</td>
+              <td class="pontos_4">50</td>
+              <td class="pontos_4">55</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">2</td>
+              <td class="barra fem">9”00</td>
+              <td class="apoio fem">27</td>
+              <td class="apoio masc">26</td>
+              <td class="abdominal masc">37</td>
+              <td class="abdominal fem">29</td>
+              <td class="corrida masc">1650</td>
+              <td class="corrida fem">1250</td>
+              <td class="pontos_1">25</td>
+              <td class="pontos_2">35</td>
+              <td class="pontos_3">45</td>
+              <td class="pontos_4">55</td>
+              <td class="pontos_4">60</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">3</td>
+              <td class="barra fem">13”00</td>
+              <td class="apoio fem">28</td>
+              <td class="apoio masc">27</td>
+              <td class="abdominal masc">39</td>
+              <td class="abdominal fem">31</td>
+              <td class="corrida masc">1700</td>
+              <td class="corrida fem">1300</td>
+              <td class="pontos_1">30</td>
+              <td class="pontos_2">40</td>
+              <td class="pontos_3">50</td>
+              <td class="pontos_4">60</td>
+              <td class="pontos_4">65</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">4</td>
+              <td class="barra fem">17”00</td>
+              <td class="apoio fem">29</td>
+              <td class="apoio masc">28</td>
+              <td class="abdominal masc">40</td>
+              <td class="abdominal fem">32</td>
+              <td class="corrida masc">1750</td>
+              <td class="corrida fem">1350</td>
+              <td class="pontos_1">35</td>
+              <td class="pontos_2">45</td>
+              <td class="pontos_3">55</td>
+              <td class="pontos_4">65</td>
+              <td class="pontos_4">70</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">5</td>
+              <td class="barra fem">20”00</td>
+              <td class="apoio fem">30</td>
+              <td class="apoio masc">29</td>
+              <td class="abdominal masc">41</td>
+              <td class="abdominal fem">33</td>
+              <td class="corrida masc">1800</td>
+              <td class="corrida fem">1400</td>
+              <td class="pontos_1">40</td>
+              <td class="pontos_2">50</td>
+              <td class="pontos_3">60</td>
+              <td class="pontos_4">70</td>
+              <td class="pontos_4 strong">75</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">6</td>
+              <td class="barra fem">23”00</td>
+              <td class="apoio fem">31</td>
+              <td class="apoio masc">30</td>
+              <td class="abdominal masc">42</td>
+              <td class="abdominal fem">34</td>
+              <td class="corrida masc">1850</td>
+              <td class="corrida fem">1450</td>
+              <td class="pontos_1">45</td>
+              <td class="pontos_2">55</td>
+              <td class="pontos_3">65</td>
+              <td class="pontos_4 strong">75</td>
+              <td class="pontos_4">80</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">7</td>
+              <td class="barra fem">26”00</td>
+              <td class="apoio fem">32</td>
+              <td class="apoio masc">31</td>
+              <td class="abdominal masc">43</td>
+              <td class="abdominal fem">35</td>
+              <td class="corrida masc">1900</td>
+              <td class="corrida fem">1500</td>
+              <td class="pontos_1">50</td>
+              <td class="pontos_2">60</td>
+              <td class="pontos_3">70</td>
+              <td class="pontos_4">80</td>
+              <td class="pontos_4">85</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">8</td>
+              <td class="barra fem">29”00</td>
+              <td class="apoio fem">33</td>
+              <td class="apoio masc">32</td>
+              <td class="abdominal masc">44</td>
+              <td class="abdominal fem">36</td>
+              <td class="corrida masc">1950</td>
+              <td class="corrida fem">1550</td>
+              <td class="pontos_1">55</td>
+              <td class="pontos_2">65</td>
+              <td class="pontos_3 strong">75</td>
+              <td class="pontos_4">85</td>
+              <td class="pontos_4">90</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">9</td>
+              <td class="barra fem">32”00</td>
+              <td class="apoio fem">34</td>
+              <td class="apoio masc">33</td>
+              <td class="abdominal masc">45</td>
+              <td class="abdominal fem">37</td>
+              <td class="corrida masc">2000</td>
+              <td class="corrida fem">1600</td>
+              <td class="pontos_1">60</td>
+              <td class="pontos_2">70</td>
+              <td class="pontos_3">80</td>
+              <td class="pontos_4">90</td>
+              <td class="pontos_4">95</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">10</td>
+              <td class="barra fem">35”00</td>
+              <td class="apoio fem">35</td>
+              <td class="apoio masc">34</td>
+              <td class="abdominal masc">46</td>
+              <td class="abdominal fem">38</td>
+              <td class="corrida masc">2050</td>
+              <td class="corrida fem">1650</td>
+              <td class="pontos_1">65</td>
+              <td class="pontos_2 strong">75</td>
+              <td class="pontos_3">85</td>
+              <td class="pontos_4">95</td>
+              <td class="pontos_4">100</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">11</td>
+              <td class="barra fem">37”00</td>
+
+              <td colspan="2" rowspan="2" style="background-color: #000000"></td>
+
+              <td class="abdominal masc">47</td>
+              <td class="abdominal fem">39</td>
+              <td class="corrida masc">2100</td>
+              <td class="corrida fem">1700</td>
+              <td class="pontos_1">70</td>
+              <td class="pontos_2">80</td>
+              <td class="pontos_3">90</td>
+              <td class="pontos_4">100</td>
+              <td class="pontos_4">105</td>
+            </tr>
+
+            <tr>
+              <td class="barra masc">12</td>
+              <td class="barra fem">39”00</td>
+
+              <td class="abdominal masc">48</td>
+              <td class="abdominal fem">40</td>
+              <td class="corrida masc">2150</td>
+              <td class="corrida fem">1750</td>
+              <td class="pontos_1 strong">75</td>
+              <td class="pontos_2">85</td>
+              <td class="pontos_3">95</td>
+              <td class="pontos_4">150</td>
+              <td class="pontos_4">110</td>
+            </tr>
+
+            <tr>
+              <td colspan="6" rowspan="15">
+
+                <table class="table-bordered" style="width: 90%; margin-left: 5%;">
+                  <tr style="background-color: #9e9e9e">
+                    <th colspan="2">CONCEITUAÇÃO</th>
+                  </tr>
+
+                  <tr style="background-color: #9e9e9e">
+                    <th>CONCEITO</th>
+                    <th>Pontos</th>
+                  </tr>
+                  <tr>
+                    <th>EXCELENTE</th>
+                    <th>300 Pontos</th>
+                  </tr>
+
+                  <tr>
+                    <th>MUITO BOM</th>
+                    <th>255 a 299 Pontos</th>
+                  </tr>
+
+                  <tr>
+                    <th>BOM</th>
+                    <th>211 a 254 Pontos</th>
+                  </tr>
+
+                  <tr>
+                    <th>REGULAR</th>
+                    <th>151 a 210 Pontos</th>
+                  </tr>
+
+                  <tr>
+                    <th>INSUFICIENTE</th>
+                    <th>Até 150 Pontos</th>
+                  </tr>
+                </table>
+
+
+              </td>
+
+              <td class="corrida masc">2200</td>
+              <td class="corrida fem">1800</td>
+              <td class="pontos_1">80</td>
+              <td class="pontos_2">90</td>
+              <td class="pontos_3">100</td>
+              <td class="pontos_4">110</td>
+              <td class="pontos_4">115</td>
+            </tr>
+
+
+            <tr>
+              <td class="corrida masc">2250</td>
+              <td class="corrida fem">1850</td>
+              <td class="pontos_1">85</td>
+              <td class="pontos_2">95</td>
+              <td class="pontos_3">105</td>
+              <td class="pontos_4">115</td>
+              <td class="pontos_4">120</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2300</td>
+              <td class="corrida fem">1900</td>
+              <td class="pontos_1">90</td>
+              <td class="pontos_2">100</td>
+              <td class="pontos_3">110</td>
+              <td class="pontos_4">120</td>
+              <td class="pontos_4">125</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2350</td>
+              <td class="corrida fem">1950</td>
+              <td class="pontos_1">95</td>
+              <td class="pontos_2">105</td>
+              <td class="pontos_3">115</td>
+              <td class="pontos_4">125</td>
+              <td class="pontos_4">130</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2400</td>
+              <td class="corrida fem">2000</td>
+              <td class="pontos_1">100</td>
+              <td class="pontos_2">110</td>
+              <td class="pontos_3">120</td>
+              <td class="pontos_4">130</td>
+              <td class="pontos_4">135</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2450</td>
+              <td class="corrida fem">2050</td>
+              <td class="pontos_1">105</td>
+              <td class="pontos_2">115</td>
+              <td class="pontos_3">125</td>
+              <td class="pontos_4">135</td>
+              <td class="pontos_4">140</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2500</td>
+              <td class="corrida fem">2100</td>
+              <td class="pontos_1">110</td>
+              <td class="pontos_2">120</td>
+              <td class="pontos_3">130</td>
+              <td class="pontos_4">140</td>
+              <td class="pontos_4">145</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2550</td>
+              <td class="corrida fem">2150</td>
+              <td class="pontos_1">115</td>
+              <td class="pontos_2">125</td>
+              <td class="pontos_3">135</td>
+              <td class="pontos_4">145</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2600</td>
+              <td class="corrida fem">2200</td>
+              <td class="pontos_1">120</td>
+              <td class="pontos_2">130</td>
+              <td class="pontos_3">140</td>
+              <td class="pontos_4 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2650</td>
+              <td class="corrida fem">2250</td>
+              <td class="pontos_1">125</td>
+              <td class="pontos_2">135</td>
+              <td class="pontos_3">145</td>
+              <td class="pontos_4 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2700</td>
+              <td class="corrida fem">2300</td>
+              <td class="pontos_1">130</td>
+              <td class="pontos_2">140</td>
+              <td class="pontos_3 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2750</td>
+              <td class="corrida fem">2350</td>
+              <td class="pontos_1">135</td>
+              <td class="pontos_2">145</td>
+              <td class="pontos_3 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2800</td>
+              <td class="corrida fem">2400</td>
+              <td class="pontos_1">140</td>
+              <td class="pontos_2 strong">150</td>
+              <td class="pontos_3 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2850</td>
+              <td class="corrida fem">2450</td>
+              <td class="pontos_1">145</td>
+              <td class="pontos_2 strong">150</td>
+              <td class="pontos_3 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+
+            <tr>
+              <td class="corrida masc">2900</td>
+              <td class="corrida fem">2600</td>
+              <td class="pontos_1 strong">150</td>
+              <td class="pontos_2 strong">150</td>
+              <td class="pontos_3 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+              <td class="pontos_4 strong">150</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Remova completamente o modal da calculadora -->
+
+    </div>
+    <script src="js/Taf.js"></script>
+    <script>
+      $(document).ready(function () {
+        listar_dados();
+
+        // Alternância das abas tipo navegador
+        $('.nav-browser-tab').click(function () {
+          var tab = $(this).data('tab');
+          $('.nav-browser-tab').removeClass('active');
+          $(this).addClass('active');
+          $('.tab-browser-content').removeClass('active');
+          $('#' + tab).addClass('active');
+
+          // Fecha o modal da calculadora ao trocar para a aba da tabela
+          if (tab === 'tabela-content') {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+            if (modal) {
+              modal.hide();
+            }
+          }
+        });
+      });
+    </script>
+
+  </body>
+      <!-- inicio crédito na página -->
+    <footer>
+      <div class="footer-content">
+        <font size="1"> Versão 4.00 </font>
+        <br />
+        <font size="1"> Criado por Sd Ferrão - 32BPM </font>
+        <br />
+      </div>
+    </footer>
+    <!-- fim o crédito na página -->
+
+</html>

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/menu.css">
+<link rel="stylesheet" type="text/css" href="css/dark-mode.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
@@ -25,7 +27,7 @@
 	</script>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Registro de Horas Trabalhadas</title>
+	<title>MINHA ESCALA</title>
 </head>
 
 <body>
@@ -59,6 +61,7 @@
 				<a href="veiculos" target="_parent">VEÍCULOS</a>
 				<a href="assuntos" target="_parent">ASSUNTOS CORRENTES</a>
 				<a href="escala" target="_parent">MINHA ESCALA</a>
+				<a href="taf" target="_parent">CALCULADORA TAF</a>
 				<a href="feedback" target="_parent">SUGESTÕES</a>
 				<a href="termos" target="_parent">TERMOS DE USO</a>
 			</div>
@@ -84,7 +87,7 @@
 			});
 		</script>
 		<!-- FIM DO MENU -->
-		<h1 class="title">Minha Escala</h1>
+		<h1 class="title">MINHA ESCALA</h1>
 		<form class="form">
 			<button type="button" id="configButton" class="btn-config">
 				<img src="https://raw.githubusercontent.com/190ALERTAS/home/refs/heads/main/img/gear-icon.png"
@@ -107,8 +110,10 @@
 
 		<div class="tabela">
 			<div class="mescontrols">
-				<label for="mesSelecionado">Selecionar Mês:</label>
-				<select id="mesSelecionado" class="select"></select>
+				<label for="mesSelecionadoMes" style="display:inline;">Mês:</label>
+				<select id="mesSelecionadoMes" class="select" style="width:auto;display:inline-block;"></select>
+				<label for="mesSelecionadoAno" style="display:inline;margin-left:10px;">Ano:</label>
+				<select id="mesSelecionadoAno" class="select" style="width:auto;display:inline-block;"></select>
 				<button type="button" id="atualizarResumo" class="btn">Atualizar Registros</button>
 			</div>
 			<ul id="listaRegistros" class="registro-list"></ul>
@@ -136,20 +141,21 @@
 			<!-- conteúdo do calendário -->
 		</div>
 
-		<!-- inicio crédito na página -->
-		<footer class="footer">
-			<font size="1"> Versão 4.25 </font>
-			<br />
-			<font size="1"> Criado por Sd Ferrão - 32BPM </font>
-			<br />
-		</footer>
-		<!-- fim o crédito na página -->
-
 		<script src="js/EscalaScript.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
+    <!-- inicio crédito na página -->
+    <footer>
+      <div class="footer-content">
+        <font size="1"> Versão 4.30 </font>
+        <br />
+        <font size="1"> Criado por Sd Ferrão - 32BPM </font>
+        <br />
+      </div>
+    </footer>
+    <!-- fim o crédito na página -->
 
 	</body>
 

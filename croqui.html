@@ -13,10 +13,13 @@
     <!-- FIM Google tag (gtag.js) -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ASSUNTOS CORRENTES</title>
+    <title>CROQUI DIGITAL</title>
     <link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico"
         type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="css/theme.css">
+    <link rel="stylesheet" type="text/css" href="css/menu.css">
+    <link rel="stylesheet" type="text/css" href="css/dark-mode.css">
+    <link rel="stylesheet" type="text/css" href="css/croqui.css"><!-- ADICIONADO -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
 </head>
 
@@ -47,6 +50,7 @@
                 <a href="veiculos" target="_parent">VEÍCULOS</a>
                 <a href="assuntos" target="_parent">ASSUNTOS CORRENTES</a>
                 <a href="escala" target="_parent">MINHA ESCALA</a>
+                <a href="taf" target="_parent">CALCULADORA TAF</a>
                 <a href="feedback" target="_parent">SUGESTÕES</a>
                 <a href="termos" target="_parent">TERMOS DE USO</a>
             </div>
@@ -76,7 +80,6 @@
         <link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico"
             type="image/x-icon">
     <head>
-        <br><br>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Mapa de Acidente de Trânsito</title>
@@ -90,7 +93,7 @@
         <script src="js/Croqui.js" defer></script>
     </head>
     <body>
-       <div id="progress-container">
+        <div id="progress-container">
             <div id="progress-bar">
                 <div id="progress-fill"></div>
             </div>
@@ -101,7 +104,7 @@
             </div>
         </div>
 
-        <div id="step1" class="step" style="display: block;">
+        <div id="step1" class="step">
             <h2>Passo 1: Selecionar o Local do Mapa</h2>
         </div>
         <div id="step2" class="step">
@@ -118,21 +121,24 @@
             </div>
         </div>
         <div id="step3" class="step">
-            <h2>Passo 3: Capturar Imagem</h2><br>
+            <h2>Passo 3: Capturar Imagem</h2>
             <button onclick="captureMap()">Salvar</button>
-        </div><br>
+        </div>
+        <br>
         <div id="map-container">
             <div id="map"></div>
             <div id="controls-container"></div>
-        			<!-- inicio crédito na página -->
-			<footer>
-				<font size="1"> Versão 4.00 </font>
-				<br />
-				<font size="1"> Criado por Sd Ferrão - 32BPM </font>
-				<br />
-			</footer>
-			<!-- fim o crédito na página -->
+
         </div>
-        
+    <!-- inicio crédito na página -->
+    <footer>
+      <div class="footer-content">
+        <font size="1"> Versão 4.00 </font>
+        <br />
+        <font size="1"> Criado por Sd Ferrão - 32BPM </font>
+        <br />
+      </div>
+    </footer>
+    <!-- fim o crédito na página -->
     </body>
 </html>
