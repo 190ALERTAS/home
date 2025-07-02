@@ -1,0 +1,427 @@
+/* Cores e fontes principais */
+body {
+  background-color: #d6d6d6;
+  color: #222;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.table-bordered {
+  border: 1px solid #694f43;
+  background-color: #e7e7e7;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.07);
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 2px solid #000000;
+  padding: 2px 2px;
+  font-size: 12px;
+}
+
+th {
+  background-color: #694f43 !important;
+  color: #fff !important;
+  font-weight: bold;
+}
+
+tr:nth-child(even) td {
+  background-color: #f5f5f5;
+}
+
+tr:nth-child(odd) td {
+  background-color: #e7e7e7;
+}
+
+.strong {
+  font-weight: bold;
+  color: #694f43;
+}
+
+.btn-primary {
+  background-color: #694f43;
+  border-color: #694f43;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #a17967;
+  border-color: #a17967;
+}
+
+.modal-content {
+  background-color: #e7e7e7;
+  color: #222;
+  border-radius: 8px;
+  border: 1px solid #694f43;
+}
+
+.form-select,
+.form-floating label {
+  font-size: 15px;
+  color: #694f43;
+}
+
+.form-select:focus {
+  border-color: #3788d8;
+  box-shadow: 0 0 0 0.2rem rgba(55, 136, 216, .25);
+}
+
+.bg-success,
+.bg-primary,
+.bg-info,
+.bg-secondary,
+.bg-danger {
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.bg-success {
+  background-color: #3e803c !important;
+}
+
+.bg-primary {
+  background-color: #694f43 !important;
+}
+
+.bg-info {
+  background-color: #a17967 !important;
+}
+
+.bg-secondary {
+  background-color: #787371 !important;
+}
+
+.bg-danger {
+  background-color: #ff4d4d !important;
+}
+
+@media (max-width: 600px) {
+
+  .table-bordered th,
+  .table-bordered td {
+    font-size: 12px;
+    padding: 3px 1px;
+  }
+}
+
+/* Modo escuro */
+body.dark-mode {
+  background-color: #222;
+  color: #eee;
+}
+
+body.dark-mode .table-bordered {
+  background-color: #333;
+  border-color: #a17967;
+}
+
+body.dark-mode th {
+  background-color: #000 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .modal-content {
+  background-color: #333;
+  color: #eee;
+  border-color: #a17967;
+}
+
+body.dark-mode .form-select,
+body.dark-mode .form-floating label {
+  background-color: #222;
+  color: #eee;
+}
+
+body.dark-mode .bg-success {
+  background-color: #3788d8 !important;
+  color: #fff;
+}
+
+body.dark-mode .bg-primary {
+  background-color: #694f43 !important;
+  color: #fff;
+}
+
+body.dark-mode .bg-info {
+  background-color: #a17967 !important;
+  color: #fff;
+}
+
+body.dark-mode .bg-secondary {
+  background-color: #787371 !important;
+  color: #fff;
+}
+
+body.dark-mode .bg-danger {
+  background-color: #ff4d4d !important;
+  color: #fff;
+}
+
+/* Abas tipo navegador */
+.nav-browser-tabs {
+  display: flex;
+  border-bottom: 2px solid #ccc;
+  margin-top: 32px;
+  margin-bottom: 2px;
+  justify-content: center;
+  gap: 2px;
+}
+
+.nav-browser-tab {
+  background: #e7e7e7;
+  color: #222;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 32px;
+  margin-right: 2px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  top: 2px;
+}
+
+.nav-browser-tab.active {
+  background: #fff;
+  color: #694f43;
+  border-bottom: 2px solid #fff;
+  z-index: 2;
+  font-weight: bold;
+}
+
+.nav-browser-tab:not(.active):hover {
+  background: #f5f5f5;
+  color: #694f43;
+}
+
+.tab-browser-content {
+  display: none;
+  animation: fadeIn 0.2s;
+}
+
+.tab-browser-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Calculadora TAF - visual clean e alinhado em coluna */
+.taf-form-linear {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.taf-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.taf-label {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 0px;
+  color: #333;
+  text-transform: uppercase;
+}
+
+.taf-select {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 1rem;
+  border: 1.5px solid #694f43;
+  border-radius: 5px;
+  background: #fff;
+  color: #222;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 2px;
+}
+
+.taf-select:focus {
+  border-color: #3788d8;
+  box-shadow: 0 0 0 0.1rem rgba(55, 136, 216, .15);
+}
+
+/* Exercícios em coluna, não em linha */
+.taf-exercicio-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  margin-bottom: 12px;
+  margin-top: 0;
+  background: transparent;
+}
+
+.taf-exercicio-label {
+  font-size: 0.97rem;
+  font-weight: 500;
+  color: #694f43;
+  margin-bottom: 2px;
+  margin-left: 2px;
+  letter-spacing: 0.01em;
+}
+
+.taf-exercicio-select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 7px 10px;
+  font-size: 1rem;
+  border: 1.5px solid #694f43;
+  border-radius: 5px;
+  background: #fff;
+  color: #222;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+select {
+  margin-top: 0px !important;
+}
+
+.taf-exercicio-pontos {
+  margin-left: 0;
+  margin-top: 0;
+  min-width: 0;
+  text-align: left;
+  color: #888;
+  font-size: 0.93rem;
+  font-weight: 400;
+  padding-left: 2px;
+}
+
+/* Remove sombra e borda do card da calculadora */
+#calc-content .card,
+#calc-content .card-body {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+#calc-content .row,
+#calc-content .col-12,
+#calc-content .col-md-8,
+#calc-content .col-lg-6 {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#calc-content {
+  padding: 0 !important;
+  background: transparent;
+}
+
+/* Destaque visual para filtros de categoria (Gênero e Idade) */
+.taf-categorias {
+  background: #fff;
+  border-radius: 3px;
+  padding: 10px 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #e7e7e7;
+  border-radius: 5px;
+  position: relative;
+}
+
+/* Destaque para o bloco de exercícios */
+.taf-exercicios-bloco {
+background: #fff;
+  border-radius: 3px;
+  padding: 10px 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #e7e7e7;
+  border-radius: 5px;
+  position: relative;
+}
+
+/* Ajuste para o formulário linear */
+.taf-form-linear {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Espaçamento entre blocos */
+.taf-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Menos gap entre label e select */
+  margin-bottom: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+/* Ajuste para não duplicar bordas */
+.taf-form-group:not(:last-child) {
+  margin-bottom: 0;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .taf-form-linear {
+    max-width: 100%;
+    padding: 0 2px;
+  }
+
+  .taf-exercicio-row {
+    gap: 1px;
+    margin-bottom: 8px;
+  }
+
+  .taf-categorias,
+  .taf-exercicios-bloco {
+    padding: 4px 2px;
+  }
+}
+
+/* Garante que o topo das categorias não tenha margem, sobrescrevendo outros arquivos */
+.taf-categorias {
+  margin-top: 0 !important;
+}
+
+/* Espaço visual entre categorias e exercícios */
+.taf-espaco-bloco {
+  height: 20px;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* No modo escuro, o espaço herda a cor do .tab-browser-content */
+body.dark-mode .taf-espaco-bloco {
+  background: #151515 !important;
+}

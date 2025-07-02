@@ -1,0 +1,156 @@
+/* INICIO DO MENU */
+* {
+  box-sizing: border-box;
+}
+
+.nav {
+  height: 60px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #000000;
+  padding: 10px;
+}
+
+.nav-links {
+  display: flex;
+  text-align: right;
+}
+
+.nav>.nav-header {
+  display: flex;
+  align-items: center;
+}
+
+.nav>.nav-header>.imagem-menu {
+  width: 50px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.nav>.nav-header>.nav-title {
+  font-size: 22px;
+  color: #fff;
+  margin: 0;
+}
+
+.nav>.nav-links {
+  font-size: 18px;
+  color: #fff;
+}
+
+.nav>.nav-links>a {
+  display: inline-block;
+  padding: 20px 10px 20px 10px;
+  text-decoration: none;
+  color: #efefef;
+}
+
+.nav>.nav-links>a:hover {
+  background-color: rgba(192, 192, 192, 0.3);
+}
+
+.nav>#nav-check {
+  display: none;
+}
+
+@media (max-width: 4000px) {
+  .nav>.nav-btn {
+    display: inline-block;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+
+  .nav>.nav-btn>label {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+  }
+
+  .nav>.nav-btn>label:hover,
+  .nav #nav-check:checked~.nav-btn>label {
+    background-color: rgba(0, 0, 0, 0);
+  }
+
+  .nav>.nav-btn>label>span {
+    display: block;
+    width: 25px;
+    height: 10px;
+    border-top: 3px solid #eee;
+  }
+
+  .nav>.nav-links {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: auto;
+    background-color: #333;
+    transition: all 0.3s ease-in;
+    overflow-y: hidden;
+    top: 60px;
+    left: 0px;
+  }
+
+  .nav>.nav-links>a {
+    display: block;
+    width: 100%;
+  }
+
+  .nav>#nav-check:not(:checked)~.nav-links {
+    height: 0px;
+  }
+
+  .nav>#nav-check:checked~.nav-links {
+    width: 100vw;
+    height: 100vh;
+    overflow-y: hidden;
+    z-index: 1500;
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+
+  botao-dark-mode {
+    position: absolute;
+    right: 70px;
+  }
+}
+
+body.scroll-lock {
+  overflow: hidden;
+}
+
+button#dark-mode-toggle {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+#icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 1.5s;
+  vertical-align: middle;
+  filter: invert();
+  float: none;
+  margin-top: 3px;
+}
+
+body.dark-mode #icon {
+  transform: rotate(360deg);
+}
+
+body.dark-mode .nav {
+  background-color: #000;
+}
+
+body.dark-mode .nav-title,
+body.dark-mode .nav-links>a {
+  color: #eee;
+}
+
+body.dark-mode .nav>.nav-links>a:hover {
+  background-color: rgba(192, 192, 192, 0.3);
+}
+
+/* FIM DO MENU */

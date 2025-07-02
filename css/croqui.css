@@ -1,0 +1,114 @@
+/* Barra de progresso dos passos do croqui */
+#progress-container {
+  max-width: 600px;
+  margin: 32px auto 24px auto;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Alinhar progress-bar com os círculos */
+#progress-bar {
+  width: 100%;
+  max-width: 600px;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: -15px;
+}
+
+#progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #7c7565 60%, #694f43 100%);
+  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(.4,0,.2,1);
+}
+
+.step-indicators {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 600px;
+  margin-top: -8px; /* Ajuste fino para alinhar com a barra */
+}
+
+.step-circle {
+  width: 38px;
+  height: 38px;
+  background: #e0e0e0;
+  border: 3px solid #694f43;
+  color: #694f43;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, border 0.3s, transform 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  position: relative;
+  z-index: 3;
+}
+
+.step-circle.active {
+  background: #3b3b3b;
+  color: #fff;
+  border-color: #000000;
+  box-shadow: 0 2px 10px rgba(55,136,216,0.10);
+  transform: scale(1.08);
+}
+
+.step-circle:not(.active):hover {
+  background: #f5f5f5;
+  color: #000000;
+  border-color: #b4b4b4;
+}
+
+.label-container {
+  background: #fff;
+  color: #222;
+  border: 1px solid #b4b4b4;
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 15px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: inline-block;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 600px) {
+  #progress-container {
+    max-width: 98vw;
+    padding: 0 2vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  #progress-bar {
+    width: 100%;
+    max-width: 98vw;
+    height: 6px;
+    margin-bottom: -10px;
+  }
+  .step-indicators {
+    width: 100%;
+    max-width: 98vw;
+    margin-top: -6px;
+  }
+  .step-circle {
+    width: 28px;
+    height: 28px;
+    font-size: 1em;
+  }
+}

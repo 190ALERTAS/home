@@ -1,0 +1,274 @@
+body.dark-mode {
+  background-color: #151515 !important;
+  color: #eee !important;
+}
+
+body.dark-mode form,
+body.dark-mode .tabela,
+body.dark-mode .resumo-container,
+body.dark-mode #calendario,
+body.dark-mode .controls-container,
+body.dark-mode .table-bordered,
+body.dark-mode .modal-content {
+  background-color: #333 !important;
+  color: #eee !important;
+}
+
+body.dark-mode label,
+body.dark-mode .form-floating label {
+  color: #fff !important;
+}
+
+body.dark-mode h1,
+body.dark-mode .nav-title,
+body.dark-mode .nav-links > a {
+  color: #eee !important;
+}
+
+body.dark-mode th {
+  background-color: #000 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .table-bordered {
+  border-color: #a17967 !important;
+}
+
+body.dark-mode .modal-content {
+  border-color: #a17967 !important;
+}
+
+body.dark-mode .form-select {
+  background-color: #222 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .bg-success { background-color: #2eaa3a !important; color: #fff !important; }
+body.dark-mode .bg-primary { background-color: #694f43 !important; color: #fff !important; }
+body.dark-mode .bg-info { background-color: #a17967 !important; color: #fff !important; }
+body.dark-mode .bg-secondary { background-color: #787371 !important; color: #fff !important; }
+body.dark-mode .bg-danger { background-color: #ff4d4d !important; color: #fff !important; }
+
+body.dark-mode #icon {
+  transform: rotate(360deg);
+}
+
+body.dark-mode .swal2-popup,
+body.dark-mode .swal2-title,
+body.dark-mode .swal2-content {
+  background-color: #333 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .swal2-styled.swal2-confirm {
+  background-color: #444 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .swal2-styled.swal2-cancel {
+  background-color: #555 !important;
+  color: #eee !important;
+}
+
+input[type="date"].dark-mode,
+input[type="time"].dark-mode,
+textarea.dark-mode {
+  background-color: #333 !important;
+  color: #eee !important;
+  border-color: #eee !important;
+}
+
+button.dark-mode {
+  background-color: #222 !important;
+  color: #eee !important;
+}
+
+iframe.dark-mode {
+  filter: invert(100%) grayscale(1);
+  width: 100%;
+  border: none;
+}
+
+/* Menu dark-mode */
+body.dark-mode .nav {
+  background-color: #000 !important;
+}
+
+body.dark-mode .btn-config {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+body.dark-mode .taf-form-linear,
+body.dark-mode .taf-form-group,
+body.dark-mode .taf-exercicio-row,
+body.dark-mode .tab-browser-content,
+body.dark-mode .nav-browser-tabs,
+body.dark-mode .nav-browser-tab {
+  background-color: #333 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .taf-label,
+body.dark-mode .taf-exercicio-label {
+  color: #fff !important;
+}
+
+body.dark-mode .taf-select,
+body.dark-mode .taf-exercicio-select,
+body.dark-mode select,
+body.dark-mode .form-select {
+  background-color: #232323 !important;
+  color: #eee !important;
+  border: 1px solid #444 !important;
+}
+
+body.dark-mode .taf-select:focus,
+body.dark-mode .taf-exercicio-select:focus,
+body.dark-mode select:focus,
+body.dark-mode .form-select:focus {
+  border-color: #181818 !important;
+  box-shadow: 0 0 0 0.2rem #694f43;
+}
+
+body.dark-mode .taf-exercicio-pontos {
+  color: #a6d8ff !important;
+}
+
+body.dark-mode .nav-browser-tabs {
+  background-color: #151515 !important;
+  border-bottom: 1px solid #444 !important;
+}
+
+body.dark-mode .nav-browser-tab {
+  background-color: #232323 !important;
+  color: #eee !important;
+  border: 1px solid #444 !important;
+}
+
+body.dark-mode .nav-browser-tab.active {
+  background-color: #694f43 !important;
+  color: #fff !important;
+  border-bottom: 2px solid #444 !important;
+}
+
+body.dark-mode .tab-browser-content {
+  background-color: #151515 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .table-bordered,
+body.dark-mode table,
+body.dark-mode th,
+body.dark-mode td {
+  background-color: #232323 !important;
+  color: #eee !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode th {
+  background-color: #111 !important;
+  color: #fff !important;
+}
+
+body.dark-mode tr:nth-child(even) td {
+  background-color: #282828 !important;
+}
+
+body.dark-mode tr:nth-child(odd) td {
+  background-color: #232323 !important;
+}
+
+body.dark-mode .strong {
+  color: #694f43 !important;
+}
+
+body.dark-mode .bg-success { background-color: #2eaa3a !important; color: #fff !important; }
+body.dark-mode .bg-primary { background-color: #694f43 !important; color: #fff !important; }
+body.dark-mode .bg-info { background-color: #a17967 !important; color: #fff !important; }
+body.dark-mode .bg-secondary { background-color: #787371 !important; color: #fff !important; }
+body.dark-mode .bg-danger { background-color: #ff4d4d !important; color: #fff !important; }
+
+body.dark-mode button,
+body.dark-mode .btn-especifico,
+body.dark-mode .taf-form-linear button,
+body.dark-mode .taf-form-group button {
+  background-color: #232323 !important;
+  color: #eee !important;
+  border: 1px solid #444 !important;
+}
+
+body.dark-mode button:hover,
+body.dark-mode .btn-especifico:hover {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+body.dark-mode input,
+body.dark-mode input[type="text"],
+body.dark-mode input[type="date"],
+body.dark-mode input[type="time"],
+body.dark-mode textarea {
+  background-color: #232323 !important;
+  color: #eee !important;
+  border: 1px solid #444 !important;
+}
+
+body.dark-mode .taf-form-group {
+  border-radius: 5px;
+}
+
+body.dark-mode .taf-form-group .form-select {
+  background-color: #232323 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .taf-form-group .form-select:focus {
+  border-color: #694f43 !important;
+}
+
+body.dark-mode .taf-form-group .taf-exercicio-pontos {
+  color: #8c8c8c !important;
+}
+
+body.dark-mode .taf-form-group .taf-exercicio-label {
+  color: #fff !important;
+}
+
+body.dark-mode .taf-categorias {
+  background: #333 !important;
+  border-color: #a17967 !important;
+}
+
+body.dark-mode .taf-exercicios-bloco {
+  background: #333 !important;
+  border-color: #a17967 !important;
+}
+
+/* Cor do link do WhatsApp no Swal */
+.whatsapp-link {
+  color: #222 !important;
+  text-decoration: underline;
+}
+body.dark-mode .whatsapp-link {
+  color: #fff !important;
+}
+
+/* FullCalendar eventos no dark-mode: fundo e borda condizentes com o tema */
+.fc-h-event,
+.fc-event-main,
+.fc-event-main-frame,
+.fc-event-title-container,
+.fc-event-title {
+  background-color: #694f43 !important;   /* marrom tema */
+  color: #fff !important;                 /* texto branco */
+  border: 1px solid #a17967 !important; /* borda marrom claro tema */
+  display: block !important;
+  border-radius: 1px !important;
+  box-shadow: 0 1px 4px #0004 !important;
+}
+
+/* Ajuste da cor do ícone de localização no modo escuro */
+body.dark-mode img[src*="croqui-img/localizacao.png"] {
+  filter: brightness(0) invert(1) saturate(2);
+}
