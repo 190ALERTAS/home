@@ -193,6 +193,14 @@ function copiarCampos() {
     icon: "success",
     confirmButtonColor: "#694f43",
     title: "Texto Copiado",
-    footer: '<a href="https://api.whatsapp.com/" target="_blank">Abrir Whatsapp</a>'
+    footer: '<a id="whatsapp-link" class="whatsapp-link" href="https://api.whatsapp.com/" target="_blank">Abrir Whatsapp</a>'
   });
+  setTimeout(updateWhatsappLinkColor, 10);
+}
+
+function updateWhatsappLinkColor() {
+  const link = document.getElementById('whatsapp-link');
+  if (!link) return;
+  // Força a classe correta (caso o Swal sobrescreva)
+  link.classList.add('whatsapp-link');
 }

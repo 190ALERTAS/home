@@ -28,16 +28,13 @@ function copiarCampos() {
 
   // Exibir um alerta de sucesso
   Swal.fire({
-    confirmButtonColor: "#694f43",
-    icon: 'success',
-    title: 'COPIADO!',
     iconColor: '#7c7565',
-    confirmButtonText: 'OK'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      window.open('https://api.whatsapp.com/', '_blank');
-    }
+    icon: "success",
+    confirmButtonColor: "#694f43",
+    title: "Texto Copiado",
+    footer: '<a id="whatsapp-link" class="whatsapp-link" href="https://api.whatsapp.com/" target="_blank">Abrir Whatsapp</a>'
   });
+  setTimeout(updateWhatsappLinkColor, 10);
 }
 
 function formatMessage(modelo, placa, cor, dataInput, hora, endereco, historico, fato, cidade) {
@@ -49,6 +46,12 @@ function formatMessage(modelo, placa, cor, dataInput, hora, endereco, historico,
   const dataText = "" + formattedDate;
   const mensagem = `🚨 *ALERTA DE ${fato}* 🚨\n *NA CIDADE DE: ${cidade}* \n\n*PLACA:* ${placa}\n*MODELO:* ${modelo}\n*COR:* ${cor}\n*DATA:* ${dataText} *HORA:* ${hora}\n*ENDEREÇO:* ${endereco}\n\n*HISTÓRICO:* \n${historico}`;
   return mensagem.toUpperCase(); // Converter a mensagem inteira para maiúsculas
+}
+
+function updateWhatsappLinkColor() {
+  const link = document.getElementById('whatsapp-link');
+  if (!link) return;
+  link.classList.add('whatsapp-link');
 }
 
 function toggleDarkMode() {
@@ -63,6 +66,7 @@ function toggleDarkMode() {
       icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png'; // Altere para o ícone da lua
       localStorage.setItem('darkMode', 'true'); // Salve a preferência como "true"
   }
+  setTimeout(updateWhatsappLinkColor, 10);
 }
 // Verificar se o usuário já tem uma preferência salva no localStorage
 const storedDarkMode = localStorage.getItem('darkMode');

@@ -418,3 +418,8 @@ if (storedDarkMode === "true") {
     // Se a preferência for "true", ativar o modo escuro
     toggleDarkMode();
 }
+
+// Ao carregar a página, sempre inicia no passo 1
+document.addEventListener('DOMContentLoaded', function () {
+    nextStep(1);
+});

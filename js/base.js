@@ -7,7 +7,7 @@ function toggleDarkMode() {
     body.classList.remove('dark-mode');
     icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png';
     localStorage.setItem('darkMode', 'false');
-    
+
     // Remove a classe dark-mode dos iframes quando o tema claro estiver ativado
     iframes.forEach(iframe => {
       iframe.classList.remove('dark-mode');
@@ -16,7 +16,7 @@ function toggleDarkMode() {
     body.classList.add('dark-mode');
     icon.src = 'https://raw.githubusercontent.com/190ALERTAS/home/main/img/moon-solid-24.png';
     localStorage.setItem('darkMode', 'true');
-    
+
     // Adiciona a classe dark-mode aos iframes quando o tema escuro estiver ativado
     iframes.forEach(iframe => {
       iframe.classList.add('dark-mode');

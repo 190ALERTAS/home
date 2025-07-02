@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const exportarPDF = document.getElementById("exportarPDF");
     const listaRegistros = document.getElementById("listaRegistros");
     const calendarioEl = document.getElementById("calendario");
-    const mesSelecionado = document.getElementById("mesSelecionado");
+    const mesSelecionadoMes = document.getElementById("mesSelecionadoMes");
+    const mesSelecionadoAno = document.getElementById("mesSelecionadoAno");
     const atualizarResumo = document.getElementById("atualizarResumo");
     const configButton = document.getElementById("configButton");
     let registros = JSON.parse(localStorage.getItem("registros")) || {};
@@ -20,17 +21,30 @@ document.addEventListener("DOMContentLoaded", function () {
         if (calendar) {
             calendar.destroy();
         }
+                // Ajuste de CSS para o container do calendário
+        calendarioEl.style.maxWidth = "600px";
+        calendarioEl.style.margin = "0 auto";
+        calendarioEl.style.overflow = "hidden";
+        calendarioEl.style.height = "auto";
+        calendarioEl.style.boxSizing = "border-box";
         // Criando o calendário com as configurações desejadas
         calendar = new FullCalendar.Calendar(calendarioEl, {
             initialView: "dayGridMonth",
             locale: "pt-br", // Idioma configurado para português brasileiro
             initialDate: dataInicial, // Define a data inicial do calendário
+                        height: "auto", // Ajusta a altura automaticamente ao mês
+            contentHeight: "auto",
+            aspectRatio: 1.2, // Deixa mais quadrado/proporcional
+            showNonCurrentDates: false, // Mostra apenas os dias do mês selecionado
             events: Object.values(registros)
                 .flat()
                 .map((registro) => ({
                     title: `${registro.horasTrabalhadas}`,
                     start: registro.data,
                 })),
+                            // Remover toolbars/botões para visual limpo
+            headerToolbar: false,
+            footerToolbar: false,
             // Configuração para formatar os meses com a primeira letra maiúscula
             eventRender: function (info) {
                 // Caso queira alterar o título do evento (em horas trabalhadas, por exemplo)
@@ -56,54 +70,91 @@ document.addEventListener("DOMContentLoaded", function () {
         calendar.render();
     }
 
-    function atualizarMesesDisponiveis() {
-        mesSelecionado.innerHTML = "";
-        const mesesDisponiveis = Object.keys(registros).sort();
-        const mesAtual = new Date().toISOString().slice(0, 7); // Obtém o mês atual no formato YYYY-MM
+    // Função para obter todos os anos disponíveis nos registros
+    function getAnosDisponiveis() {
+        return [...new Set(Object.keys(registros).map(m => m.split('-')[0]))].sort();
+    }
+    // Função para obter todos os meses disponíveis para um ano
+    function getMesesDisponiveis(ano) {
+        return [...new Set(Object.keys(registros).filter(m => m.startsWith(ano)).map(m => m.split('-')[1]))].sort();
+    }
 
-        if (mesesDisponiveis.length === 0) {
-            const option = document.createElement("option");
-            option.value = "";
-            option.textContent = "Nenhum mês disponível";
-            mesSelecionado.appendChild(option);
-        } else {
-            mesesDisponiveis.forEach((mes) => {
-                const [ano, mesIndexado] = mes.split("-");
-                const option = document.createElement("option");
-                option.value = mes;
-                option.textContent = new Date(ano, mesIndexado - 1).toLocaleDateString("pt-BR", {
-                    month: "long",
-                    year: "numeric",
-                });
-                mesSelecionado.appendChild(option);
-            });
+    // Popula os seletores de mês e ano
+    function atualizarMesesAnosDisponiveis() {
+        // Salva os valores atualmente selecionados
+        const anoSelecionadoAntes = mesSelecionadoAno.value;
+        const mesSelecionadoAntes = mesSelecionadoMes.value;
 
-            // Seleciona o mês mais próximo do atual ou o mês armazenado
-            if (mesAtualSelecionado && mesesDisponiveis.includes(mesAtualSelecionado)) {
-                mesSelecionado.value = mesAtualSelecionado;
-            } else if (mesesDisponiveis.includes(mesAtual)) {
-                mesSelecionado.value = mesAtual;
-            } else {
-                mesSelecionado.value = mesesDisponiveis[mesesDisponiveis.length - 1]; // Último mês disponível
-            }
-        }
+        // Limpa seletores
+        mesSelecionadoAno.innerHTML = "";
+        mesSelecionadoMes.innerHTML = "";
+
+        const anos = getAnosDisponiveis();
+        const mesAtual = new Date().toISOString().slice(0, 7);
+
+        // Preenche anos
+        anos.forEach(ano => {
+            const opt = document.createElement("option");
+            opt.value = ano;
+            opt.textContent = ano;
+            mesSelecionadoAno.appendChild(opt);
+        });
+
+        // Seleciona o ano salvo anteriormente, se existir, senão usa lógica antiga
+        let anoSelecionado = anoSelecionadoAntes && anos.includes(anoSelecionadoAntes)
+            ? anoSelecionadoAntes
+            : (mesAtualSelecionado ? mesAtualSelecionado.split('-')[0] : (anos.includes(mesAtual.split('-')[0]) ? mesAtual.split('-')[0] : anos[anos.length-1]));
+        if (!anoSelecionado) anoSelecionado = new Date().getFullYear().toString();
+        mesSelecionadoAno.value = anoSelecionado;
+
+        // Preenche meses do ano selecionado
+        const meses = getMesesDisponiveis(anoSelecionado);
+        const nomesMeses = [
+            "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+            "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+        ];
+        meses.forEach(mesNum => {
+            const opt = document.createElement("option");
+            opt.value = mesNum;
+            opt.textContent = nomesMeses[parseInt(mesNum, 10) - 1];
+            mesSelecionadoMes.appendChild(opt);
+        });
+
+        // Seleciona o mês salvo anteriormente, se existir, senão usa lógica antiga
+        let mesSelecionado = mesSelecionadoAntes && meses.includes(mesSelecionadoAntes)
+            ? mesSelecionadoAntes
+            : (mesAtualSelecionado ? mesAtualSelecionado.split('-')[1] : (meses.includes(mesAtual.split('-')[1]) ? mesAtual.split('-')[1] : meses[meses.length-1]));
+        if (!mesSelecionado) mesSelecionado = (new Date().getMonth()+1).toString().padStart(2, "0");
+        mesSelecionadoMes.value = mesSelecionado;
 
         // Atualiza os dados para o mês selecionado
-        if (mesSelecionado.value) {
-            calcularResumoMes(mesSelecionado.value);
-            atualizarListaRegistros(mesSelecionado.value);
-            inicializarCalendario(`${mesSelecionado.value}-01`); // Atualiza o calendário para o mês selecionado
+        const mesAno = mesSelecionadoAno.value && mesSelecionadoMes.value ? `${mesSelecionadoAno.value}-${mesSelecionadoMes.value}` : "";
+        if (mesAno && registros[mesAno]) {
+            calcularResumoMes(mesAno);
+            atualizarListaRegistros(mesAno);
+            inicializarCalendario(`${mesAno}-01`);
+        } else {
+            calcularResumoMes("");
+            atualizarListaRegistros("");
+            inicializarCalendario(new Date().toISOString().slice(0, 10));
         }
     }
 
-    mesSelecionado.addEventListener("change", function () {
-        const mes = mesSelecionado.value;
-        if (mes) {
-            mesAtualSelecionado = mes; // Atualiza o mês selecionado
-            localStorage.setItem("mesAtualSelecionado", mesAtualSelecionado); // Salva no localStorage
-            calcularResumoMes(mes);
-            atualizarListaRegistros(mes);
-            inicializarCalendario(`${mes}-01`); // Atualiza o calendário para o mês selecionado
+    mesSelecionadoAno.addEventListener("change", function () {
+        atualizarMesesAnosDisponiveis();
+    });
+    mesSelecionadoMes.addEventListener("change", function () {
+        const mesAno = mesSelecionadoAno.value && mesSelecionadoMes.value ? `${mesSelecionadoAno.value}-${mesSelecionadoMes.value}` : "";
+        mesAtualSelecionado = mesAno;
+        localStorage.setItem("mesAtualSelecionado", mesAtualSelecionado);
+        if (mesAno && registros[mesAno]) {
+            calcularResumoMes(mesAno);
+            atualizarListaRegistros(mesAno);
+            inicializarCalendario(`${mesAno}-01`);
+        } else {
+            calcularResumoMes("");
+            atualizarListaRegistros("");
+            inicializarCalendario(new Date().toISOString().slice(0, 10));
         }
     });
 
@@ -143,13 +194,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function calcularResumoMes(mes) {
         const registrosMes = registros[mes] || [];
-        let totalMinutos = registrosMes.reduce((acc, { horasTrabalhadas }) => {
-            const [horas, minutos] = horasTrabalhadas.match(/\d+/g).map(Number);
-            return acc + horas * 60 + minutos;
-        }, 0);
+        let totalMinutos = 0;
+        let diasEDTRSP = 0;
+        let diasFerias = 0;
+
+        registrosMes.forEach(({ horasTrabalhadas, tipo }) => {
+            if (horasTrabalhadas === "FER" || tipo === "FER") {
+                diasFerias++;
+                // Não soma nada ao total de minutos
+            } else if (horasTrabalhadas === "EDT/RSP" || tipo === "EDT/RSP") {
+                diasEDTRSP++;
+                // Não soma nada ao total de minutos, mas desconta do limite
+            } else {
+                const [horas, minutos] = horasTrabalhadas.match(/\d+/g).map(Number);
+                totalMinutos += horas * 60 + minutos;
+            }
+        });
 
         const diasNoMes = new Date(mes.split("-")[0], mes.split("-")[1], 0).getDate();
-        const limiteMinutos = diasNoMes * 342;
+        // Limite padrão: 342m por dia útil, descontando férias e EDT/RSP
+        // Cada dia de EDT/RSP desconta 6h (360m) do limite mensal
+        const limiteMinutos = (diasNoMes - diasFerias) * 342 - diasEDTRSP * 360;
 
         const horasLimite = Math.floor(limiteMinutos / 60);
         const minutosLimite = limiteMinutos % 60;
@@ -171,14 +236,16 @@ document.addEventListener("DOMContentLoaded", function () {
         <span style="color: #3788d8;">Horas Normais: ${totalAjustadoHoras}h${totalAjustadoMinutosRestantes}m</span>
         <span style="color: red;">Extras: ${horasExtrasFormatadas}h${minutosExtrasFormatados}m</span>
         <span style="color: green;">Total de Horas: ${horas}h${minutos}m</span>
+        <span style="color: #694f43; font-size:10px; display:block;">Férias: ${diasFerias} dias -&nbsp;EDT/RSP: ${diasEDTRSP} dias</span>
     `;
 
         // Adicionar a base de cálculo
         const baseCalculoElemento = document.getElementById("baseCalculo");
-        baseCalculoElemento.innerHTML = `Base de Cálculo conforme NI 033.2: (342m) 5,7xdia/mês`;
+        baseCalculoElemento.innerHTML = `Base de Cálculo conforme NI 033.2: (342m) 5,7xdia/mês<br>
+        Cada dia de EDT/RSP desconta 6h (360m) do limite mensal.`;
 
         // Definindo o estilo para o texto pequeno
-        baseCalculoElemento.style.fontSize = "12px";  // Define o tamanho do texto
+        baseCalculoElemento.style.fontSize = "10px";
     }
 
     function atualizarListaRegistros(mes) {
@@ -217,7 +284,22 @@ document.addEventListener("DOMContentLoaded", function () {
             // Formatar a data para DD/MM/YYYY
             const dataFormatada = formatarData(registro.data);
 
-            const values = [dataFormatada, registro.inicio, registro.fim, registro.horasTrabalhadas];
+            // Destacar linha de férias ou EDT/RSP
+            if (registro.horasTrabalhadas === "FER" || registro.tipo === "FER") {
+                row.style.backgroundColor = "#e0e0e0";
+                row.style.fontWeight = "bold";
+            }
+            if (registro.horasTrabalhadas === "EDT/RSP" || registro.tipo === "EDT/RSP") {
+                row.style.backgroundColor = "#d0e6fa";
+                row.style.fontWeight = "bold";
+            }
+
+            const values = [
+                dataFormatada,
+                registro.inicio,
+                registro.fim,
+                registro.horasTrabalhadas
+            ];
             values.forEach((value) => {
                 const td = document.createElement("td");
                 td.textContent = value;
@@ -245,9 +327,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 localStorage.setItem("registros", JSON.stringify(registros));
                 inicializarCalendario();
-                atualizarMesesDisponiveis();
-                calcularResumoMes(mesSelecionado.value);
-                atualizarListaRegistros(mesSelecionado.value);
+                atualizarMesesAnosDisponiveis(); // Troque para a função correta
+                calcularResumoMes(mesSelecionadoMes.value);
+                atualizarListaRegistros(mesSelecionadoMes.value);
             });
 
             tdExcluir.appendChild(btnExcluir);
@@ -262,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     exportarPDF.addEventListener("click", function () {
-        const mes = mesSelecionado.value;
+        const mes = mesSelecionadoAno.value && mesSelecionadoMes.value ? `${mesSelecionadoAno.value}-${mesSelecionadoMes.value}` : "";
         if (!mes) {
             Swal.fire("Erro", "Selecione um mês para exportar o PDF.", "error");
             return;
@@ -301,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     excluirMes.addEventListener("click", function () {
-        const mes = mesSelecionado.value;
+        const mes = mesSelecionadoAno.value && mesSelecionadoMes.value ? `${mesSelecionadoAno.value}-${mesSelecionadoMes.value}` : "";
         if (!mes) {
             Swal.fire("Erro", "Selecione um mês.", "error");
             return;
@@ -318,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 delete registros[mes];
                 localStorage.setItem("registros", JSON.stringify(registros));
                 inicializarCalendario();
-                atualizarMesesDisponiveis();
+                atualizarMesesAnosDisponiveis(); // Troque para a função correta
                 calcularResumoMes("");
                 atualizarListaRegistros("");
                 Swal.fire("Sucesso", "Registros do mês excluídos.", "success");
@@ -360,7 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         registros = {};
                         localStorage.removeItem("registros");
                         inicializarCalendario();
-                        atualizarMesesDisponiveis();
+                        atualizarMesesAnosDisponiveis(); // Troque para a função correta
                         calcularResumoMes("");
                         atualizarListaRegistros("");
                         Swal.fire("Sucesso", "Todos os registros foram apagados.", "success");
@@ -394,9 +476,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         localStorage.setItem("registros", JSON.stringify(registros));
         inicializarCalendario();
-        atualizarMesesDisponiveis();
+        atualizarMesesAnosDisponiveis(); // Troque para a função correta
 
-        if (mesSelecionado.value === mes) {
+        if (mesSelecionadoMes.value === mes) {
             calcularResumoMes(mes);
             atualizarListaRegistros(mes);
         }
@@ -420,20 +502,30 @@ document.addEventListener("DOMContentLoaded", function () {
             title: 'Configurações',
             showCancelButton: true,
             showConfirmButton: false,
+            cancelButtonText: "Fechar",
             html: `
-<button id="downloadRegistros" class="swal2-styled">
-    Exportar registros
-    <img src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/setas/seta-cima.png" alt="Seta para cima" style="width: 18px; margin-left: 8px; filter: invert(1);">
-</button>
-
-<button id="importRegistros" class="swal2-styled">
-    Importar registros
-    <img src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/setas/seta-baixo.png" alt="Seta para baixo" style="width: 18px; margin-left: 8px; filter: invert(1);">
-</button>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px;">
+    <button id="downloadRegistros" class="swal2-styled" style="width: 250px; margin: 0;">
+        Exportar registros
+        <img src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/setas/seta-cima.png" alt="Seta para cima" style="width: 18px; margin-left: 8px; filter: invert(1);">
+    </button>
+    <button id="importRegistros" class="swal2-styled" style="width: 250px; margin: 0;">
+        Importar registros
+        <img src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/setas/seta-baixo.png" alt="Seta para baixo" style="width: 18px; margin-left: 8px; filter: invert(1);">
+    </button>
+    <button id="inserirFerias" class="swal2-styled" style="width: 250px; margin: 0;">
+        Inserir Férias ⛱︎
+    </button>
+    <button id="inserirEDTRSP" class="swal2-styled" style="width: 250px; margin: 0;">
+        EDT/RSP 🗓
+    </button>
+</div>
             `,
             didOpen: () => {
                 const downloadButton = document.getElementById("downloadRegistros");
                 const importButton = document.getElementById("importRegistros");
+                const inserirFeriasBtn = document.getElementById("inserirFerias");
+                const inserirEDTRSPBtn = document.getElementById("inserirEDTRSP");
 
                 downloadButton.addEventListener("click", function () {
                     const registros = JSON.parse(localStorage.getItem("registros")) || {};
@@ -461,7 +553,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 localStorage.setItem("registros", JSON.stringify(importedRegistros));
                                 registros = importedRegistros;
                                 inicializarCalendario();
-                                atualizarMesesDisponiveis();
+                                atualizarMesesAnosDisponiveis(); // Troque para a função correta
                                 calcularResumoMes(mesSelecionado.value);
                                 atualizarListaRegistros(mesSelecionado.value);
                                 Swal.fire("Sucesso", "Registros importados com sucesso.", "success");
@@ -471,6 +563,106 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                     input.click();
                     Swal.close();
+                });
+
+                inserirFeriasBtn.addEventListener("click", function () {
+                    Swal.fire({
+                        title: 'Inserir Férias',
+                        html: `
+                            <label>Data Início: <input type="date" id="feriasDataInicio"></label><br><br>
+                            <label>Data Fim: <input type="date" id="feriasDataFim"></label>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Inserir',
+                        cancelButtonText: 'Cancelar',
+                        preConfirm: () => {
+                            const inicio = document.getElementById('feriasDataInicio').value;
+                            const fim = document.getElementById('feriasDataFim').value;
+                            if (!inicio || !fim) {
+                                Swal.showValidationMessage('Preencha ambas as datas.');
+                                return false;
+                            }
+                            if (fim < inicio) {
+                                Swal.showValidationMessage('Data final deve ser igual ou posterior à inicial.');
+                                return false;
+                            }
+                            return { inicio, fim };
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const { inicio, fim } = result.value;
+                            let dataAtual = new Date(inicio);
+                            const dataFim = new Date(fim);
+                            while (dataAtual <= dataFim) {
+                                const dataStr = dataAtual.toISOString().slice(0, 10);
+                                const mes = dataStr.slice(0, 7);
+                                if (!registros[mes]) registros[mes] = [];
+                                // Evita duplicidade de férias
+                                if (!registros[mes].some(r => r.data === dataStr && r.tipo === "FER")) {
+                                    registros[mes].push({
+                                        data: dataStr,
+                                        inicio: "-",
+                                        fim: "-",
+                                        horasTrabalhadas: "FER",
+                                        tipo: "FER"
+                                    });
+                                    // Ordena após inserir
+                                    registros[mes].sort((a, b) => a.data.localeCompare(b.data));
+                                }
+                                dataAtual.setDate(dataAtual.getDate() + 1);
+                            }
+                            localStorage.setItem("registros", JSON.stringify(registros));
+                            inicializarCalendario();
+                            atualizarMesesAnosDisponiveis(); // Troque para a função correta
+                            calcularResumoMes(mesSelecionado.value);
+                            atualizarListaRegistros(mesSelecionado.value);
+                            Swal.fire("Sucesso", "Férias inseridas.", "success");
+                        }
+                    });
+                });
+
+                inserirEDTRSPBtn.addEventListener("click", function () {
+                    Swal.fire({
+                        title: 'Inserir EDT/RSP',
+                        html: `
+                            <label>Data: <input type="date" id="edtrspData"></label>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Inserir',
+                        cancelButtonText: 'Cancelar',
+                        preConfirm: () => {
+                            const data = document.getElementById('edtrspData').value;
+                            if (!data) {
+                                Swal.showValidationMessage('Selecione a data.');
+                                return false;
+                            }
+                            return { data };
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const { data } = result.value;
+                            const mes = data.slice(0, 7);
+                            if (!registros[mes]) registros[mes] = [];
+                            // Evita duplicidade de EDT/RSP
+                            if (!registros[mes].some(r => r.data === data && r.tipo === "EDT/RSP")) {
+                                registros[mes].push({
+                                    data: data,
+                                    inicio: "-",
+                                    fim: "-",
+                                    horasTrabalhadas: "EDT/RSP",
+                                    tipo: "EDT/RSP"
+                                });
+                                // Ordena após inserir
+                                registros[mes].sort((a, b) => a.data.localeCompare(b.data));
+                            }
+                            localStorage.setItem("registros", JSON.stringify(registros));
+                            inicializarCalendario();
+                            atualizarMesesAnosDisponiveis(); // Troque para a função correta
+                            calcularResumoMes(mesSelecionado.value);
+                            atualizarListaRegistros(mesSelecionado.value);
+                            Swal.fire("Sucesso", "EDT/RSP inserido.", "success");
+                        }
+                    });
                 });
             }
         });
@@ -491,7 +683,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return `${horas}h${minutos}m`;
     }
     inicializarCalendario(new Date().toISOString().slice(0, 10)); // Inicializa o calendário com a data atual
-    atualizarMesesDisponiveis();
+    atualizarMesesAnosDisponiveis();
 });
 
 function formatarData(data) {
