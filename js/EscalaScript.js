@@ -682,6 +682,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         return `${horas}h${minutos}m`;
     }
+    // Scroll automático ao focar nos campos de hora no mobile
+    [horaInicio, horaFim].forEach(input => {
+        input.addEventListener('focus', function () {
+            setTimeout(() => this.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        });
+    });
+
     inicializarCalendario(new Date().toISOString().slice(0, 10)); // Inicializa o calendário com a data atual
     atualizarMesesAnosDisponiveis();
 });

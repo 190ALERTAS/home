@@ -257,7 +257,7 @@ h2 {
 
 .controls-container .control-group {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   margin-bottom: 10px;
 }
 
@@ -1087,6 +1087,10 @@ footer .footer-content {
   textarea,
   select {
     font-size: 14px;
+  }
+
+  input[type="time"] {
+    scroll-margin-bottom: 300px;
   }
 
   .botoes {

@@ -86,6 +86,131 @@
   letter-spacing: 1px;
 }
 
+.control-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 6px 0;
+  flex-wrap: nowrap;
+}
+
+.step-button {
+  min-width: 48px;
+  min-height: 44px;
+  padding: 8px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #694f43;
+  background: #fff;
+  color: #694f43;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.step-button:active {
+  background: #694f43;
+  color: #fff;
+}
+
+.step-value {
+  min-width: 52px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 15px;
+  color: #3b3b3b;
+}
+
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #2b2b2b;
+  border: 1px solid #444;
+  border-radius: 12px;
+  margin: 8px auto;
+  max-width: 98vw;
+  width: 320px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  margin: 0;
+}
+
+.controls-container input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.controls-container .add-label-button {
+  display: block;
+  margin: 0 auto;
+}
+
+.step-button {
+  min-width: 100px;
+  min-height: 44px;
+  padding: 8px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: none;
+  background: #3b3b3b;
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.step-button:active {
+  background: #555;
+}
+
+.step-value {
+  min-width: 52px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 15px;
+  color: #aaa;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+
+.delete-button, .close-button, .add-label-button {
+  min-height: 44px;
+  padding: 8px 24px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+  border: none;
+  background: #3b3b3b;
+  color: #fff;
+}
+
+.delete-button:active, .close-button:active, .add-label-button:active {
+  background: #555;
+}
+
 @media (max-width: 600px) {
   #progress-container {
     max-width: 98vw;

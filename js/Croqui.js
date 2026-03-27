@@ -80,22 +80,16 @@ function showControls(marker) {
     controls.id = 'marker-controls'; // Adiciona um ID específico para os controles do marcador
 
     // Campo de Legenda
-    const labelControl = document.createElement('div');
-    labelControl.className = 'control-group';
-
     const labelInput = document.createElement('input');
     labelInput.type = 'text';
     labelInput.placeholder = 'Placa';
-    labelControl.appendChild(labelInput);
+    controls.appendChild(labelInput);
 
     const addLabelButton = document.createElement('button');
     addLabelButton.className = 'add-label-button';
     addLabelButton.innerText = 'Adicionar';
     addLabelButton.onclick = function() {
-        if (marker.label) {
-            map.removeLayer(marker.label);
-        }
-
+        if (marker.label) map.removeLayer(marker.label);
         const labelText = labelInput.value.trim().toUpperCase();
         if (labelText) {
             const labelDiv = L.divIcon({
@@ -104,78 +98,124 @@ function showControls(marker) {
                 iconSize: [100, 30],
                 iconAnchor: [50, -10]
             });
-
             const labelMarker = L.marker(marker.getLatLng(), { icon: labelDiv, draggable: true }).addTo(map);
             marker.label = labelMarker;
-
-            labelMarker.on('drag', function() {
-                marker.setLatLng(labelMarker.getLatLng());
-            });
-
+            labelMarker.on('drag', function() { marker.setLatLng(labelMarker.getLatLng()); });
             closeControls();
         }
     };
-    labelControl.appendChild(addLabelButton);
-
-    controls.appendChild(labelControl);
+    controls.appendChild(addLabelButton);
 
     // Controle de Rotação
     const rotationControl = document.createElement('div');
     rotationControl.className = 'control-group';
 
-    const rotationLabel = document.createElement('label');
-    rotationLabel.innerText = 'Rotação: ';
-    rotationControl.appendChild(rotationLabel);
+    let currentAngle = marker.options.rotationAngle || 0;
+    let rotInterval = null;
 
-    const rotationSlider = document.createElement('input');
-    rotationSlider.type = 'range';
-    rotationSlider.min = '-360';
-    rotationSlider.max = '360';
-    rotationSlider.value = marker.options.rotationAngle;
-    rotationSlider.oninput = function() {
-        const newAngle = parseInt(rotationSlider.value);
-        marker.setRotationAngle(newAngle);
-        console.log(`Rotated marker to: ${newAngle} degrees`);
-    };
-    rotationControl.appendChild(rotationSlider);
+    function applyRotation(angle) {
+        currentAngle = ((angle % 360) + 360) % 360;
+        marker.options.rotationAngle = currentAngle;
+        if (typeof marker.setRotationAngle === 'function') {
+            marker.setRotationAngle(currentAngle);
+        } else {
+            const el = marker.getElement();
+            if (el) {
+                const img = el.querySelector('img');
+                if (img) img.style.transform = `rotate(${currentAngle}deg)`;
+            }
+        }
+    }
 
+    function startContinuous(direction) {
+        applyRotation(currentAngle + direction * 5);
+        rotInterval = setInterval(() => applyRotation(currentAngle + direction * 2), 80);
+    }
+
+    function stopContinuous() {
+        clearInterval(rotInterval);
+        rotInterval = null;
+    }
+
+    const rotBtnMinus = document.createElement('button');
+    rotBtnMinus.className = 'step-button';
+    rotBtnMinus.innerText = '↺ -5°';
+    rotBtnMinus.addEventListener('mousedown', () => startContinuous(-1));
+    rotBtnMinus.addEventListener('touchstart', (e) => { e.preventDefault(); startContinuous(-1); });
+    rotBtnMinus.addEventListener('mouseup', stopContinuous);
+    rotBtnMinus.addEventListener('mouseleave', stopContinuous);
+    rotBtnMinus.addEventListener('touchend', stopContinuous);
+
+    const rotBtnPlus = document.createElement('button');
+    rotBtnPlus.className = 'step-button';
+    rotBtnPlus.innerText = '+5° ↻';
+    rotBtnPlus.addEventListener('mousedown', () => startContinuous(1));
+    rotBtnPlus.addEventListener('touchstart', (e) => { e.preventDefault(); startContinuous(1); });
+    rotBtnPlus.addEventListener('mouseup', stopContinuous);
+    rotBtnPlus.addEventListener('mouseleave', stopContinuous);
+    rotBtnPlus.addEventListener('touchend', stopContinuous);
+
+    rotationControl.appendChild(rotBtnMinus);
+    rotationControl.appendChild(rotBtnPlus);
     controls.appendChild(rotationControl);
 
     // Controle de Tamanho
     const sizeControl = document.createElement('div');
     sizeControl.className = 'control-group';
 
-    const sizeLabel = document.createElement('label');
-    sizeLabel.innerText = 'Tamanho: ';
-    sizeControl.appendChild(sizeLabel);
+    let currentSize = Math.round(marker.options.icon.options.iconSize[0]);
+    let sizeInterval = null;
 
-    const sizeSlider = document.createElement('input');
-    sizeSlider.type = 'range';
-    sizeSlider.min = '10';
-    sizeSlider.max = '100';
-    sizeSlider.value = marker.options.icon.options.iconSize[0];
-    sizeSlider.oninput = function() {
-        const newWidth = parseInt(sizeSlider.value);
+    function applySize(newWidth) {
+        newWidth = Math.min(100, Math.max(10, newWidth));
         const aspectRatio = marker.options.icon.options.iconSize[1] / marker.options.icon.options.iconSize[0];
         const newHeight = newWidth * aspectRatio;
-
+        currentSize = newWidth;
+        sizeValue.innerText = `${newWidth}px`;
         marker.setIcon(L.icon({
             iconUrl: marker.options.icon.options.iconUrl,
             iconSize: [newWidth, newHeight],
             iconAnchor: [newWidth / 2, newHeight / 2]
         }));
+        setTimeout(() => applyRotation(currentAngle), 0);
+    }
 
-        sizeValue.innerText = sizeSlider.value;
-        console.log(`Resized marker to: ${newWidth}x${newHeight}`);
-    };
-    sizeControl.appendChild(sizeSlider);
+    function startSizeContinuous(direction) {
+        applySize(currentSize + direction * 4);
+        sizeInterval = setInterval(() => applySize(currentSize + direction), 80);
+    }
 
-    controls.appendChild(sizeControl);
+    function stopSizeContinuous() {
+        clearInterval(sizeInterval);
+        sizeInterval = null;
+    }
+
+    const sizeBtnMinus = document.createElement('button');
+    sizeBtnMinus.className = 'step-button';
+    sizeBtnMinus.innerText = '− Tam';
+    sizeBtnMinus.addEventListener('mousedown', () => startSizeContinuous(-1));
+    sizeBtnMinus.addEventListener('touchstart', (e) => { e.preventDefault(); startSizeContinuous(-1); });
+    sizeBtnMinus.addEventListener('mouseup', stopSizeContinuous);
+    sizeBtnMinus.addEventListener('mouseleave', stopSizeContinuous);
+    sizeBtnMinus.addEventListener('touchend', stopSizeContinuous);
 
     const sizeValue = document.createElement('span');
-    sizeValue.className = 'size-value'; // Adiciona uma classe CSS
-    sizeValue.innerText = marker.options.icon.options.iconSize[0];
+    sizeValue.className = 'step-value';
+    sizeValue.innerText = `${currentSize}px`;
+
+    const sizeBtnPlus = document.createElement('button');
+    sizeBtnPlus.className = 'step-button';
+    sizeBtnPlus.innerText = '+ Tam';
+    sizeBtnPlus.addEventListener('mousedown', () => startSizeContinuous(1));
+    sizeBtnPlus.addEventListener('touchstart', (e) => { e.preventDefault(); startSizeContinuous(1); });
+    sizeBtnPlus.addEventListener('mouseup', stopSizeContinuous);
+    sizeBtnPlus.addEventListener('mouseleave', stopSizeContinuous);
+    sizeBtnPlus.addEventListener('touchend', stopSizeContinuous);
+
+    sizeControl.appendChild(sizeBtnMinus);
     sizeControl.appendChild(sizeValue);
+    sizeControl.appendChild(sizeBtnPlus);
+    controls.appendChild(sizeControl);
 
     // Botões de Ação
     const buttonGroup = document.createElement('div');
