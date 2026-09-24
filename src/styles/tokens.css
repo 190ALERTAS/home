@@ -1,0 +1,149 @@
+/* ==========================================================================
+   190 ALERTAS — design tokens
+   Tema escuro (padrão) e claro. Para ajustar cores, altere apenas aqui.
+   ========================================================================== */
+
+:root {
+  --font-ui: 'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Barlow Condensed', 'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 340ms;
+
+  --siren-red: #ff1f3d;
+  --siren-blue: #2563ff;
+
+  --topbar-h: 58px;
+  --nav-h: 66px;
+  --sidebar-w: 248px;
+  --content-w: 760px;
+  --content-w-wide: 1120px;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Cores de identificação de veículos no croqui (V1, V2, ...) */
+  --v1: #e53935;
+  --v2: #1e6fe5;
+  --v3: #f2c200;
+  --v4: #2e9d4a;
+  --v5: #8e44d6;
+  --v6: #f57c00;
+}
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0a0a0c;
+  --bg-accent: radial-gradient(1100px 520px at 50% -140px, rgba(229, 22, 44, 0.2), transparent 62%);
+  --surface: #131317;
+  --surface-2: #1a1a1f;
+  --surface-3: #24242b;
+  --surface-inset: #0d0d10;
+  --surface-hover: #1f1f25;
+  --border: #25252c;
+  --border-strong: #383842;
+  --text: #f4f4f6;
+  --text-2: #b6b6c0;
+  --text-3: #7f7f8b;
+
+  --primary: #e5162c;
+  --primary-hi: #ff2d44;
+  --primary-lo: #b30f20;
+  --primary-soft: rgba(229, 22, 44, 0.14);
+  --primary-line: rgba(229, 22, 44, 0.5);
+  --on-primary: #ffffff;
+
+  --blue: #4a78ff;
+  --blue-soft: rgba(74, 120, 255, 0.15);
+  --green: #2bd46a;
+  --green-soft: rgba(43, 212, 106, 0.14);
+  --amber: #f6ad2b;
+  --amber-soft: rgba(246, 173, 43, 0.15);
+  --violet: #a879ff;
+  --violet-soft: rgba(168, 121, 255, 0.15);
+  --danger: #ff4d5e;
+
+  --input-bg: #0e0e12;
+  --input-border: #2a2a32;
+  --overlay: rgba(4, 4, 6, 0.66);
+
+  --topbar-bg: rgba(10, 10, 12, 0.86);
+  --topbar-text: #f4f4f6;
+  --topbar-border: rgba(255, 255, 255, 0.06);
+  --nav-bg: rgba(13, 13, 16, 0.9);
+
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.035) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --glow: 0 8px 26px rgba(229, 22, 44, 0.38);
+
+  --bubble-bg: #1d2b24;
+  --bubble-text: #e9f2ec;
+  --stripe: rgba(255, 255, 255, 0.025);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f3f3f5;
+  --bg-accent: radial-gradient(1100px 520px at 50% -160px, rgba(208, 20, 43, 0.12), transparent 62%);
+  --surface: #ffffff;
+  --surface-2: #f6f6f8;
+  --surface-3: #ebebef;
+  --surface-inset: #f0f0f3;
+  --surface-hover: #f4f4f7;
+  --border: #e2e2e8;
+  --border-strong: #cdcdd6;
+  --text: #121216;
+  --text-2: #4a4a55;
+  --text-3: #7c7c88;
+
+  --primary: #d0142b;
+  --primary-hi: #e5162c;
+  --primary-lo: #a30f20;
+  --primary-soft: rgba(208, 20, 43, 0.09);
+  --primary-line: rgba(208, 20, 43, 0.42);
+  --on-primary: #ffffff;
+
+  --blue: #1f55e0;
+  --blue-soft: rgba(31, 85, 224, 0.1);
+  --green: #13914a;
+  --green-soft: rgba(19, 145, 74, 0.1);
+  --amber: #b86e00;
+  --amber-soft: rgba(230, 150, 20, 0.14);
+  --violet: #6d3fd1;
+  --violet-soft: rgba(109, 63, 209, 0.1);
+  --danger: #d11a2e;
+
+  --input-bg: #ffffff;
+  --input-border: #d9d9e1;
+  --overlay: rgba(14, 14, 20, 0.45);
+
+  /* A barra superior permanece escura nos dois temas (identidade da marca). */
+  --topbar-bg: rgba(14, 14, 17, 0.94);
+  --topbar-text: #f4f4f6;
+  --topbar-border: rgba(0, 0, 0, 0.2);
+  --nav-bg: rgba(255, 255, 255, 0.92);
+
+  --shadow-1: 0 1px 2px rgba(16, 16, 24, 0.06), 0 1px 1px rgba(16, 16, 24, 0.04);
+  --shadow-2: 0 10px 30px rgba(16, 16, 24, 0.1);
+  --shadow-3: 0 24px 60px rgba(16, 16, 24, 0.18);
+  --glow: 0 8px 22px rgba(208, 20, 43, 0.28);
+
+  --bubble-bg: #e3f5e9;
+  --bubble-text: #10231a;
+  --stripe: rgba(0, 0, 0, 0.025);
+}

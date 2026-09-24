@@ -1,0 +1,31 @@
+.termos article {
+  line-height: 1.6;
+}
+
+.termos h2 {
+  margin: 22px 0 10px;
+  font-size: 22px;
+}
+
+.termos ol {
+  margin: 0 0 16px;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text-2);
+}
+
+.termos strong {
+  color: var(--text);
+}
+
+.termos p + p {
+  margin-top: 10px;
+}
+
+.termos .assinatura {
+  margin-top: 22px;
+  text-align: right;
+  color: var(--text-2);
+}

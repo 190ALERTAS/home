@@ -1,0 +1,652 @@
+/* ==========================================================================
+   Croqui
+   ========================================================================== */
+
+.cro-page {
+  max-width: var(--content-w-wide);
+}
+
+/* Na etapa de desenho a página ocupa a altura disponível. */
+.cro-page.cro-full {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--topbar-h) - var(--safe-top) - var(--nav-h) - var(--safe-bottom));
+  padding-top: 10px;
+  padding-bottom: 10px;
+  animation: none;
+}
+
+@media (min-width: 900px) {
+  .cro-page.cro-full {
+    height: calc(100dvh - var(--topbar-h) - var(--safe-top));
+  }
+}
+
+.cro-topo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cro-etapas {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+
+.cro-etapas li {
+  flex: 1;
+  min-width: 0;
+}
+
+.cro-etapas button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-3);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.cro-etapas button:disabled {
+  opacity: 0.5;
+}
+
+.cro-etapas .n {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.cro-etapas li.atual button {
+  border-color: var(--primary);
+  color: var(--text);
+  background: var(--primary-soft);
+}
+
+.cro-etapas li.atual .n {
+  background: var(--primary);
+  color: #fff;
+}
+
+.cro-etapas li.feito .n {
+  background: color-mix(in srgb, var(--primary) 40%, var(--surface-3));
+  color: #fff;
+}
+
+@media (max-width: 420px) {
+  .cro-etapas button {
+    padding: 0 6px;
+    font-size: 12.5px;
+    gap: 5px;
+  }
+  .cro-topo .btn.sm {
+    padding: 0 10px;
+  }
+}
+
+/* ---------- Mapa ---------- */
+
+.cro-mapa {
+  position: relative;
+  height: calc(100dvh - var(--topbar-h) - var(--safe-top) - var(--nav-h) - var(--safe-bottom) - 170px);
+  min-height: 380px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: #cfd4d8;
+}
+
+@media (min-width: 900px) {
+  .cro-mapa {
+    height: calc(100dvh - var(--topbar-h) - 190px);
+  }
+}
+
+.cro-leaflet {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.cro-leaflet .leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.cro-mira {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 45, 68, 0.9);
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+}
+
+.cro-mira svg {
+  width: 30px;
+  height: 30px;
+}
+
+.cro-busca {
+  position: absolute;
+  z-index: 10;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 5px 5px 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-2);
+}
+
+.cro-busca input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+}
+
+.cro-busca .icon-btn {
+  width: 34px;
+  height: 34px;
+}
+
+.cro-resultados {
+  position: absolute;
+  z-index: 11;
+  top: 62px;
+  left: 10px;
+  right: 10px;
+  max-height: 50%;
+  overflow-y: auto;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-3);
+}
+
+.cro-resultados button {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-size: 14px;
+}
+
+.cro-resultados button:hover {
+  background: var(--surface-hover);
+}
+
+.cro-mapa-ctrl {
+  position: absolute;
+  z-index: 10;
+  right: 10px;
+  top: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cro-mapa-ctrl button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 4px 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-2);
+}
+
+.cro-mapa-ctrl button svg,
+.cro-zoom button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cro-mapa-ctrl button small {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cro-mapa-rodape {
+  position: absolute;
+  z-index: 10;
+  left: 10px;
+  right: 10px;
+  bottom: 26px; /* deixa a atribuição do mapa visível */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cro-dica {
+  align-self: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(10, 10, 12, 0.78);
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cro-modelos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* ---------- Editor ---------- */
+
+.cro-desenho {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cro-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cro-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.cro-toolbar .btn {
+  flex: none;
+}
+
+.cro-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 12px, var(--stripe) 12px 24px),
+    var(--surface-inset);
+}
+
+.editor-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.editor-svg {
+  display: block;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cro-zoom,
+.cro-hist {
+  position: absolute;
+  z-index: 5;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cro-hist {
+  right: auto;
+  left: 10px;
+}
+
+.cro-zoom button,
+.cro-hist button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-2);
+}
+
+.cro-hist button:disabled {
+  opacity: 0.4;
+}
+
+.cro-hist button svg {
+  width: 19px;
+  height: 19px;
+}
+
+.cro-vazio {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 16px;
+  width: min(92%, 420px);
+  transform: translateX(-50%);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: rgba(10, 10, 12, 0.82);
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Painel de propriedades flutuante */
+.cro-painel {
+  position: absolute;
+  z-index: 6;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  max-height: min(52%, 400px);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: var(--shadow-3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: rise-in var(--dur) var(--ease-out);
+}
+
+@media (min-width: 900px) {
+  .cro-painel {
+    left: auto;
+    right: 60px;
+    top: 10px;
+    bottom: auto;
+    width: 340px;
+    max-height: calc(100% - 20px);
+  }
+}
+
+.cro-painel-top {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 6px 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cro-painel-top .icon-btn {
+  width: 38px;
+  height: 38px;
+}
+
+.cro-painel-top .icon-btn svg {
+  width: 19px;
+  height: 19px;
+}
+
+.cro-painel-nome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+}
+
+.cro-painel-nome strong {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cro-painel-nome small {
+  color: var(--text-3);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cro-painel-nome .dot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.5);
+}
+
+.cro-painel-rapido {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cro-painel-rapido .btn {
+  flex: none;
+}
+
+.cro-painel-rapido .btn.ghost {
+  margin-left: auto;
+}
+
+.cro-painel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cro-painel-body .input,
+.cro-painel-body .select {
+  min-height: 42px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.cro-painel-body .seg button {
+  min-height: 36px;
+  font-size: 14px;
+}
+
+.cro-cores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.cro-cor {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.cro-cor[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--primary-hi);
+}
+
+.cro-slider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.cro-slider span {
+  flex: none;
+  width: 82px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 12.5px;
+}
+
+.cro-slider input[type='range'] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--primary);
+  height: 30px;
+}
+
+.cro-slider b {
+  flex: none;
+  min-width: 44px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* Paleta */
+.cro-paleta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 560px) {
+  .cro-paleta {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.cro-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 10px 8px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #f4f4f1;
+  color: #1a1a1a;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  transition:
+    transform var(--dur-fast),
+    border-color var(--dur);
+}
+
+.cro-item:hover {
+  border-color: var(--primary);
+}
+
+.cro-item:active {
+  transform: scale(0.96);
+}
+
+/* Exportação */
+.cro-previa {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  border-radius: var(--radius);
+  background: var(--surface-inset);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.cro-previa img {
+  width: 100%;
+  height: auto;
+}
+
+.cro-leg-cor {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 40px;
+  border-radius: 10px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-shadow: 0 0 3px #000, 0 0 2px #000;
+  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 520px) {
+  .cro-etapas li:not(.atual) .nome {
+    display: none;
+  }
+  .cro-etapas li:not(.atual) {
+    flex: none;
+  }
+  .cro-etapas li:not(.atual) button {
+    width: 40px;
+    justify-content: center;
+    padding: 0;
+  }
+  .cro-toolbar .lbl {
+    display: none;
+  }
+  .cro-toolbar .btn.sm {
+    padding: 0 12px;
+  }
+}
