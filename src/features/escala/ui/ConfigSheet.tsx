@@ -3,6 +3,7 @@ import { Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { Sheet } from '../../../components/Sheet';
 import { toast } from '../../../components/toast';
 import { Field, gap } from '../../../components/ui';
+import { CampoHora } from '../../../components/pickers';
 import { formatMinutes, shiftMinutes } from '../../../lib/date';
 import { uid } from '../../../lib/id';
 import { EDT_PADRAO, METAS_PADRAO, type Config, type DiasNoMes, type ModeloTurno } from '../model';
@@ -160,19 +161,17 @@ export function ConfigSheet({ open, onClose }: { open: boolean; onClose: () => v
                 </button>
               </div>
               <div className="grid-2" style={{ alignItems: 'center' }}>
-                <input
-                  className="input"
-                  type="time"
+                <CampoHora
+                  rotulo="Início"
+                  titulo={`Início · ${m.nome || 'turno'}`}
                   value={m.start}
-                  aria-label="Início"
-                  onChange={(e) => setModelos((l) => l.map((x, j) => (j === i ? { ...x, start: e.target.value } : x)))}
+                  onChange={(v) => setModelos((l) => l.map((x, j) => (j === i ? { ...x, start: v } : x)))}
                 />
-                <input
-                  className="input"
-                  type="time"
+                <CampoHora
+                  rotulo="Fim"
+                  titulo={`Fim · ${m.nome || 'turno'}`}
                   value={m.end}
-                  aria-label="Fim"
-                  onChange={(e) => setModelos((l) => l.map((x, j) => (j === i ? { ...x, end: e.target.value } : x)))}
+                  onChange={(v) => setModelos((l) => l.map((x, j) => (j === i ? { ...x, end: v } : x)))}
                 />
               </div>
               {m.start && m.end && <span className="subtle" style={{ fontSize: 13 }}>Duração: {formatMinutes(shiftMinutes(m.start, m.end))}</span>}

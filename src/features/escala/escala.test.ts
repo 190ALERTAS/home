@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calcularResumo, duplicados, turnosFrequentes } from './calc';
+import { calcularResumo, duplicados, proximoTurno, turnosFrequentes } from './calc';
 import { interpretarBackup, mesclar, migrarV1, paraV1, parseHorasV1 } from './migrate';
 import { configPadrao, dbVazio, type Entry, type Turno } from './model';
 import { adicionarTurno, aplicarTurno, editarTurno, limparDias, marcar, removerMes } from './ops';
@@ -278,5 +278,26 @@ describe('backup (importar/exportar)', () => {
     const { entries: juntas, adicionadas } = mesclar(entries, migrarV1(LEGADO).entries);
     expect(adicionadas).toBe(0);
     expect(juntas).toHaveLength(entries.length);
+  });
+});
+
+describe('próximo serviço (painel inicial)', () => {
+  const t = (id: string, date: string, start: string, end: string): Turno => ({ id, kind: 'turno', date, start, end, minutes: 0 });
+  const lista: Entry[] = [
+    t('a', '2026-09-23', '19:00', '07:00'),
+    t('b', '2026-09-25', '07:00', '19:00'),
+    t('c', '2026-09-27', '07:00', '07:00'),
+    { id: 'f', kind: 'ferias', date: '2026-09-24' },
+  ];
+  it('reconhece o turno noturno ainda em andamento na manhã seguinte', () => {
+    expect(proximoTurno(lista, '2026-09-24T06:30')).toEqual({ turno: lista[0], emAndamento: true });
+  });
+  it('aponta o próximo turno depois que o atual termina', () => {
+    expect(proximoTurno(lista, '2026-09-24T07:00')?.turno.id).toBe('b');
+    expect(proximoTurno(lista, '2026-09-25T19:30')?.turno.id).toBe('c');
+  });
+  it('turno de 24h termina no dia seguinte; sem turnos futuros não há próximo', () => {
+    expect(proximoTurno(lista, '2026-09-28T06:59')).toEqual({ turno: lista[2], emAndamento: true });
+    expect(proximoTurno(lista, '2026-09-28T07:00')).toBeNull();
   });
 });

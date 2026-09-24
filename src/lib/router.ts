@@ -10,12 +10,12 @@ import { trackPage } from './analytics';
 export const ROUTES = {
   inicio: { path: '', title: 'Início' },
   release: { path: 'release', title: 'Release' },
-  veiculos: { path: 'veiculos', title: 'Alerta de Veículo' },
-  escala: { path: 'escala', title: 'Minha Escala' },
+  veiculos: { path: 'veiculos', title: 'Alerta de veículo' },
+  escala: { path: 'escala', title: 'Minha escala' },
   croqui: { path: 'croqui', title: 'Croqui' },
   taf: { path: 'taf', title: 'Calculadora TAF' },
   sugestoes: { path: 'sugestoes', title: 'Sugestões' },
-  termos: { path: 'termos', title: 'Termos de Uso' },
+  termos: { path: 'termos', title: 'Termos de uso' },
 } as const;
 
 export type RouteId = keyof typeof ROUTES;

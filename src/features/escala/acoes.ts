@@ -1,5 +1,6 @@
 import { DIAS_SEMANA_CURTOS, MESES, formatDateBR, formatMinutes, parseMonthKey, todayISO, weekdayOf } from '../../lib/date';
 import { downloadBlob } from '../../lib/share';
+import { emblemaPNG } from '../../components/Emblema';
 import { calcularResumo, entriesDoMes } from './calc';
 import { ROTULO_MARCACAO, type EscalaDB } from './model';
 
@@ -44,21 +45,25 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
   const margem = 40;
 
   // Cabeçalho
-  doc.setFillColor(12, 12, 15);
+  doc.setFillColor(11, 15, 20);
   doc.rect(0, 0, W, 78, 'F');
-  doc.setFillColor(229, 22, 44);
-  doc.rect(0, 78, W, 4, 'F');
+  doc.setFillColor(200, 25, 47);
+  doc.rect(0, 78, W, 3, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
   doc.text('RELATÓRIO DE ESCALA', margem, 36);
-  doc.setFontSize(12);
-  doc.setTextColor(255, 70, 90);
-  doc.text(MAIUSC(nomeMes(mes)).replace('/', ' DE '), margem, 56);
-  doc.setTextColor(200, 200, 205);
+  doc.setFontSize(11);
+  doc.setTextColor(170, 180, 192);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.text('190 ALERTAS', W - margem, 36, { align: 'right' });
+  doc.text(MAIUSC(nomeMes(mes)).replace('/', ' DE '), margem, 56);
+  doc.setTextColor(231, 236, 242);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('190 ALERTAS', W - margem, 44, { align: 'right' });
+  const emblema = emblemaPNG(128);
+  if (emblema) doc.addImage(emblema, 'PNG', W - margem - doc.getTextWidth('190 ALERTAS') - 34, 22, 28, 28);
+  doc.setFont('helvetica', 'normal');
 
   let y = 108;
   const p = db.config.perfil;
@@ -80,14 +85,14 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
   const cw = (W - margem * 2 - 18) / 4;
   caixas.forEach(([rot, val], i) => {
     const x = margem + i * (cw + 6);
-    doc.setFillColor(244, 244, 246);
-    doc.roundedRect(x, y, cw, 52, 6, 6, 'F');
+    doc.setFillColor(242, 244, 247);
+    doc.roundedRect(x, y, cw, 52, 4, 4, 'F');
     doc.setFontSize(8);
-    doc.setTextColor(110, 110, 120);
+    doc.setTextColor(93, 105, 119);
     doc.setFont('helvetica', 'bold');
     doc.text(rot, x + 10, y + 17);
     doc.setFontSize(17);
-    const cor: [number, number, number] = i !== 2 || r.saldo === 0 ? [20, 20, 25] : r.saldo > 0 ? [20, 130, 70] : [200, 20, 40];
+    const cor: [number, number, number] = i !== 2 || r.saldo === 0 ? [18, 24, 32] : r.saldo > 0 ? [18, 131, 74] : [200, 25, 47];
     doc.setTextColor(...cor);
     doc.text(pdfTxt(val), x + 10, y + 40);
   });
@@ -122,9 +127,9 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
     head: [['Data', 'Dia', 'Início', 'Fim', 'Horas', 'Observação']],
     body: corpo.length ? corpo : [[{ content: 'Nenhum lançamento neste mês.', colSpan: 6, styles: { halign: 'center' } }]],
     theme: 'grid',
-    styles: { font: 'helvetica', fontSize: 9.5, cellPadding: 5, lineColor: [225, 225, 230], lineWidth: 0.5, textColor: [30, 30, 35] },
-    headStyles: { fillColor: [20, 20, 24], textColor: [255, 255, 255], fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [248, 248, 250] },
+    styles: { font: 'helvetica', fontSize: 9.5, cellPadding: 5, lineColor: [221, 226, 232], lineWidth: 0.5, textColor: [18, 24, 32] },
+    headStyles: { fillColor: [14, 19, 26], textColor: [255, 255, 255], fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [246, 247, 249] },
     columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 38 }, 2: { cellWidth: 48 }, 3: { cellWidth: 48 }, 4: { cellWidth: 52, fontStyle: 'bold' } },
   });
 

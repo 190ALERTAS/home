@@ -29,19 +29,13 @@ function useContagem(valor: number, duracao = 650): number {
 
 function Anel({ progresso, extra }: { progresso: number; extra: number }) {
   const tamanho = 120;
-  const traco = 12;
+  const traco = 8;
   const r = (tamanho - traco) / 2;
   const c = 2 * Math.PI * r;
   const p = Math.max(0, Math.min(1, progresso));
   const x = Math.max(0, Math.min(1, extra));
   return (
     <svg viewBox={`0 0 ${tamanho} ${tamanho}`} aria-hidden>
-      <defs>
-        <linearGradient id="grad-ring" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" style={{ stopColor: 'var(--primary-hi)' }} />
-          <stop offset="1" style={{ stopColor: 'var(--primary-lo)' }} />
-        </linearGradient>
-      </defs>
       <circle className="trilho" cx={tamanho / 2} cy={tamanho / 2} r={r} fill="none" strokeWidth={traco} />
       <circle
         className="progresso"

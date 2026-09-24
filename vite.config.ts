@@ -28,8 +28,8 @@ export default defineConfig({
         scope: base,
         display: 'standalone',
         orientation: 'any',
-        background_color: '#0a0a0c',
-        theme_color: '#0a0a0c',
+        background_color: '#0b0f14',
+        theme_color: '#0b0f14',
         categories: ['utilities', 'productivity'],
         icons: [
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
@@ -39,8 +39,8 @@ export default defineConfig({
         ],
         shortcuts: [
           { name: 'Release', short_name: 'Release', url: `${base}release` },
-          { name: 'Alerta de Veículo', short_name: 'Alerta', url: `${base}veiculos` },
-          { name: 'Minha Escala', short_name: 'Escala', url: `${base}escala` },
+          { name: 'Alerta de veículo', short_name: 'Alerta', url: `${base}veiculos` },
+          { name: 'Minha escala', short_name: 'Escala', url: `${base}escala` },
           { name: 'Croqui', short_name: 'Croqui', url: `${base}croqui` },
         ],
       },

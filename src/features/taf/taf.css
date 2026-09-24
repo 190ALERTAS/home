@@ -12,15 +12,15 @@
   min-height: 52px;
   padding: 6px 2px;
   border: 1px solid var(--border-strong);
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--surface-2);
   color: var(--text-2);
 }
 
 .taf-faixas b {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 17px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .taf-faixas small {
@@ -59,12 +59,12 @@
   display: flex;
   align-items: baseline;
   gap: 2px;
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
 }
 
 .taf-pts b {
-  font-size: 34px;
-  font-weight: 800;
+  font-size: 30px;
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -102,16 +102,16 @@
   border-radius: var(--radius-sm);
   background: var(--input-bg);
   color: var(--text);
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 600;
   text-align: center;
 }
 
 .taf-input input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-soft);
 }
 
 .taf-input span {
@@ -135,7 +135,7 @@
   display: block;
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, var(--primary-lo), var(--primary-hi));
+  background: var(--primary);
   transition: width var(--dur-slow) var(--ease-out);
 }
 
@@ -170,12 +170,12 @@
 .taf-total-num {
   display: flex;
   align-items: baseline;
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
 }
 
 .taf-total-num b {
-  font-size: 46px;
-  font-weight: 800;
+  font-size: 40px;
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -197,7 +197,7 @@
 .taf-escala span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-lo), var(--primary-hi));
+  background: var(--primary);
   transition: width var(--dur-slow) var(--ease-out);
 }
 
@@ -230,8 +230,9 @@
 .taf-tab th {
   padding: 6px 8px;
   text-align: left;
-  font-family: var(--font-display);
-  font-size: 12.5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-3);

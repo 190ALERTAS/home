@@ -28,15 +28,14 @@
   border: 0;
   background: transparent;
   color: var(--text);
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 21px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 17px;
+  text-transform: capitalize;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
 }
 
 .month-switch .title:hover {
@@ -45,8 +44,9 @@
 
 .month-switch .title small {
   color: var(--text-3);
-  font-weight: 700;
-  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 500;
 }
 
 /* ---------- Resumo ---------- */
@@ -75,7 +75,7 @@
 }
 
 .ring .progresso {
-  stroke: url(#grad-ring);
+  stroke: var(--primary);
   transition: stroke-dashoffset 900ms var(--ease-out);
 }
 
@@ -94,9 +94,9 @@
 }
 
 .ring .pct {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 30px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 27px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -106,11 +106,11 @@
 }
 
 .ring .lbl {
-  margin-top: 2px;
-  font-family: var(--font-display);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -174,12 +174,10 @@
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text-2);
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-family: var(--font-ui);
+  font-weight: 600;
   font-size: 13px;
-  letter-spacing: 0.05em;
-  line-height: 1.1;
-  text-transform: uppercase;
+  line-height: 1.15;
   text-align: center;
   transition:
     background-color var(--dur),
@@ -200,7 +198,7 @@
 }
 
 .quick button:active {
-  transform: scale(0.96);
+  transform: translateY(1px);
 }
 
 .quick button[aria-pressed='true'] {
@@ -229,10 +227,10 @@
 
 .cal-head span {
   text-align: center;
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -250,7 +248,7 @@
   min-height: 62px;
   padding: 5px 5px 5px;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: var(--surface-2);
   color: var(--text);
   text-align: left;
@@ -266,7 +264,7 @@
 }
 
 .day:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 
 .day.vazio {
@@ -274,9 +272,9 @@
 }
 
 .day .n {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 500;
   line-height: 1;
   color: var(--text-2);
   font-variant-numeric: tabular-nums;
@@ -295,18 +293,19 @@
   display: inline-grid;
   place-items: center;
   width: 22px;
-  height: 22px;
+  height: 20px;
   margin: -3px 0 0 -3px;
-  border-radius: 50%;
+  border-radius: var(--radius-xs);
   background: var(--primary);
   color: #fff;
-  font-size: 13.5px;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
 .day .h {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 16px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14.5px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -322,18 +321,18 @@
 }
 
 .day .bar {
-  height: 4px;
+  height: 3px;
   margin-top: 4px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, var(--primary-hi), var(--primary-lo));
+  border-radius: 1px;
+  background: var(--primary);
 }
 
 .day .bar.noite {
-  background: linear-gradient(90deg, var(--blue), #2a3fbf);
+  background: var(--blue);
 }
 
 .day .bar.misto {
-  background: linear-gradient(90deg, var(--primary-hi) 50%, var(--blue) 50%);
+  background: linear-gradient(90deg, var(--primary) 50%, var(--blue) 50%);
 }
 
 .day.trabalho {
@@ -342,12 +341,12 @@
 
 .day .tag {
   align-self: flex-start;
-  padding: 1px 5px;
-  border-radius: 6px;
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  padding: 1px 4px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .day.ferias {
@@ -434,10 +433,10 @@
   padding: 12px;
   border: 1px solid var(--primary-line);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  box-shadow: var(--shadow-2), 0 0 0 4px var(--primary-soft);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  box-shadow: var(--shadow-2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: rise-in var(--dur) var(--ease-out);
 }
 
@@ -489,16 +488,16 @@ button.entry:hover {
 
 .entry .d b {
   display: block;
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .entry .d small {
-  font-family: var(--font-display);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -524,9 +523,9 @@ button.entry:hover {
 }
 
 .entry .dur {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 19px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -560,13 +559,13 @@ button.entry:hover {
 }
 
 .slot:active {
-  transform: scale(0.97);
+  transform: translateY(1px);
 }
 
 .slot b {
-  font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 16.5px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -601,10 +600,9 @@ button.entry:hover {
 }
 
 .preset b {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .preset small {
@@ -615,7 +613,7 @@ button.entry:hover {
 
 .preset[aria-pressed='true'] {
   border-color: var(--primary);
-  background: linear-gradient(160deg, var(--primary-soft), transparent 80%), var(--surface-2);
+  background: var(--primary-soft);
   box-shadow: inset 0 0 0 1px var(--primary-line);
 }
 
@@ -632,12 +630,12 @@ button.entry:hover {
   place-items: center;
   width: 38px;
   height: 44px;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   background: var(--surface-3);
   color: var(--text-3);
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
   line-height: 1.1;
   text-align: center;
 }
@@ -663,12 +661,12 @@ button.entry:hover {
 .weekdays button {
   min-height: 42px;
   border: 1px solid var(--border-strong);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: var(--surface-2);
   color: var(--text-2);
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
   text-transform: uppercase;
 }
 
@@ -689,9 +687,9 @@ button.entry:hover {
 }
 
 .previa-gerador .big {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 30px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 26px;
   line-height: 1;
 }
 
@@ -713,10 +711,10 @@ button.entry:hover {
   border-radius: var(--radius);
   background: var(--surface-2);
   color: var(--text);
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 17px;
-  text-transform: uppercase;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: capitalize;
 }
 
 .months button small {
@@ -748,7 +746,7 @@ button.entry:hover {
 }
 
 .chart-ano text {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   fill: var(--text-3);
 }
 

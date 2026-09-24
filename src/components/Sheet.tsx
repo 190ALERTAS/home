@@ -9,6 +9,8 @@ interface SheetProps {
   children: ReactNode;
   footer?: ReactNode;
   wide?: boolean;
+  /** Janela estreita no computador (seletores de data/hora). */
+  size?: 'sm';
   /** Impede fechar tocando fora (ex.: formulários longos). */
   modalLock?: boolean;
 }
@@ -19,7 +21,7 @@ let openCount = 0;
  * Folha inferior no celular / janela central no desktop, sobre o <dialog> nativo
  * (acessível: foco preso, Esc fecha, fundo escurecido).
  */
-export function Sheet({ open, onClose, title, subtitle, children, footer, wide, modalLock }: SheetProps) {
+export function Sheet({ open, onClose, title, subtitle, children, footer, wide, size, modalLock }: SheetProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -62,8 +64,11 @@ export function Sheet({ open, onClose, title, subtitle, children, footer, wide, 
     <dialog
       ref={ref}
       tabIndex={-1}
-      className={`sheet${wide ? ' wide' : ''}`}
+      className={`sheet${wide ? ' wide' : ''}${size ? ` ${size}` : ''}`}
       onCancel={(e) => {
+        // O React propaga "cancel" pela árvore: com folhas aninhadas (ex.: seletor de
+        // hora dentro de outra folha), só a de cima deve fechar com o Esc.
+        if (e.target !== ref.current) return;
         e.preventDefault();
         onClose();
       }}

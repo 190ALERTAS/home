@@ -1,8 +1,12 @@
 import { formatDateBR } from '../../lib/date';
+import { desenharEmblema } from '../../components/Emblema';
 import { CAMADAS } from './mapa';
 import { LINHAS, SIMBOLOS, VEICULOS, type CroquiDoc, type LinhaEl, type SimboloEl, type VeiculoEl } from './model';
 
 const NS = 'http://www.w3.org/2000/svg';
+const SANS = '"IBM Plex Sans", Arial, sans-serif';
+const MONO = '"IBM Plex Mono", Consolas, monospace';
+
 
 function carregar(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -69,9 +73,10 @@ function escalaGrafica(mpu: number, pxPorUnidade: number, alvoPx: number): { met
 export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: Blob | null): Promise<Blob> {
   try {
     await Promise.all([
-      document.fonts.load('800 40px "Barlow Condensed"'),
-      document.fonts.load('600 20px "Barlow"'),
-      document.fonts.load('400 20px "Barlow"'),
+      document.fonts.load('700 40px "IBM Plex Sans"'),
+      document.fonts.load('600 20px "IBM Plex Sans"'),
+      document.fonts.load('400 20px "IBM Plex Sans"'),
+      document.fonts.load('500 20px "IBM Plex Mono"'),
     ]);
   } catch {
     /* segue com a fonte padrão */
@@ -92,7 +97,7 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
   const linhas = [...new Map(doc.elementos.filter((e): e is LinhaEl => e.kind === 'linha').map((l) => [l.estilo, l])).values()];
 
   const medir = document.createElement('canvas').getContext('2d')!;
-  medir.font = `400 ${Math.round(26 * u)}px Barlow, Arial, sans-serif`;
+  medir.font = `400 ${Math.round(26 * u)}px ${SANS}`;
   const obs = doc.info.observacoes.trim() ? quebrarTexto(medir, doc.info.observacoes.trim(), DW) : [];
   const linhaAlt = Math.round(40 * u);
   const itensLegenda = veiculos.length + simbolos.length + linhas.length;
@@ -110,28 +115,28 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
   ctx.fillRect(0, 0, W, H);
 
   // Cabeçalho
-  ctx.fillStyle = '#0c0c0f';
+  ctx.fillStyle = '#0b0f14';
   ctx.fillRect(0, 0, W, cabecalho);
-  ctx.fillStyle = '#e5162c';
-  ctx.fillRect(0, cabecalho - Math.round(8 * u), W, Math.round(8 * u));
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#c8192f';
+  ctx.fillRect(0, cabecalho - Math.round(6 * u), W, Math.round(6 * u));
   ctx.textBaseline = 'alphabetic';
-  ctx.font = `800 ${Math.round(54 * u)}px "Barlow Condensed", "Arial Narrow", Arial, sans-serif`;
-  const titulo = `CROQUI — ${(doc.info.titulo || 'Acidente de trânsito').toLocaleUpperCase('pt-BR')}`;
-  ctx.fillText(titulo, P, Math.round(70 * u), W - P * 2 - 200 * u);
-  ctx.font = `500 ${Math.round(26 * u)}px Barlow, Arial, sans-serif`;
-  ctx.fillStyle = '#c9c9d1';
-  const quando = [doc.info.data && formatDateBR(doc.info.data), doc.info.hora].filter(Boolean).join(' às ');
-  const sub = [quando, doc.info.local].filter(Boolean).join('  ·  ');
-  if (sub) ctx.fillText(sub, P, Math.round(112 * u), W - P * 2);
+  // Marca à direita: emblema + "190 ALERTAS"
   ctx.textAlign = 'right';
-  ctx.font = `800 ${Math.round(30 * u)}px "Barlow Condensed", Arial, sans-serif`;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('ALERTAS', W - P, Math.round(68 * u));
-  const larguraAlertas = ctx.measureText('ALERTAS').width;
-  ctx.fillStyle = '#ff2d44';
-  ctx.fillText('190', W - P - larguraAlertas - 8 * u, Math.round(68 * u));
+  ctx.font = `600 ${Math.round(24 * u)}px ${SANS}`;
+  ctx.fillStyle = '#e7ecf2';
+  ctx.fillText('190 ALERTAS', W - P, Math.round(72 * u));
+  const larguraMarca = ctx.measureText('190 ALERTAS').width;
+  desenharEmblema(ctx, W - P - larguraMarca - 58 * u, Math.round(34 * u), 50 * u);
   ctx.textAlign = 'left';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `700 ${Math.round(46 * u)}px ${SANS}`;
+  const titulo = `Croqui — ${doc.info.titulo || 'Acidente de trânsito'}`;
+  ctx.fillText(titulo, P, Math.round(72 * u), W - P * 3 - larguraMarca - 58 * u);
+  ctx.font = `500 ${Math.round(24 * u)}px ${MONO}`;
+  ctx.fillStyle = '#aab4c0';
+  const quando = [doc.info.data && formatDateBR(doc.info.data), doc.info.hora].filter(Boolean).join(' · ');
+  const sub = [quando, doc.info.local].filter(Boolean).join('  |  ');
+  if (sub) ctx.fillText(sub, P, Math.round(114 * u), W - P * 2);
 
   // Desenho
   const dy = cabecalho + P;
@@ -162,7 +167,7 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
   ctx.strokeStyle = '#111111';
   ctx.lineWidth = 2 * u;
   ctx.stroke();
-  ctx.fillStyle = '#e5162c';
+  ctx.fillStyle = '#c8192f';
   ctx.beginPath();
   ctx.moveTo(nx, ny - nr * 0.78);
   ctx.lineTo(nx + nr * 0.3, ny + nr * 0.1);
@@ -171,7 +176,7 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = '#111111';
-  ctx.font = `800 ${Math.round(24 * u)}px "Barlow Condensed", Arial, sans-serif`;
+  ctx.font = `700 ${Math.round(22 * u)}px ${SANS}`;
   ctx.textAlign = 'center';
   ctx.fillText('N', nx, ny + nr * 0.72);
   ctx.textAlign = 'left';
@@ -193,18 +198,18 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
   ctx.lineWidth = 1.5 * u;
   ctx.strokeRect(bx, by, esc.px, bh);
   ctx.fillStyle = '#111111';
-  ctx.font = `600 ${Math.round(20 * u)}px Barlow, Arial, sans-serif`;
+  ctx.font = `500 ${Math.round(19 * u)}px ${MONO}`;
   ctx.fillText('0', bx - 4 * u, by - 8 * u);
   ctx.fillText(`${esc.metros} m`, bx + esc.px - 12 * u, by - 8 * u);
 
   // Legenda
   let y = dy + DH + P;
   const titulo2 = (t: string) => {
-    ctx.fillStyle = '#e5162c';
-    ctx.fillRect(P, y + 6 * u, 6 * u, 26 * u);
+    ctx.fillStyle = '#c8192f';
+    ctx.fillRect(P, y + 12 * u, 12 * u, 12 * u);
     ctx.fillStyle = '#111111';
-    ctx.font = `800 ${Math.round(28 * u)}px "Barlow Condensed", Arial, sans-serif`;
-    ctx.fillText(t, P + 16 * u, y + 30 * u);
+    ctx.font = `600 ${Math.round(22 * u)}px ${MONO}`;
+    ctx.fillText(t, P + 24 * u, y + 26 * u);
     y += 56 * u;
   };
   if (itensLegenda) {
@@ -220,7 +225,7 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = '#111111';
-        ctx.font = `700 ${Math.round(24 * u)}px Barlow, Arial, sans-serif`;
+        ctx.font = `600 ${Math.round(23 * u)}px ${SANS}`;
         const nome = VEICULOS.find((x2) => x2.tipo === v.tipo)?.nome ?? 'Veículo';
         const estado = v.estado === 'capotado' ? ' (capotado)' : v.estado === 'tombado' ? ' (tombado)' : '';
         ctx.fillText(`${v.rotulo || '—'}  ${v.descricao || nome}${estado}`, x + 58 * u, yy, colW - 70 * u);
@@ -236,7 +241,7 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = '#111111';
-        ctx.font = `500 ${Math.round(24 * u)}px Barlow, Arial, sans-serif`;
+        ctx.font = `500 ${Math.round(23 * u)}px ${SANS}`;
         ctx.fillText(SIMBOLOS.find((x2) => x2.tipo === s.tipo)?.nome ?? '', x + 58 * u, yy, colW - 70 * u);
       });
     }
@@ -251,7 +256,7 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = '#111111';
-        ctx.font = `500 ${Math.round(24 * u)}px Barlow, Arial, sans-serif`;
+        ctx.font = `500 ${Math.round(23 * u)}px ${SANS}`;
         ctx.fillText(LINHAS.find((x2) => x2.estilo === l.estilo)?.nome ?? '', x + 58 * u, yy, colW - 70 * u);
       });
     }
@@ -266,16 +271,16 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
   if (obs.length) {
     titulo2('OBSERVAÇÕES');
     ctx.fillStyle = '#222222';
-    ctx.font = `400 ${Math.round(26 * u)}px Barlow, Arial, sans-serif`;
+    ctx.font = `400 ${Math.round(26 * u)}px ${SANS}`;
     obs.forEach((l, i) => ctx.fillText(l, P, y + i * 34 * u + 4 * u));
     y += obs.length * 34 * u;
   }
 
   // Rodapé
-  ctx.fillStyle = '#f2f2f4';
+  ctx.fillStyle = '#f1f3f6';
   ctx.fillRect(0, H - rodape, W, rodape);
-  ctx.fillStyle = '#6b6b75';
-  ctx.font = `500 ${Math.round(19 * u)}px Barlow, Arial, sans-serif`;
+  ctx.fillStyle = '#5d6977';
+  ctx.font = `500 ${Math.round(18 * u)}px ${MONO}`;
   const agora = new Date();
   const credito = doc.fundo.tipo === 'mapa' ? ` · ${CAMADAS[doc.fundo.camada].creditoCurto}` : '';
   ctx.fillText(

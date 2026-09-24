@@ -1,18 +1,81 @@
-import { useState, type ReactNode } from 'react';
-import { ArrowRight, CalendarDays, Download, Lock, Share, Sparkles, SquarePlus, X } from 'lucide-react';
-import mascote from '../../assets/mascote.webp';
+import { useEffect, useState, type ReactNode } from 'react';
+import { ArrowRight, Download, Lock, Share, SquarePlus, X } from 'lucide-react';
 import { linkProps, type RouteId } from '../../lib/router';
-import { formatMinutes, monthKeyOf, monthLabel, todayISO } from '../../lib/date';
+import { DIAS_SEMANA_CURTOS, formatDateBR, formatMinutes, monthKeyOf, monthLabel, nowHM, todayISO, weekdayOf } from '../../lib/date';
 import { readString, writeString } from '../../lib/storage';
-import { useInstall } from '../../lib/pwa';
+import { useInstall, useOnline } from '../../lib/pwa';
 import { NAV, APP_VERSION } from '../../app/nav';
 import { IOSInstallHelp } from '../../app/Shell';
 import { toast } from '../../components/toast';
 import { useEscala } from '../escala/store';
-import { calcularResumo } from '../escala/calc';
+import { calcularResumo, proximoTurno } from '../escala/calc';
 import './inicio.css';
 
 const K_NOVIDADES = '190a:novidades-v5';
+
+/** Data e hora do aparelho, atualizadas a cada minuto. */
+function useAgora() {
+  const [agora, setAgora] = useState(() => ({ data: todayISO(), hora: nowHM() }));
+  useEffect(() => {
+    const id = window.setInterval(() => setAgora({ data: todayISO(), hora: nowHM() }), 10_000);
+    return () => window.clearInterval(id);
+  }, []);
+  return agora;
+}
+
+function saudacao(hora: string): string {
+  const h = Number(hora.slice(0, 2));
+  if (h >= 5 && h < 12) return 'Bom dia';
+  if (h >= 12 && h < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
+
+const diaCurto = (iso: string) => `${DIAS_SEMANA_CURTOS[weekdayOf(iso)].toUpperCase()} ${formatDateBR(iso).slice(0, 5)}`;
+
+function Painel() {
+  const { data, hora } = useAgora();
+  const online = useOnline();
+  const db = useEscala();
+  const servico = proximoTurno(db.entries, `${data}T${hora}`);
+  return (
+    <section className="painel" aria-label="Painel">
+      <div className="painel-topo">
+        <span className="eyebrow">Painel</span>
+        <h1>{saudacao(hora)}. Bom serviço!</h1>
+      </div>
+      <dl className="painel-status">
+        <div>
+          <dt>Data</dt>
+          <dd className="mono">
+            {DIAS_SEMANA_CURTOS[weekdayOf(data)].toUpperCase()} {formatDateBR(data)}
+          </dd>
+        </div>
+        <div>
+          <dt>Hora</dt>
+          <dd className="mono">{hora}</dd>
+        </div>
+        <div>
+          <dt>Conexão</dt>
+          <dd className={`mono ${online ? 'ok' : 'off'}`}>
+            <i aria-hidden /> {online ? 'Online' : 'Offline'}
+          </dd>
+        </div>
+        {servico && (
+          <div className="servico">
+            <dt>{servico.emAndamento ? 'Em serviço' : 'Próximo serviço'}</dt>
+            <dd className="mono">
+              <a {...linkProps('escala')}>
+                {servico.emAndamento
+                  ? `até ${servico.turno.end}`
+                  : `${diaCurto(servico.turno.date)} ${servico.turno.start}–${servico.turno.end}`}
+              </a>
+            </dd>
+          </div>
+        )}
+      </dl>
+    </section>
+  );
+}
 
 function Tile({ id, destaque, extra }: { id: RouteId; destaque?: boolean; extra?: ReactNode }) {
   const n = NAV[id];
@@ -58,18 +121,7 @@ export default function InicioPage() {
 
   return (
     <div className="page inicio">
-      <section className="home-hero">
-        <div className="home-mascote">
-          <img src={mascote} alt="Mascote do 190 ALERTAS" width={132} height={132} fetchPriority="high" />
-        </div>
-        <div className="home-txt">
-          <span className="eyebrow">De praça para praça</span>
-          <h1>
-            <span className="n">190</span> ALERTAS
-          </h1>
-          <p>Release, alerta de veículo, croqui, escala e TAF — rápido, organizado e pronto para o WhatsApp.</p>
-        </div>
-      </section>
+      <Painel />
 
       {novidades && (
         <section className="card pad novidades">
@@ -84,18 +136,19 @@ export default function InicioPage() {
           >
             <X />
           </button>
-          <div className="card-title">
-            <Sparkles size={18} /> Novidades da versão 5
-          </div>
+          <div className="card-title">Novidades da versão 5</div>
           <ul>
             <li>
-              <b>Novo visual</b>, com tema escuro e claro.
+              <b>Novo visual</b>, mais sóbrio, com tema escuro e claro.
             </li>
             <li>
-              <b>Release</b> no novo padrão, com ícone 🚔, 🦅 ou ⚡ no título.
+              <b>Release</b> no padrão do batalhão, com ícone 🚔, 🦅 ou ⚡ no título.
             </li>
             <li>
-              <b>Minha Escala</b> mais dinâmica: gerador de escala (12x36, 24x72…), férias, relatório em PDF.{' '}
+              <b>Data e hora</b> com seletores próprios, que abrem sempre dentro da tela.
+            </li>
+            <li>
+              <b>Minha escala</b> mais dinâmica: gerador de escala (12x36, 24x72…), férias, relatório em PDF.{' '}
               <em>Seus registros anteriores foram mantidos.</em>
             </li>
             <li>
@@ -106,6 +159,7 @@ export default function InicioPage() {
         </section>
       )}
 
+      <div className="eyebrow secao-titulo">Ferramentas</div>
       <div className="tiles">
         <Tile id="veiculos" destaque />
         <Tile id="release" />
@@ -144,9 +198,9 @@ export default function InicioPage() {
       </section>
 
       <footer className="creditos">
-        <CalendarDays size={14} /> Idealizado e criado por <b>Sd Ferrão · 32º BPM</b> — em desenvolvimento desde janeiro de 2023.
+        Idealizado e criado por <b>Sd Ferrão · 32º BPM</b> — em desenvolvimento desde janeiro de 2023.
         <br />
-        Versão {APP_VERSION}
+        <span className="mono">v{APP_VERSION}</span>
         {showIOSHelp && (
           <>
             {' '}

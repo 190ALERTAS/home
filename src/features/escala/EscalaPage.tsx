@@ -202,7 +202,7 @@ export default function EscalaPage() {
     <div className="page wide">
       <PageHead
         icon={CalendarDays}
-        title="Minha Escala"
+        title="Minha escala"
         subtitle="Turnos, horas trabalhadas e extras do mês."
         actions={
           <>
@@ -246,9 +246,8 @@ export default function EscalaPage() {
             <button type="button" className="icon-btn" aria-label="Mês anterior" onClick={() => irMes(shiftMonth(mes, -1))}>
               <ChevronLeft />
             </button>
-            <button type="button" className="title" onClick={() => setSheet('mes')} aria-label="Escolher mês">
-              {monthLabel(mes).split(' ')[0]}
-              <small>{parseMonthKey(mes).year}</small>
+            <button type="button" className="title" onClick={() => setSheet('mes')} aria-label={`${monthLabel(mes)}, escolher mês`}>
+              {monthLabel(mes).split(' ')[0]} <small>{parseMonthKey(mes).year}</small>
             </button>
             <button type="button" className="icon-btn" aria-label="Próximo mês" onClick={() => irMes(shiftMonth(mes, 1))}>
               <ChevronRight />

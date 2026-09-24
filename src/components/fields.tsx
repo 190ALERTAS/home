@@ -3,6 +3,7 @@ import { Clock } from 'lucide-react';
 import { nowHM, todayISO } from '../lib/date';
 import { readRecent } from '../lib/storage';
 import { Field } from './ui';
+import { CampoData, CampoHora } from './pickers';
 
 /** Data + hora lado a lado, com atalho "Agora". */
 export function DateTimeFields({
@@ -19,24 +20,19 @@ export function DateTimeFields({
   return (
     <div className="grid-2" style={{ alignItems: 'end' }}>
       <Field label="Data" required htmlFor={idD}>
-        <input id={idD} className="input" type="date" value={data} onChange={(e) => onChange({ data: e.target.value, hora })} />
+        <CampoData id={idD} rotulo="Data" value={data} onChange={(v) => onChange({ data: v, hora })} />
       </Field>
       <Field
         label="Hora"
         required
         htmlFor={idH}
         aside={
-          <button
-            type="button"
-            className="btn sm ghost"
-            style={{ minHeight: 24, padding: '0 6px', color: 'var(--primary-hi)' }}
-            onClick={() => onChange({ data: todayISO(), hora: nowHM() })}
-          >
+          <button type="button" className="btn sm ghost field-aside-btn" onClick={() => onChange({ data: todayISO(), hora: nowHM() })}>
             <Clock /> Agora
           </button>
         }
       >
-        <input id={idH} className="input" type="time" value={hora} onChange={(e) => onChange({ data, hora: e.target.value })} />
+        <CampoHora id={idH} rotulo="Hora" value={hora} onChange={(v) => onChange({ data, hora: v })} />
       </Field>
     </div>
   );

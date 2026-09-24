@@ -1,4 +1,4 @@
-import { daysInMonth, parseMonthKey, shiftMinutes } from '../../lib/date';
+import { addDays, daysInMonth, hmToMinutes, parseMonthKey, shiftMinutes } from '../../lib/date';
 import { isTurno, type Config, type DiasNoMes, type Entry, type Turno } from './model';
 
 export interface ResumoMes {
@@ -149,4 +149,21 @@ export function novoTurnoMinutos(start: string, end: string): number {
 
 export function totalTurnos(turnos: Turno[]): number {
   return turnos.reduce((s, t) => s + t.minutes, 0);
+}
+
+/**
+ * Turno em andamento ou o próximo a começar, a partir de `agora` ("AAAA-MM-DDTHH:MM").
+ * Turnos que passam da meia-noite (ou de 24h) terminam no dia seguinte.
+ */
+export function proximoTurno(entries: Entry[], agora: string): { turno: Turno; emAndamento: boolean } | null {
+  let proximo: Turno | null = null;
+  for (const e of entries) {
+    if (!isTurno(e)) continue;
+    const inicio = `${e.date}T${e.start}`;
+    const fim = `${hmToMinutes(e.end) <= hmToMinutes(e.start) ? addDays(e.date, 1) : e.date}T${e.end}`;
+    if (fim <= agora) continue;
+    if (inicio <= agora) return { turno: e, emAndamento: true };
+    if (!proximo || inicio < `${proximo.date}T${proximo.start}`) proximo = e;
+  }
+  return proximo ? { turno: proximo, emAndamento: false } : null;
 }

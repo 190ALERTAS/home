@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { formatMinutes, shiftMinutes } from '../../../lib/date';
+import { CampoHora } from '../../../components/pickers';
 import { turnosFrequentes } from '../calc';
 import type { Entry, ModeloTurno } from '../model';
 
@@ -77,11 +78,11 @@ export function CamposHorario({
   return (
     <div className="grid-2" style={{ alignItems: 'end' }}>
       <div className="field">
-        <label>Início</label>
-        <input className="input" type="time" value={start} onChange={(e) => onChange({ start: e.target.value, end })} />
+        <span className="field-label">Início</span>
+        <CampoHora rotulo="Início do turno" titulo="Início do turno" value={start} onChange={(v) => onChange({ start: v, end })} />
       </div>
       <div className="field">
-        <label>
+        <span className="field-label">
           Fim
           {valido && (
             <span className="badge red" style={{ marginLeft: 'auto' }}>
@@ -89,8 +90,8 @@ export function CamposHorario({
               {dur === 1440 ? ' (24h)' : ''}
             </span>
           )}
-        </label>
-        <input className="input" type="time" value={end} onChange={(e) => onChange({ start, end: e.target.value })} />
+        </span>
+        <CampoHora rotulo="Fim do turno" titulo="Fim do turno" value={end} onChange={(v) => onChange({ start, end: v })} />
       </div>
     </div>
   );

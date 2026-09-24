@@ -7,7 +7,7 @@ export type ReleaseIcone = (typeof ICONES)[number];
 export interface Detido {
   id: string;
   nome: string;
-  /** Idade, alcunha ou outra qualificação curta (opcional). */
+  /** Texto entre o nome e o RG (idade, alcunha…). Pode ficar vazio, como no padrão. */
   complemento: string;
   rg: string;
 }
@@ -22,14 +22,12 @@ export interface ReleaseData {
   numero: string;
   bairro: string;
   cidade: string;
-  houveApreensao: boolean;
+  /** Itens apreendidos, um por linha. Vazio: a linha abaixo de APREENSÃO fica em branco. */
   apreensoes: string[];
   detidos: Detido[];
   historico: string;
   ba: string;
   dp: string;
-  /** Destaca os rótulos em *negrito* no WhatsApp. */
-  negrito: boolean;
 }
 
 const up = (s: string) => s.trim().replace(/\s+/g, ' ').toLocaleUpperCase('pt-BR');
@@ -55,59 +53,71 @@ export function formatEndereco(d: Pick<ReleaseData, 'logradouro' | 'numero' | 'b
   return s;
 }
 
-/** "Anderson Leandro Bairros - 35 anos, RG N° 2104033028" */
+/**
+ * "Anderson Leandro Bairros - , RG N° 2104033028" — o separador " - " e o ", RG N°"
+ * ficam sempre, exatamente como no modelo, mesmo com o complemento vazio.
+ */
 export function formatDetido(d: Pick<Detido, 'nome' | 'complemento' | 'rg'>): string {
   const nome = clean(d.nome);
   const complemento = clean(d.complemento);
   const rg = clean(d.rg).replace(/^RG\s*(N\s*[º°.]?)?\s*:?\s*/i, '');
-  let s = nome;
-  if (complemento) s += (s ? ' - ' : '') + complemento;
-  if (rg) s += (s ? ', ' : '') + `RG N° ${rg}`;
-  return s;
+  return `${nome} - ${complemento}, RG N° ${rg}`;
 }
 
-export function detidosValidos(d: ReleaseData): Detido[] {
+export function detidosValidos(d: Pick<ReleaseData, 'detidos'>): Detido[] {
   return d.detidos.filter((x) => x.nome.trim() || x.rg.trim() || x.complemento.trim());
 }
 
-export function apreensoesValidas(d: ReleaseData): string[] {
-  return d.houveApreensao ? d.apreensoes.map(clean).filter(Boolean) : [];
+export function apreensoesValidas(d: Pick<ReleaseData, 'apreensoes'>): string[] {
+  return d.apreensoes
+    .flatMap((item) => item.split(/\r?\n/))
+    .map(clean)
+    .filter(Boolean);
 }
 
-/** Monta o texto final do release no padrão da Brigada Militar. */
-export function formatRelease(d: ReleaseData): string {
-  const b = (label: string) => (d.negrito ? `*${label}*` : label);
-  const lines: string[] = [];
-
-  const titulo = `${d.icone}${up(d.unidade)}${d.icone}`;
-  lines.push(d.negrito ? `*${titulo}*` : titulo);
-  lines.push(`${b('FATO:')} ${up(d.fato)}`);
-  lines.push(`${b('DATA:')} ${d.data ? formatDateBR(d.data) : ''}`);
-  lines.push(`${b('HORA:')} ${d.hora}`);
-  lines.push(`${b('ENDEREÇO:')} ${formatEndereco(d)}`);
-
-  const itens = apreensoesValidas(d);
-  if (itens.length === 0) lines.push(`${b('APREENSÃO:')} Sem Apreensões`);
-  else if (itens.length === 1) lines.push(`${b('APREENSÃO:')} ${itens[0]}`);
-  else lines.push(b('APREENSÃO:'), ...itens);
-
-  const detidos = detidosValidos(d).map(formatDetido);
-  if (detidos.length === 0) lines.push(`${b('INDIVÍDUOS DETIDOS:')} Nenhum`);
-  else lines.push(b('INDIVÍDUOS DETIDOS:'), ...detidos);
-
-  lines.push(b('HISTÓRICO:'));
-  const historico = d.historico
+function normalizarHistorico(texto: string): string {
+  return texto
     .replace(/\r\n?/g, '\n')
     .split('\n')
     .map((l) => l.replace(/\s+$/, ''))
     .join('\n')
-    .trim();
-  if (historico) lines.push(historico);
+    .replace(/^\n+|\n+$/g, '')
+    .replace(/^[ \t]+/, '');
+}
 
-  if (d.ba.trim()) lines.push(`${b('BA:')} ${clean(d.ba)}`);
-  if (d.dp.trim()) lines.push(`${b('DP:')} ${clean(d.dp)}`);
+/**
+ * Monta o release exatamente no modelo do batalhão (ver `Formato.txt`):
+ * rótulos em *negrito*, linhas em branco nas mesmas posições e todos os campos
+ * sempre presentes — o que não foi preenchido sai em branco.
+ */
+export function formatRelease(d: ReleaseData): string {
+  const unidade = up(d.unidade);
+  const apreensoes = apreensoesValidas(d);
+  const detidos = detidosValidos(d).map(formatDetido);
 
-  return lines.map((l) => l.replace(/[ \t]+$/, '')).join('\n');
+  return [
+    `${d.icone}${unidade ? `*${unidade}*` : ''}${d.icone}`,
+    '',
+    `*FATO:* ${up(d.fato)}`,
+    `*DATA:* ${d.data ? formatDateBR(d.data) : ''}`,
+    `*HORA:* ${d.hora}`,
+    `*ENDEREÇO:* ${formatEndereco(d)}`,
+    '',
+    '',
+    '*APREENSÃO:* ',
+    ...(apreensoes.length ? apreensoes : ['']),
+    '',
+    '*INDIVÍDUOS DETIDOS:* ',
+    ...(detidos.length ? detidos : ['']),
+    '',
+    '*HISTÓRICO:*',
+    '',
+    normalizarHistorico(d.historico),
+    '',
+    '',
+    `*BA:* ${clean(d.ba)}`,
+    `*DP:* ${clean(d.dp)}`,
+  ].join('\n');
 }
 
 /** Campos essenciais ainda vazios (para avisar antes de enviar). */
