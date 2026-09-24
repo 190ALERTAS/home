@@ -1,189 +1,75 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-	<!-- INICIO Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-
-		function gtag() {
-			dataLayer.push(arguments);
-		}
-		gtag('js', new Date());
-		gtag('config', 'G-3Q72PBZVYP');
-	</script>
-	<!-- FIM Google tag (gtag.js) -->
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="apple-touch-icon" sizes="180x180"
-		href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/android-chrome-192x192.png">
-	<link rel="icon" type="image/png" sizes="32x32"
-		href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16"
-		href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon-16x16.png">
-	<link rel="manifest" href="https://190alertas.github.io/home/js/manifest.json">
-	<link rel="stylesheet" type="text/css" href="css/theme.css">
-	<link rel="stylesheet" type="text/css" href="css/menu.css">
-	<link rel="stylesheet" type="text/css" href="css/dark-mode.css">
-	<!-- INICIO DO MENU -->
-	<title>190 🚨 ALERTAS</title>
-</head>
-
-<body>
-	<div class="nav">
-		<input type="checkbox" id="nav-check">
-		<div class="nav-header">
-			<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png"
-				class="imagem-menu">
-			<div class="nav-title">190 🚨 ALERTAS</div>
-		</div>
-		<div class="nav-btn">
-			<label for="nav-check">
-				<span></span>
-				<span></span>
-				<span></span>
-			</label>
-		</div>
-		<div class="nav-links">
-			<a href="index" target="_parent">INÍCIO</a>
-			<a href="release" target="_parent">RELEASE</a>
-			<a href="croqui" target="_parent">CROQUI DIGITAL</a>
-			<a href="veiculos" target="_parent">VEÍCULOS</a>
-			<a href="assuntos" target="_parent">ASSUNTOS CORRENTES</a>
-			<a href="escala" target="_parent">MINHA ESCALA</a>
-			<a href="taf" target="_parent">CALCULADORA TAF</a>
-			<a href="feedback" target="_parent">SUGESTÕES</a>
-			<a href="termos" target="_parent">TERMOS DE USO</a>
-		</div>
-		<botao-dark-mode class="botao-dark-mode" id="dark-mode-toggle" onclick="toggleDarkMode()">
-			<img id="icon" src="https://raw.githubusercontent.com/190ALERTAS/home/main/img/sun-solid-24.png"
-				alt="Ícone do sol">
-		</botao-dark-mode>
-	</div>
-	<script>
-		// Adicione um evento de clique no checkbox
-		document.addEventListener('DOMContentLoaded', function () {
-			var checkbox = document.getElementById('nav-check');
-			var body = document.body;
-			checkbox.addEventListener('change', function () {
-				if (checkbox.checked) {
-					// Quando o checkbox estiver marcado, adicione a classe scroll-lock ao body
-					body.classList.add('scroll-lock');
-				} else {
-					// Quando o checkbox não estiver marcado, remova a classe scroll-lock do body
-					body.classList.remove('scroll-lock');
-				}
-			});
-		});
-	</script>
-	<!-- FIM DO MENU -->
-	<title> 190 🚨 ALERTAS</title>
-	<link rel="icon" href="https://raw.githubusercontent.com/190ALERTAS/home/main/img/favicon_io/favicon.ico"
-		type="image/x-icon">
-	<style>
-		body {
-			background-color: #f0f0f0;
-			margin: 0;
-			padding: 0;
-		}
-
-		.header {
-			background-color: #e1e1e1;
-			color: #fff;
-			text-align: center;
-			padding: 20px 0;
-		}
-
-		.container {
-			max-width: 800px;
-			margin: 0 auto;
-			padding: 20px;
-			background-color: #e1e1e1;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-			border-radius: 5px;
-			margin-top: 20px;
-		}
-
-		h3 {
-			color: #333;
-			text-align: center;
-			font-family: 'Trebuchet MS', sans-serif;
-		}
-
-		h3 {
-			color: #333;
-			text-align: center;
-			font-family: Arial, Helvetica, sans-serif;
-		}
-
-		h5,
-		p {
-			color: #333;
-			font-family: Arial, Helvetica, sans-serif;
-		}
-
-		p {
-			color: #333;
-		}
-
-		img {
-			max-height: 150px;
-			float: left;
-		}
-
-		b {
-			font-weight: bold;
-		}
-	</style>
-	<form>
-		<div class="header">
-			<h3>PLATAFORMA CRIADA PARA AUXILIAR FORÇAS DE SEGURANÇA PÚBLICA</h3>
-		</div>
-		<div class="container">
-			<h3>Disseminação da informação correta e organizada.</h3>
-		</div>
-		<div class="container">
-			<img src="https://raw.githubusercontent.com/190ALERTAS/190/main/img/Logo%20190ALERTAS.png">
-			<h5>Aqui você poderá formatar facilmente informações para difundir nos canais de WhatsApp adequados. Elas
-				ficarão organizadas, concisas e completas.</h5>
-			<h5>Para utilizar a plataforma, selecione uma das guias acima, insira os dados desejados, clique em copiar e
-				divulgue a informação para quem achar necessário. É importante ressaltar que esta plataforma não
-				armazena nenhum tipo de banco de dados, portanto as informações inseridas <b>NÃO</b> serão armazenadas.
-			</h5>
-		</div>
-		<div class="container">
-			<p>
-			<h5>Agora é possível fazer o download do app em dispositivos Android e Win10 utilizando o navegador Google
-				Chrome. <p><br>Funciona assim: <br>
-					<br>PC: <br>
-					Estando nessa pagina, olhe para a barra de endereços, e há um icone na direita, do lado esquerdo da estrela de favoritos. Clique ali, e o aplicativo será instalado!
-					<br><br>Celular: <br>
-					Estando nessa pagina, aparece no topo, um botão para instalar o aplicativo. Clique ali! O aplicativo será instalado!
-					<br><br>Se não aparecer pelo celular: <br>
-					Estando nessa pagina, clique nos 3 pontos na direita superior, e vá em "Adicionar a tela inicial". O aplicativo será instalado!
-			</h5>
-		</div>
-		<div class="container" style="text-align: center;">
-			<p>
-			<h5>Idealizado e criado por Sd Ferrão - 32BPM</p>
-				Ferramenta em desenvolvimento desde janeiro de 2023</h5>
-
-			<p><a href="https://190alertas.github.io/home/termos">Acesse os Termos de Uso para mais detalhes</a>
-		</div>
-		<script src="js/base.js"></script>
-		<script src="https://190alertas.github.io/home/js/main.js"></script>
-	</form>
-    <!-- inicio crédito na página -->
-    <footer>
-      <div class="footer-content">
-        <font size="1"> Versão 4.00 </font>
-        <br />
-        <font size="1"> Criado por Sd Ferrão - 32BPM </font>
-        <br />
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>190 ALERTAS</title>
+    <meta name="description" content="Ferramentas de apoio operacional para a Brigada Militar: release, alerta de veículo, croqui, escala e TAF." />
+    <meta name="theme-color" content="#0a0a0c" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="190 ALERTAS" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="190 🚨 ALERTAS" />
+    <meta property="og:description" content="De praça para praça: release, alerta de veículo, croqui, escala e TAF na palma da mão." />
+    <meta property="og:image" content="https://190alertas.github.io/home/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="%BASE_URL%favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%BASE_URL%icons/favicon-32.png" />
+    <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-icon.png" />
+    <script>
+      // Aplica o tema antes da renderização para evitar "piscar" a tela.
+      (function () {
+        var tema = 'dark';
+        try {
+          var salvo = localStorage.getItem('190a:tema');
+          if (salvo === 'light' || salvo === 'dark') tema = salvo;
+          else if (localStorage.getItem('darkMode') === 'false') tema = 'light';
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', tema);
+        document.documentElement.style.background = tema === 'light' ? '#f3f3f5' : '#0a0a0c';
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', tema === 'light' ? '#f4f4f6' : '#0a0a0c');
+      })();
+    </script>
+    <!-- Google Analytics (estatísticas anônimas de uso; nenhum conteúdo digitado é enviado) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-3Q72PBZVYP', { send_page_view: false });
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Esqueleto exibido até o app iniciar (primeira pintura instantânea) -->
+      <div style="position:fixed;inset:0 0 auto 0;height:58px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#0a0a0c;border-bottom:1px solid #1d1d22;font:800 22px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:.04em;color:#f4f4f6">
+        <span style="color:#ff1f3d">190</span>ALERTAS
       </div>
-    </footer>
-    <!-- fim o crédito na página -->
-</body>
-
+    </div>
+    <script>
+      // Se o app não iniciar (rede muito lenta ou publicação em andamento), orienta o usuário.
+      setTimeout(function () {
+        var root = document.getElementById('root');
+        if (root && document.documentElement.getAttribute('data-app') !== 'ok') {
+          root.innerHTML =
+            '<div style="max-width:420px;margin:18vh auto;padding:24px;font-family:system-ui,sans-serif;text-align:center;color:#b6b6c0">' +
+            '<div style="font:800 34px system-ui,sans-serif;color:#fff"><span style="color:#ff1f3d">190</span> ALERTAS</div>' +
+            '<p>Carregando… Se esta mensagem continuar, verifique a conexão e recarregue a página.</p>' +
+            '<button onclick="location.reload()" style="margin-top:12px;padding:12px 22px;border:0;border-radius:10px;background:#e5162c;color:#fff;font-weight:700">Recarregar</button></div>';
+        }
+      }, 8000);
+    </script>
+    <noscript>
+      <p style="padding: 24px; font-family: sans-serif">O 190 ALERTAS precisa do JavaScript ativado para funcionar.</p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
