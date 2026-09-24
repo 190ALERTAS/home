@@ -1,5 +1,6 @@
 import { Dumbbell, Minus, Plus, RotateCcw, Trophy } from 'lucide-react';
 import { Card, PageHead, Seg, gap } from '../../components/ui';
+import { NoDock } from '../../components/dock';
 import { usePersistentState } from '../../lib/storage';
 import {
   FAIXAS,
@@ -150,23 +151,25 @@ export default function TafPage() {
               );
             })}
 
-            <div className="taf-total" aria-live="polite">
-              <div className="taf-total-num">
-                <b>{total}</b>
-                <small>/300</small>
-              </div>
-              <div className="grow">
-                <span className={`badge ${COR_CONCEITO[c]}`} style={{ height: 28, fontSize: 14 }}>
-                  <Trophy /> {preenchidos === 0 ? 'Informe os índices' : c}
-                </span>
-                <div className="taf-escala" aria-hidden>
-                  <span style={{ width: `${(total / 300) * 100}%` }} />
-                  {[151, 211, 255].map((m) => (
-                    <i key={m} style={{ left: `${(m / 300) * 100}%` }} />
-                  ))}
+            <NoDock>
+              <div className="taf-total" aria-live="polite">
+                <div className="taf-total-num">
+                  <b>{total}</b>
+                  <small>/300</small>
+                </div>
+                <div className="grow">
+                  <span className={`badge ${COR_CONCEITO[c]}`} style={{ height: 26, fontSize: 12.5 }}>
+                    <Trophy /> {preenchidos === 0 ? 'Informe os índices' : c}
+                  </span>
+                  <div className="taf-escala" aria-hidden>
+                    <span style={{ width: `${(total / 300) * 100}%` }} />
+                    {[151, 211, 255].map((m) => (
+                      <i key={m} style={{ left: `${(m / 300) * 100}%` }} />
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            </NoDock>
           </>
         ) : (
           <>

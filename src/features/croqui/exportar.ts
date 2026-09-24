@@ -149,7 +149,8 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
       URL.revokeObjectURL(url);
     }
   }
-  const vetor = await imagemVetorial(svg, doc, doc.fundo.tipo === 'branco', DW, DH);
+  // O fundo em imagem (mapa antigo) já foi desenhado acima; os demais fundos são vetoriais.
+  const vetor = await imagemVetorial(svg, doc, doc.fundo.tipo !== 'mapa', DW, DH);
   ctx.drawImage(vetor, P, dy, DW, DH);
   ctx.strokeStyle = '#111111';
   ctx.lineWidth = Math.max(2, 2 * u);
@@ -157,7 +158,7 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
 
   // Norte (só faz sentido sobre o mapa, que é sempre orientado ao norte)
   const nr = 34 * u;
-  if (doc.fundo.tipo === 'mapa') {
+  if (doc.fundo.tipo === 'mapa' || doc.fundo.tipo === 'tracado') {
   const nx = P + DW - nr - 16 * u;
   const ny = dy + nr + 16 * u;
   ctx.fillStyle = 'rgba(255,255,255,0.92)';
@@ -282,7 +283,12 @@ export async function exportarCroqui(svg: SVGSVGElement, doc: CroquiDoc, fundo: 
   ctx.fillStyle = '#5d6977';
   ctx.font = `500 ${Math.round(18 * u)}px ${MONO}`;
   const agora = new Date();
-  const credito = doc.fundo.tipo === 'mapa' ? ` · ${CAMADAS[doc.fundo.camada].creditoCurto}` : '';
+  const credito =
+    doc.fundo.tipo === 'mapa'
+      ? ` · ${CAMADAS[doc.fundo.camada].creditoCurto}`
+      : doc.fundo.tipo === 'tracado'
+        ? ' · Vias © colaboradores do OpenStreetMap'
+        : '';
   ctx.fillText(
     `Gerado com o 190 ALERTAS em ${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · Croqui ilustrativo${credito}`,
     P,

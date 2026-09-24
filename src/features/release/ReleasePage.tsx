@@ -7,9 +7,10 @@ import { confirmDialog } from '../../components/dialogs';
 import { usePersistentState, pushRecent, readRecent } from '../../lib/storage';
 import { nowHM, todayISO } from '../../lib/date';
 import { uid } from '../../lib/id';
+import { CampoOpcoes } from '../../components/opcoes';
 import {
-  FATOS_RAPIDOS,
-  FATOS_SUGERIDOS,
+  FATOS_GRUPOS,
+  FATOS_PADRAO,
   ICONES,
   acrescentarTrecho,
   camposPendentes,
@@ -58,6 +59,7 @@ export default function ReleasePage() {
   const ids = { unidade: useId(), fato: useId(), log: useId(), num: useId(), bairro: useId(), cidade: useId(), hist: useId(), ba: useId(), dp: useId() };
 
   const data: ReleaseData = { ...draft, icone: prefs.icone, unidade: prefs.unidade };
+  const fatosRecentes = readRecent(K_FATOS).slice(0, 6);
   const texto = formatRelease(data);
   const pendentes = camposPendentes(data);
 
@@ -114,29 +116,19 @@ export default function ReleasePage() {
           <Card title="Ocorrência">
             <div className="stack" style={gap(14)}>
               <Field label="Fato" required htmlFor={ids.fato}>
-                <RecentInput
+                <CampoOpcoes
                   id={ids.fato}
-                  upper
+                  rotulo="Fato"
+                  titulo="Fato da ocorrência"
                   value={draft.fato}
                   onChange={(v) => set('fato', v)}
-                  recentKey={K_FATOS}
-                  extra={FATOS_SUGERIDOS}
-                  placeholder="MANDADO DE PRISÃO"
+                  grupos={FATOS_GRUPOS}
+                  recentes={fatosRecentes}
+                  atalhos={fatosRecentes.length ? fatosRecentes : FATOS_PADRAO}
+                  placeholder="Selecione o fato"
+                  placeholderBusca="Buscar ou digitar o fato"
                 />
               </Field>
-              <div className="chips scroll" aria-label="Fatos frequentes">
-                {FATOS_RAPIDOS.map((f) => (
-                  <button
-                    key={f}
-                    type="button"
-                    className="chip"
-                    aria-pressed={draft.fato.toLocaleUpperCase('pt-BR') === f}
-                    onClick={() => set('fato', f)}
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
               <DateTimeFields data={draft.data} hora={draft.hora} onChange={(v) => setDraft((d) => ({ ...d, ...v }))} />
             </div>
           </Card>

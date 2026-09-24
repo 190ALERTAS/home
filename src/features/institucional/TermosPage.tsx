@@ -54,8 +54,9 @@ export default function TermosPage() {
             do navegador. Os dados da escala não são sincronizados entre aparelhos: faça backups pelo menu da escala.
           </li>
           <li>
-            <strong>Serviços de terceiros:</strong> no Croqui, os mapas e as imagens de satélite são carregados do OpenStreetMap e da Esri,
-            e a busca de endereços usa o Nominatim (OpenStreetMap); esses serviços recebem a área do mapa exibida e o texto pesquisado. O
+            <strong>Serviços de terceiros:</strong> no Croqui, o mapa e o traçado das ruas vêm do OpenStreetMap (servidores de mapas e
+            Overpass) e a busca de endereços usa o Nominatim (OpenStreetMap); esses serviços recebem a área do mapa exibida e o texto
+            pesquisado. O
             botão “WhatsApp” abre o WhatsApp com o texto gerado, e o formulário de Sugestões é hospedado no Google Forms.
           </li>
           <li>

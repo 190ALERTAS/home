@@ -152,7 +152,7 @@ export default function InicioPage() {
               <em>Seus registros anteriores foram mantidos.</em>
             </li>
             <li>
-              <b>Croqui</b> sobre mapa ou satélite em escala real, com setas, medidas e legenda.
+              <b>Croqui</b> com as ruas reais do local em traçado plano (sem satélite), em escala real, com setas, medidas e legenda.
             </li>
             <li>O módulo “Assuntos Correntes” foi descontinuado.</li>
           </ul>

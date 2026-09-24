@@ -73,15 +73,6 @@ export default defineConfig({
               cacheableResponse: { statuses: [200] },
             },
           },
-          {
-            urlPattern: /^https:\/\/server\.arcgisonline\.com\//,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'mapa-satelite',
-              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 14 },
-              cacheableResponse: { statuses: [200] },
-            },
-          },
         ],
       },
     }),

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MutableRefObject, type PointerEvent as RPointerEvent } from 'react';
 import { ElementoSVG, LinhaSVG } from './glyphs';
+import { FundoTracadoSVG } from './FundoTracado';
 import { ordemDesenho, tamanhoPalco } from './elementos';
 import type { CroquiDoc, Elemento, ElementoPontual, LinhaEl } from './model';
 
@@ -354,6 +355,8 @@ export function CamadasCroqui({ doc, fundoUrl }: { doc: CroquiDoc; fundoUrl: str
       <g data-layer="fundo">
         {doc.fundo.tipo === 'mapa' ? (
           fundoUrl ? <image href={fundoUrl} x={0} y={0} width={doc.largura} height={doc.altura} preserveAspectRatio="none" /> : <rect x={0} y={0} width={doc.largura} height={doc.altura} fill="#d9d9d9" />
+        ) : doc.fundo.tipo === 'tracado' ? (
+          <FundoTracadoSVG f={doc.fundo} largura={doc.largura} altura={doc.altura} mpu={mpu} />
         ) : (
           <FundoBranco largura={doc.largura} altura={doc.altura} mpu={mpu} grade={doc.fundo.grade} />
         )}

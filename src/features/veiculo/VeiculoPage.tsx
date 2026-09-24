@@ -6,7 +6,9 @@ import { MessagePreview, ShareActions } from '../../components/MessageComposer';
 import { confirmDialog } from '../../components/dialogs';
 import { pushRecent, readRecent, usePersistentState } from '../../lib/storage';
 import { nowHM, todayISO } from '../../lib/date';
-import { CORES, FATOS_ALERTA, MODELOS, camposPendentesAlerta, formatAlerta, tipoPlaca, type AlertaData } from './format';
+import { CORES, FATOS_ALERTA, camposPendentesAlerta, formatAlerta, tipoPlaca, type AlertaData } from './format';
+import { MODELOS_GRUPOS } from './modelos';
+import { CampoOpcoes } from '../../components/opcoes';
 import './veiculo.css';
 
 const K_DRAFT = '190a:alerta:rascunho';
@@ -39,6 +41,7 @@ export default function VeiculoPage() {
   const set = <K extends keyof AlertaData>(k: K, v: AlertaData[K]) => setD((x) => ({ ...x, [k]: v }));
 
   const fatoPadrao = FATOS_ALERTA.some((f) => f.value === d.fato);
+  const modelosRecentes = readRecent(K_MODELOS).slice(0, 6);
   const outro = !fatoPadrao;
   const texto = formatAlerta(d);
   const tipo = tipoPlaca(d.placa);
@@ -137,14 +140,17 @@ export default function VeiculoPage() {
                 </div>
               </Field>
               <Field label="Marca / modelo" htmlFor={ids.modelo}>
-                <RecentInput
+                <CampoOpcoes
                   id={ids.modelo}
-                  upper
+                  rotulo="Marca e modelo"
+                  titulo="Marca e modelo"
                   value={d.modelo}
                   onChange={(v) => set('modelo', v)}
-                  recentKey={K_MODELOS}
-                  extra={MODELOS}
-                  placeholder="VW GOL"
+                  grupos={MODELOS_GRUPOS}
+                  recentes={modelosRecentes}
+                  atalhos={modelosRecentes}
+                  placeholder="Selecione ou digite (ex.: VW GOL)"
+                  placeholderBusca="Buscar ou digitar marca e modelo"
                 />
               </Field>
               <Field label="Cor" htmlFor={ids.cor}>

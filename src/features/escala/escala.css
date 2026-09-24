@@ -422,15 +422,14 @@
 
 /* ---------- Seleção múltipla ---------- */
 
+/* Cartão flutuante acima da navegação (components/dock.tsx) */
 .sel-bar {
-  position: sticky;
-  z-index: 25;
-  bottom: calc(var(--nav-h) + var(--safe-bottom) + 10px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 14px;
-  padding: 12px;
+  gap: 8px;
+  max-width: var(--content-w-wide);
+  margin: 0 auto;
+  padding: 10px;
   border: 1px solid var(--primary-line);
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface) 95%, transparent);
@@ -440,10 +439,8 @@
   animation: rise-in var(--dur) var(--ease-out);
 }
 
-@media (min-width: 900px) {
-  .sel-bar {
-    bottom: 16px;
-  }
+.sel-bar .row strong {
+  font-size: 14.5px;
 }
 
 .sel-bar .acts {
@@ -455,7 +452,8 @@
 .sel-bar .acts .btn {
   flex-direction: column;
   gap: 3px;
-  min-height: 56px;
+  min-width: 0;
+  min-height: 54px;
   padding: 4px;
   font-size: 12px;
 }

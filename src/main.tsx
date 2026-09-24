@@ -20,6 +20,12 @@ import { App } from './app/App';
 normalizeInitialUrl();
 void cleanupLegacyServiceWorker();
 
+// iPhone/iPad ignoram "user-scalable=no": bloqueia o gesto de pinça do Safari.
+// (O croqui e o mapa tratam o próprio zoom com eventos de ponteiro, sem depender disto.)
+for (const evento of ['gesturestart', 'gesturechange']) {
+  document.addEventListener(evento, (e) => e.preventDefault(), { passive: false });
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

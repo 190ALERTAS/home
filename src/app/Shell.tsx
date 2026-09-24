@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Download, Ellipsis, Moon, Share, SquarePlus, Sun, WifiOff } from 'lucide-react';
 import { linkProps, type RouteId } from '../lib/router';
 import { toggleTheme, useTheme } from '../lib/theme';
@@ -7,6 +7,7 @@ import { Sheet } from '../components/Sheet';
 import { toast } from '../components/toast';
 import { gap } from '../components/ui';
 import { Emblema } from '../components/Emblema';
+import { DockContext } from '../components/dock';
 import { APP_VERSION, BOTTOM, MORE, NAV, SIDE_EXTRA, SIDE_MAIN } from './nav';
 
 export function Brand({ onClick }: { onClick?: () => void }) {
@@ -84,6 +85,23 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
   const online = useOnline();
   const theme = useTheme();
   const moreActive = MORE.includes(route as RouteId);
+  const [slotAcoes, setSlotAcoes] = useState<HTMLDivElement | null>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
+
+  // Altura da parte inferior fixa (navegação + barra flutuante da tela) → espaço no fim da página e posição dos avisos.
+  useEffect(() => {
+    const dock = dockRef.current;
+    if (!dock) return;
+    const raiz = document.documentElement;
+    const medir = () => raiz.style.setProperty('--dock-h', `${Math.ceil(dock.getBoundingClientRect().height)}px`);
+    const ro = new ResizeObserver(medir);
+    ro.observe(dock);
+    medir();
+    return () => {
+      ro.disconnect();
+      raiz.style.removeProperty('--dock-h');
+    };
+  }, []);
 
   return (
     <div className="app" data-route={route}>
@@ -125,40 +143,45 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
         </div>
       </nav>
 
-      <main className="main" id="conteudo">
-        {children}
-      </main>
+      <DockContext.Provider value={slotAcoes}>
+        <main className="main" id="conteudo">
+          {children}
+        </main>
+      </DockContext.Provider>
 
-      <nav className="bottom-nav" aria-label="Navegação">
-        {BOTTOM.map((id) => {
-          const Icon = NAV[id].icon;
-          return (
-            <a
-              key={id}
-              className={`nav-item${id === 'veiculos' ? ' nav-destaque' : ''}`}
-              {...linkProps(id)}
-              aria-current={route === id ? 'page' : undefined}
-            >
-              <span className="pill">
-                <Icon />
-              </span>
-              {NAV[id].label}
-            </a>
-          );
-        })}
-        <button
-          type="button"
-          className="nav-item"
-          aria-current={moreActive ? 'page' : undefined}
-          aria-haspopup="dialog"
-          onClick={() => setMoreOpen(true)}
-        >
-          <span className="pill">
-            <Ellipsis />
-          </span>
-          Mais
-        </button>
-      </nav>
+      <div className="dock" ref={dockRef}>
+        <div className="dock-acoes" ref={setSlotAcoes} />
+        <nav className="bottom-nav" aria-label="Navegação">
+          {BOTTOM.map((id) => {
+            const Icon = NAV[id].icon;
+            return (
+              <a
+                key={id}
+                className={`nav-item${id === 'veiculos' ? ' nav-destaque' : ''}`}
+                {...linkProps(id)}
+                aria-current={route === id ? 'page' : undefined}
+              >
+                <span className="pill">
+                  <Icon />
+                </span>
+                {NAV[id].label}
+              </a>
+            );
+          })}
+          <button
+            type="button"
+            className="nav-item"
+            aria-current={moreActive ? 'page' : undefined}
+            aria-haspopup="dialog"
+            onClick={() => setMoreOpen(true)}
+          >
+            <span className="pill">
+              <Ellipsis />
+            </span>
+            Mais
+          </button>
+        </nav>
+      </div>
 
       <Sheet open={moreOpen} onClose={() => setMoreOpen(false)} title="Mais ferramentas">
         <div className="stack" style={gap(14)}>
