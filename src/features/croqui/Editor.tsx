@@ -51,6 +51,8 @@ export function Editor({ doc, fundoUrl, selecionado, onSelecionar, onAlterar, ap
   selRef.current = selecionado;
   const ponteiros = useRef(new Map<number, { x: number; y: number }>());
   const gesto = useRef<Gesto | null>(null);
+  /** Resultado mais recente do gesto (o estado do React pode estar um quadro atrasado). */
+  const ultimos = useRef<Elemento[] | null>(null);
   const ajustado = useRef(false);
 
   const kAjuste = useCallback(
@@ -139,8 +141,15 @@ export function Editor({ doc, fundoUrl, selecionado, onSelecionar, onAlterar, ap
   };
 
   const atualizarEl = (id: string, fn: (el: Elemento) => Elemento) => {
-    const novos = docRef.current.elementos.map((e) => (e.id === id ? fn(e) : e));
+    const base = ultimos.current ?? docRef.current.elementos;
+    const novos = base.map((e) => (e.id === id ? fn(e) : e));
+    ultimos.current = novos;
     onAlterar(novos, false);
+  };
+
+  const confirmarGesto = () => {
+    onAlterar(ultimos.current ?? docRef.current.elementos, true);
+    ultimos.current = null;
   };
 
   const iniciarPinca = () => {
@@ -151,12 +160,13 @@ export function Editor({ doc, fundoUrl, selecionado, onSelecionar, onAlterar, ap
     const my = (a.y + b.y) / 2 - r.top;
     // Encerra qualquer arrasto em andamento, preservando a posição atual.
     const g = gesto.current;
-    if (g && 'alterou' in g && g.alterou) onAlterar(docRef.current.elementos, true);
+    if (g && 'alterou' in g && g.alterou) confirmarGesto();
     gesto.current = { t: 'pinca', d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, k0: c.k, mx, my, cx0: c.x + mx / c.k, cy0: c.y + my / c.k };
   };
 
   const onDown = (e: RPointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
+    ultimos.current = null;
     svgRef.current?.setPointerCapture(e.pointerId);
     ponteiros.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ponteiros.current.size === 2) return iniciarPinca();
@@ -279,7 +289,7 @@ export function Editor({ doc, fundoUrl, selecionado, onSelecionar, onAlterar, ap
     if (ponteiros.current.size > 0) return;
     if (g) {
       if (g.t === 'pan' && !g.moveu) onSelecionar(g.tocouVia);
-      else if ('alterou' in g && g.alterou) onAlterar(docRef.current.elementos, true);
+      else if ('alterou' in g && g.alterou) confirmarGesto();
     }
     gesto.current = null;
   };

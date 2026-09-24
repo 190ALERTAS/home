@@ -39,7 +39,7 @@ export function novaVia(tipo: TipoVia, x: number, y: number): ViaEl {
 }
 
 export function novoTexto(x: number, y: number, texto = 'Texto'): TextoEl {
-  return { id: uid(), kind: 'texto', texto, x, y, rot: 0, escala: 1, cor: '#111111', fundo: true };
+  return { id: uid(), kind: 'texto', texto, x, y, rot: 0, escala: 1.6, cor: '#111111', fundo: true };
 }
 
 /** Nova linha centrada em (x, y), com o comprimento indicado em metros. */

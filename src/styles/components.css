@@ -1088,3 +1088,12 @@ button.list-item:hover {
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
+
+@media (min-width: 700px) {
+  .chips.scroll {
+    flex-wrap: wrap;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+}

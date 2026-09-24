@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { dbVazio, type Entry, type EscalaDB } from './model';
 import { mesclar, migrarV1, normalizarV2, paraV1 } from './migrate';
+import { toast } from '../../components/toast';
 
 /**
  * Persistência da Escala.
@@ -173,6 +174,14 @@ export function atualizar(fn: (db: EscalaDB) => EscalaDB, rotulo?: string): bool
   estado = next;
   const ok = salvar(kvNavegador, next);
   falhouSalvar = !ok;
+  if (!ok) {
+    toast({
+      title: 'Não foi possível salvar a escala',
+      desc: 'O armazenamento do aparelho está cheio ou bloqueado. Faça um backup pelo menu da escala.',
+      kind: 'error',
+      duration: 8000,
+    });
+  }
   emitir();
   return ok;
 }

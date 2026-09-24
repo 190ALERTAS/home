@@ -204,6 +204,7 @@ export function Painel({ el, mpu, onChange, onDuplicar, onFrente, onExcluir, onF
                   value={el.comprimento}
                   onChange={(e) => onChange({ comprimento: Number(e.target.value) })}
                   onPointerUp={() => onChange({}, true)}
+                  onKeyUp={() => onChange({}, true)}
                 />
                 <b>{el.comprimento} m</b>
               </div>
@@ -266,6 +267,7 @@ export function Painel({ el, mpu, onChange, onDuplicar, onFrente, onExcluir, onF
                   aria-label="Rotação"
                   onChange={(e) => onChange({ rot: Number(e.target.value) })}
                   onPointerUp={() => onChange({}, true)}
+                  onKeyUp={() => onChange({}, true)}
                 />
                 <button type="button" className="btn sm icon" aria-label="Girar 15° à direita" onClick={() => onChange({ rot: (el.rot + 15) % 360 }, true)}>
                   <RotateCw />
@@ -284,6 +286,7 @@ export function Painel({ el, mpu, onChange, onDuplicar, onFrente, onExcluir, onF
                     aria-label="Tamanho"
                     onChange={(e) => onChange({ escala: Number(e.target.value) / 100 })}
                     onPointerUp={() => onChange({}, true)}
+                  onKeyUp={() => onChange({}, true)}
                   />
                   <button type="button" className="btn sm" onClick={() => onChange({ escala: 1 }, true)} title="Tamanho real">
                     {Math.round(el.escala * 100)}%

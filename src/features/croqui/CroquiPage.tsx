@@ -113,11 +113,27 @@ export default function CroquiPage() {
   }, []);
 
   // Salvamento automático (IndexedDB, só neste aparelho).
+  const pendente = useRef<Salvo | null>(null);
+  const gravar = useCallback(() => {
+    if (!pendente.current) return;
+    void idbSet(K_IDB, pendente.current);
+    pendente.current = null;
+  }, []);
   useEffect(() => {
     if (!carregado || !doc) return;
-    const t = setTimeout(() => void idbSet(K_IDB, { doc, fundo } satisfies Salvo), 500);
+    pendente.current = { doc, fundo };
+    const t = setTimeout(gravar, 500);
     return () => clearTimeout(t);
-  }, [doc, fundo, carregado]);
+  }, [doc, fundo, carregado, gravar]);
+  // Grava na hora ao sair da tela ou quando o app vai para segundo plano.
+  useEffect(() => {
+    const oculto = () => document.visibilityState === 'hidden' && gravar();
+    document.addEventListener('visibilitychange', oculto);
+    return () => {
+      document.removeEventListener('visibilitychange', oculto);
+      gravar();
+    };
+  }, [gravar]);
 
   const iniciar = (novo: CroquiDoc, img: Blob | null) => {
     setDoc(novo);
@@ -176,6 +192,7 @@ export default function CroquiPage() {
       });
       if (!ok) return;
     }
+    pendente.current = null;
     await idbDel(K_IDB);
     setDoc(null);
     setFundo(null);

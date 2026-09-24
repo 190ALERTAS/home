@@ -48,6 +48,19 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Se o app não iniciar (rede muito lenta ou publicação em andamento), orienta o usuário.
+      setTimeout(function () {
+        var root = document.getElementById('root');
+        if (root && !root.hasChildNodes()) {
+          root.innerHTML =
+            '<div style="max-width:420px;margin:18vh auto;padding:24px;font-family:system-ui,sans-serif;text-align:center;color:#b6b6c0">' +
+            '<div style="font:800 34px system-ui,sans-serif;color:#fff"><span style="color:#ff1f3d">190</span> ALERTAS</div>' +
+            '<p>Carregando… Se esta mensagem continuar, verifique a conexão e recarregue a página.</p>' +
+            '<button onclick="location.reload()" style="margin-top:12px;padding:12px 22px;border:0;border-radius:10px;background:#e5162c;color:#fff;font-weight:700">Recarregar</button></div>';
+        }
+      }, 8000);
+    </script>
     <noscript>
       <p style="padding: 24px; font-family: sans-serif">O 190 ALERTAS precisa do JavaScript ativado para funcionar.</p>
     </noscript>
