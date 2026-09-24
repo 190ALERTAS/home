@@ -146,18 +146,31 @@ export default function CroquiPage() {
   };
 
   const usarMapa = async (r: ResultadoMapa) => {
-    const novo: CroquiDoc = {
-      version: 1,
-      largura: r.captura.largura,
-      altura: r.captura.altura,
-      metrosPorUnidade: r.captura.metrosPorUnidade,
-      fundo: { tipo: 'mapa', camada: r.camada, lat: r.lat, lng: r.lng, zoom: r.zoom },
-      elementos: [],
-      info: { ...infoVazia(), data: todayISO(), hora: nowHM() },
-      atualizadoEm: new Date().toISOString(),
-    };
-    iniciar(novo, r.captura.blob);
-    track('croqui_mapa', { camada: r.camada, zoom: r.zoom });
+    const base = { version: 1 as const, elementos: [], info: { ...infoVazia(), data: todayISO(), hora: nowHM() }, atualizadoEm: new Date().toISOString() };
+    if (r.tipo === 'tracado') {
+      iniciar(
+        {
+          ...base,
+          largura: r.area.largura,
+          altura: r.area.altura,
+          metrosPorUnidade: r.area.mpu,
+          fundo: { tipo: 'tracado', lat: r.lat, lng: r.lng, zoom: r.zoom, ...r.tracado },
+        },
+        null,
+      );
+    } else {
+      iniciar(
+        {
+          ...base,
+          largura: r.captura.largura,
+          altura: r.captura.altura,
+          metrosPorUnidade: r.captura.metrosPorUnidade,
+          fundo: { tipo: 'mapa', camada: 'ruas', lat: r.lat, lng: r.lng, zoom: r.zoom },
+        },
+        r.captura.blob,
+      );
+    }
+    track('croqui_mapa', { tipo: r.tipo, zoom: r.zoom });
     const local = await enderecoDoPonto(r.lat, r.lng);
     if (local) setDoc((d) => (d && !d.info.local ? { ...d, info: { ...d.info, local } } : d));
   };

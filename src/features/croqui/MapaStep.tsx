@@ -1,36 +1,33 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Crosshair, Layers, LocateFixed, Minus, Plus, Search, X } from 'lucide-react';
+import { Crosshair, LocateFixed, Minus, Plus, Search, X } from 'lucide-react';
 import { toast } from '../../components/toast';
+import { confirmDialog } from '../../components/dialogs';
 import { readJSON, writeJSON } from '../../lib/storage';
-import { CAMADAS, buscarEndereco, capturarArea, metrosPorPixel, type Camada, type Captura, type ResultadoBusca } from './mapa';
+import { CAMADAS, buscarEndereco, capturarArea, metrosPorPixel, type Captura, type ResultadoBusca } from './mapa';
+import { buscarVias, caixaDaArea, montarTracado, type Area } from './tracado';
 
 const K_ULTIMO = '190a:croqui:ultimo-local';
-const PADRAO = { lat: -30.0346, lng: -51.2177, zoom: 17, camada: 'satelite' as Camada };
+const PADRAO = { lat: -30.0346, lng: -51.2177, zoom: 17 };
 
-export interface ResultadoMapa {
-  captura: Captura;
-  camada: Camada;
-  lat: number;
-  lng: number;
-  zoom: number;
-}
+export type ResultadoMapa =
+  /** Traçado plano das ruas (padrão) */
+  | { tipo: 'tracado'; area: Area; tracado: ReturnType<typeof montarTracado>; lat: number; lng: number; zoom: number }
+  /** Imagem do mapa de ruas (reserva, se o serviço do traçado não responder) */
+  | { tipo: 'imagem'; captura: Captura; lat: number; lng: number; zoom: number };
 
 export function MapaStep({ onUsar, ocupado }: { onUsar: (r: ResultadoMapa) => Promise<void>; ocupado?: boolean }) {
   const divRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const camadaRef = useRef<L.TileLayer | null>(null);
   const gpsRef = useRef<L.CircleMarker | null>(null);
   const inicial = readJSON(K_ULTIMO, PADRAO);
-  const [camada, setCamada] = useState<Camada>(inicial.camada === 'ruas' ? 'ruas' : 'satelite');
   const [zoom, setZoom] = useState(inicial.zoom);
   const [lat, setLat] = useState(inicial.lat);
   const [q, setQ] = useState('');
   const [resultados, setResultados] = useState<ResultadoBusca[] | null>(null);
   const [buscando, setBuscando] = useState(false);
-  const [progresso, setProgresso] = useState<{ feitos: number; total: number } | null>(null);
-  const camadaAtual = useRef(camada);
+  const [progresso, setProgresso] = useState<{ texto: string } | null>(null);
 
   useEffect(() => {
     if (!divRef.current) return;
@@ -45,12 +42,19 @@ export function MapaStep({ onUsar, ocupado }: { onUsar: (r: ResultadoMapa) => Pr
       doubleClickZoom: true,
     });
     map.attributionControl.setPrefix(false);
+    // Mapa de ruas só para localizar o ponto; o croqui recebe o traçado plano das vias.
+    L.tileLayer(CAMADAS.ruas.url, {
+      maxZoom: 21,
+      maxNativeZoom: CAMADAS.ruas.maxNativo,
+      attribution: CAMADAS.ruas.atribuicao,
+      crossOrigin: 'anonymous',
+    }).addTo(map);
     mapRef.current = map;
     const salvar = () => {
       const c = map.getCenter();
       setZoom(map.getZoom());
       setLat(c.lat);
-      writeJSON(K_ULTIMO, { lat: +c.lat.toFixed(5), lng: +c.lng.toFixed(5), zoom: map.getZoom(), camada: camadaAtual.current });
+      writeJSON(K_ULTIMO, { lat: +c.lat.toFixed(5), lng: +c.lng.toFixed(5), zoom: map.getZoom() });
     };
     map.on('moveend zoomend', salvar);
     setTimeout(() => map.invalidateSize(), 60);
@@ -59,19 +63,6 @@ export function MapaStep({ onUsar, ocupado }: { onUsar: (r: ResultadoMapa) => Pr
       mapRef.current = null;
     };
   }, []);
-
-  useEffect(() => {
-    camadaAtual.current = camada;
-    const map = mapRef.current;
-    if (!map) return;
-    camadaRef.current?.remove();
-    camadaRef.current = L.tileLayer(CAMADAS[camada].url, {
-      maxZoom: 21,
-      maxNativeZoom: CAMADAS[camada].maxNativo,
-      attribution: CAMADAS[camada].atribuicao,
-      crossOrigin: 'anonymous',
-    }).addTo(map);
-  }, [camada]);
 
   const localizar = () => {
     if (!navigator.geolocation) {
@@ -119,31 +110,55 @@ export function MapaStep({ onUsar, ocupado }: { onUsar: (r: ResultadoMapa) => Pr
     setResultados(null);
   };
 
+  /** Reserva: imagem do mapa de ruas da área (como nas versões anteriores). */
+  const usarImagem = async (area: Area, c: L.LatLng) => {
+    setProgresso({ texto: 'Capturando o mapa' });
+    const captura = await capturarArea({
+      camada: 'ruas',
+      zoom: area.zoom,
+      origem: area.origem,
+      largura: area.largura,
+      altura: area.altura,
+      lat: c.lat,
+      onProgresso: (feitos, total) => setProgresso({ texto: `Capturando o mapa ${Math.round((feitos / total) * 100)}%` }),
+    });
+    if (captura.falhas > 0) {
+      toast({ title: `${captura.falhas} parte(s) do mapa não carregaram`, desc: 'Verifique a conexão e tente de novo.', kind: 'error' });
+    }
+    await onUsar({ tipo: 'imagem', captura, lat: c.lat, lng: c.lng, zoom: area.zoom });
+  };
+
   const usar = async () => {
     const map = mapRef.current;
     if (!map) return;
     const tamanho = map.getSize();
     const origem = map.getPixelBounds().min!;
     const c = map.getCenter();
+    const z = map.getZoom();
+    const area: Area = { zoom: z, origem: { x: origem.x, y: origem.y }, largura: tamanho.x, altura: tamanho.y, mpu: metrosPorPixel(c.lat, z) };
+    let motivo = 'O serviço de mapas do OpenStreetMap não respondeu.';
     try {
-      setProgresso({ feitos: 0, total: 1 });
-      const captura = await capturarArea({
-        camada,
-        zoom: map.getZoom(),
-        origem: { x: origem.x, y: origem.y },
-        largura: tamanho.x,
-        altura: tamanho.y,
-        lat: c.lat,
-        onProgresso: (feitos, total) => setProgresso({ feitos, total }),
-      });
-      if (captura.falhas > 0) {
-        toast({
-          title: `${captura.falhas} parte(s) do mapa não carregaram`,
-          desc: 'Verifique a conexão; você pode refazer a captura depois.',
-          kind: 'error',
-        });
+      setProgresso({ texto: 'Desenhando as ruas' });
+      const tracado = montarTracado(await buscarVias(caixaDaArea(area)), area);
+      if (tracado.vias.length > 0) {
+        await onUsar({ tipo: 'tracado', area, tracado, lat: c.lat, lng: c.lng, zoom: z });
+        return;
       }
-      await onUsar({ captura, camada, lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+      motivo = 'Não há ruas mapeadas no OpenStreetMap nesta área.';
+    } catch {
+      /* segue para a reserva */
+    } finally {
+      setProgresso(null);
+    }
+    const ok = await confirmDialog({
+      title: 'Traçado das ruas indisponível',
+      message: `${motivo} Você pode usar a imagem do mapa de ruas desta área, ou tentar de novo em instantes.`,
+      confirmLabel: 'Usar imagem do mapa',
+      cancelLabel: 'Tentar depois',
+    });
+    if (!ok) return;
+    try {
+      await usarImagem(area, c);
     } catch {
       toast({ title: 'Falha ao capturar o mapa', desc: 'Verifique a conexão e tente de novo.', kind: 'error' });
     } finally {
@@ -200,10 +215,6 @@ export function MapaStep({ onUsar, ocupado }: { onUsar: (r: ResultadoMapa) => Pr
         <button type="button" aria-label="Minha localização" onClick={localizar}>
           <LocateFixed />
         </button>
-        <button type="button" aria-label={camada === 'ruas' ? 'Ver satélite' : 'Ver ruas'} onClick={() => setCamada(camada === 'ruas' ? 'satelite' : 'ruas')}>
-          <Layers />
-          <small>{camada === 'ruas' ? 'Satélite' : 'Ruas'}</small>
-        </button>
       </div>
 
       <div className="cro-mapa-rodape">
@@ -219,7 +230,7 @@ export function MapaStep({ onUsar, ocupado }: { onUsar: (r: ResultadoMapa) => Pr
         <button type="button" className="btn primary lg block" onClick={usar} disabled={!!progresso || ocupado}>
           {progresso ? (
             <>
-              <span className="spinner" /> Capturando {progresso.total > 1 ? `${Math.round((progresso.feitos / progresso.total) * 100)}%` : ''}
+              <span className="spinner" /> {progresso.texto}…
             </>
           ) : (
             'Usar esta área'

@@ -13,8 +13,8 @@ function read(): Theme {
 export function setTheme(theme: Theme): void {
   document.documentElement.setAttribute('data-theme', theme);
   document.documentElement.style.background = theme === 'light' ? '#f1f3f6' : '#0b0f14';
-  // A barra superior é escura nos dois temas; a barra do navegador acompanha.
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#0e131a' : '#0b0f14');
+  // As barras do app são escuras nos dois temas; a barra do navegador acompanha.
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0b0f14');
   writeString(KEY, theme);
   listeners.forEach((l) => l());
 }

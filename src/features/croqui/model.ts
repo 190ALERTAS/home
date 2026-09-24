@@ -94,8 +94,54 @@ export interface LinhaEl {
 export type Elemento = VeiculoEl | SimboloEl | ViaEl | TextoEl | LinhaEl;
 export type ElementoPontual = VeiculoEl | SimboloEl | ViaEl | TextoEl;
 
+/* ---------- Traçado plano das ruas (OpenStreetMap) ---------- */
+
+export type ClasseVia = 'rodovia' | 'principal' | 'local' | 'servico' | 'pedestre' | 'terra';
+
+export interface ViaMapa {
+  /** pontos [x0, y0, x1, y1, …] em unidades do palco, no sentido do tráfego se for mão única */
+  pts: number[];
+  /** largura da pista (m) */
+  largura: number;
+  /** calçada de cada lado (m) */
+  calcada: number;
+  classe: ClasseVia;
+  mao: 'dupla' | 'unica';
+  faixas: number;
+}
+
+export interface Cruzamento {
+  x: number;
+  y: number;
+  /** raio (m) da área da interseção, sem pintura */
+  r: number;
+  classe: ClasseVia;
+}
+
+export interface RotuloMapa {
+  texto: string;
+  /** trecho da rua onde o nome é escrito */
+  pts: number[];
+  /** altura do texto (m) */
+  tam: number;
+}
+
+export interface FundoTracado {
+  tipo: 'tracado';
+  lat: number;
+  lng: number;
+  zoom: number;
+  vias: ViaMapa[];
+  cruzamentos: Cruzamento[];
+  rotulos: RotuloMapa[];
+  /** setas de mão única (ângulo em graus) */
+  setas: { x: number; y: number; ang: number }[];
+}
+
 export type Fundo =
+  /** Imagem do mapa (croquis iniciados antes do traçado plano) */
   | { tipo: 'mapa'; camada: 'ruas' | 'satelite'; lat: number; lng: number; zoom: number }
+  | FundoTracado
   | { tipo: 'branco'; grade: boolean };
 
 export interface CroquiInfo {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CalendarX, Clock, Eraser, Palmtree, Stethoscope, X } from 'lucide-react';
 import { Sheet } from '../../../components/Sheet';
 import { Switch, gap } from '../../../components/ui';
+import { NoDock } from '../../../components/dock';
 import { formatMinutes, shiftMinutes } from '../../../lib/date';
 import { ROTULO_MARCACAO, type TipoMarcacao } from '../model';
 import { aplicarTurno, limparDias, marcar } from '../ops';
@@ -22,47 +23,49 @@ export function SelecaoBar({ datas, onLimpar, onSair }: { datas: string[]; onLim
 
   return (
     <>
-      <div className="sel-bar" role="toolbar" aria-label="Ações para os dias selecionados">
-        <div className="row">
-          <strong className="grow">
-            {n === 0 ? 'Toque nos dias para selecionar' : `${n} dia(s) selecionado(s)`}
-          </strong>
-          {n > 0 && (
-            <button type="button" className="btn sm ghost" onClick={onLimpar}>
-              Limpar seleção
+      <NoDock>
+        <div className="sel-bar" role="toolbar" aria-label="Ações para os dias selecionados">
+          <div className="row">
+            <strong className="grow">
+              {n === 0 ? 'Toque nos dias para selecionar' : `${n} dia(s) selecionado(s)`}
+            </strong>
+            {n > 0 && (
+              <button type="button" className="btn sm ghost" onClick={onLimpar}>
+                Limpar seleção
+              </button>
+            )}
+            <button type="button" className="icon-btn" aria-label="Sair da seleção" onClick={onSair}>
+              <X />
             </button>
-          )}
-          <button type="button" className="icon-btn" aria-label="Sair da seleção" onClick={onSair}>
-            <X />
-          </button>
+          </div>
+          <div className="acts">
+            <button type="button" className="btn primary" disabled={!n} onClick={() => setTurnoOpen(true)}>
+              <Clock /> Turno
+            </button>
+            <button type="button" className="btn" disabled={!n} onClick={() => marcarTodos('ferias')}>
+              <Palmtree /> Férias
+            </button>
+            <button type="button" className="btn" disabled={!n} onClick={() => marcarTodos('afastamento')}>
+              <Stethoscope /> Afast.
+            </button>
+            <button type="button" className="btn" disabled={!n} onClick={() => marcarTodos('edt')}>
+              <CalendarX /> EDT
+            </button>
+            <button
+              type="button"
+              className="btn danger"
+              disabled={!n}
+              onClick={() => {
+                atualizar((db) => limparDias(db, datas), `${n} dia(s) limpos`);
+                avisarDesfazer(`Lançamentos de ${n} dia(s) removidos`);
+                onLimpar();
+              }}
+            >
+              <Eraser /> Limpar
+            </button>
+          </div>
         </div>
-        <div className="acts">
-          <button type="button" className="btn primary" disabled={!n} onClick={() => setTurnoOpen(true)}>
-            <Clock /> Turno
-          </button>
-          <button type="button" className="btn" disabled={!n} onClick={() => marcarTodos('ferias')}>
-            <Palmtree /> Férias
-          </button>
-          <button type="button" className="btn" disabled={!n} onClick={() => marcarTodos('afastamento')}>
-            <Stethoscope /> Afast.
-          </button>
-          <button type="button" className="btn" disabled={!n} onClick={() => marcarTodos('edt')}>
-            <CalendarX /> EDT
-          </button>
-          <button
-            type="button"
-            className="btn danger"
-            disabled={!n}
-            onClick={() => {
-              atualizar((db) => limparDias(db, datas), `${n} dia(s) limpos`);
-              avisarDesfazer(`Lançamentos de ${n} dia(s) removidos`);
-              onLimpar();
-            }}
-          >
-            <Eraser /> Limpar
-          </button>
-        </div>
-      </div>
+      </NoDock>
       <LoteTurnoSheet
         open={turnoOpen}
         datas={datas}

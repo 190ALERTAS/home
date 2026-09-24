@@ -133,42 +133,94 @@ export function camposPendentes(d: ReleaseData): string[] {
   return faltando;
 }
 
-export const FATOS_SUGERIDOS = [
-  'MANDADO DE PRISÃO',
-  'TRÁFICO DE DROGAS',
-  'PORTE ILEGAL DE ARMA DE FOGO',
-  'POSSE ILEGAL DE ARMA DE FOGO',
-  'DESCUMPRIMENTO DE MEDIDA PROTETIVA',
-  'VIOLÊNCIA DOMÉSTICA',
-  'RECAPTURA DE FORAGIDO',
-  'ROUBO A PEDESTRE',
-  'ROUBO A ESTABELECIMENTO COMERCIAL',
-  'ROUBO DE VEÍCULO',
-  'FURTO DE VEÍCULO',
-  'FURTO',
-  'RECEPTAÇÃO',
-  'ADULTERAÇÃO DE SINAL IDENTIFICADOR DE VEÍCULO',
-  'EMBRIAGUEZ AO VOLANTE',
-  'LESÃO CORPORAL',
-  'AMEAÇA',
-  'RESISTÊNCIA E DESACATO',
-  'SEQUESTRO',
-  'ESTUPRO',
-  'TENTATIVA DE HOMICÍDIO',
-  'HOMICÍDIO',
-  'HOMICÍDIO POR INTERVENÇÃO POLICIAL',
-  'APREENSÃO DE ARMA DE FOGO',
-  'APREENSÃO DE DROGAS',
-] as const;
+/** Fatos mais comuns, agrupados para o seletor (o usuário também pode digitar outro). */
+export const FATOS_GRUPOS: { titulo: string; itens: readonly string[] }[] = [
+  {
+    titulo: 'Mandados e capturas',
+    itens: ['MANDADO DE PRISÃO', 'RECAPTURA DE FORAGIDO', 'MANDADO DE BUSCA E APREENSÃO', 'APREENSÃO DE ADOLESCENTE'],
+  },
+  {
+    titulo: 'Drogas',
+    itens: ['TRÁFICO DE DROGAS', 'POSSE DE DROGAS PARA CONSUMO', 'ASSOCIAÇÃO PARA O TRÁFICO', 'APREENSÃO DE DROGAS'],
+  },
+  {
+    titulo: 'Armas',
+    itens: [
+      'PORTE ILEGAL DE ARMA DE FOGO',
+      'POSSE ILEGAL DE ARMA DE FOGO',
+      'PORTE ILEGAL DE ARMA DE FOGO DE USO RESTRITO',
+      'DISPARO DE ARMA DE FOGO',
+      'APREENSÃO DE ARMA DE FOGO',
+    ],
+  },
+  {
+    titulo: 'Patrimônio',
+    itens: [
+      'ROUBO A PEDESTRE',
+      'ROUBO A ESTABELECIMENTO COMERCIAL',
+      'ROUBO A RESIDÊNCIA',
+      'ROUBO DE VEÍCULO',
+      'ROUBO DE CARGA',
+      'LATROCÍNIO',
+      'FURTO',
+      'FURTO QUALIFICADO',
+      'FURTO DE VEÍCULO',
+      'FURTO EM RESIDÊNCIA',
+      'FURTO EM ESTABELECIMENTO COMERCIAL',
+      'RECEPTAÇÃO',
+      'ADULTERAÇÃO DE SINAL IDENTIFICADOR DE VEÍCULO',
+      'ESTELIONATO',
+      'EXTORSÃO',
+      'DANO',
+    ],
+  },
+  {
+    titulo: 'Contra a pessoa',
+    itens: [
+      'HOMICÍDIO',
+      'TENTATIVA DE HOMICÍDIO',
+      'FEMINICÍDIO',
+      'TENTATIVA DE FEMINICÍDIO',
+      'LESÃO CORPORAL',
+      'AMEAÇA',
+      'SEQUESTRO E CÁRCERE PRIVADO',
+      'ESTUPRO',
+      'ESTUPRO DE VULNERÁVEL',
+      'MORTE DECORRENTE DE INTERVENÇÃO POLICIAL',
+    ],
+  },
+  {
+    titulo: 'Violência doméstica',
+    itens: ['VIOLÊNCIA DOMÉSTICA', 'DESCUMPRIMENTO DE MEDIDA PROTETIVA'],
+  },
+  {
+    titulo: 'Trânsito',
+    itens: [
+      'EMBRIAGUEZ AO VOLANTE',
+      'DIREÇÃO SEM HABILITAÇÃO',
+      'ACIDENTE DE TRÂNSITO COM VÍTIMA',
+      'FUGA DO LOCAL DO ACIDENTE',
+    ],
+  },
+  {
+    titulo: 'Outros',
+    itens: [
+      'RESISTÊNCIA',
+      'DESACATO',
+      'DESOBEDIÊNCIA',
+      'RESISTÊNCIA E DESACATO',
+      'CORRUPÇÃO DE MENORES',
+      'ATO INFRACIONAL',
+      'CONTRABANDO E DESCAMINHO',
+      'CRIME AMBIENTAL',
+      'MAUS-TRATOS A ANIMAIS',
+      'PERTURBAÇÃO DO SOSSEGO',
+    ],
+  },
+];
 
-export const FATOS_RAPIDOS = [
-  'MANDADO DE PRISÃO',
-  'TRÁFICO DE DROGAS',
-  'PORTE ILEGAL DE ARMA DE FOGO',
-  'DESCUMPRIMENTO DE MEDIDA PROTETIVA',
-  'RECEPTAÇÃO',
-  'ROUBO A PEDESTRE',
-] as const;
+/** Atalhos de um toque enquanto o usuário ainda não tem fatos recentes. */
+export const FATOS_PADRAO = ['MANDADO DE PRISÃO', 'TRÁFICO DE DROGAS', 'PORTE ILEGAL DE ARMA DE FOGO'] as const;
 
 /** Frases prontas para o histórico. `dp` preenche o número da ocorrência. */
 export function trechosHistorico(dp: string): { rotulo: string; texto: string }[] {

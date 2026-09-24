@@ -12,6 +12,14 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   background: var(--bg);
+  /* App: sem pinça/duplo toque para zoom (o croqui e o mapa têm zoom próprio) */
+  touch-action: pan-x pan-y;
+}
+
+/* Nada pode deixar a página mais larga que a tela */
+html,
+body {
+  overflow-x: clip;
 }
 
 body {

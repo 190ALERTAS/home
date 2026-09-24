@@ -5,7 +5,7 @@ Ferramentas de apoio operacional para a Brigada Militar (PMRS), feitas **de pra�
 - **Release** de ocorrência no padrão do batalhão (título com 🚔, 🦅 ou ⚡), pronto para o WhatsApp;
 - **Alerta de Veículo** (furto/roubo) em segundos;
 - **Minha Escala**: turnos, horas, extras, férias, EDT/RSP, gerador de escala e relatório em PDF;
-- **Croqui digital** sobre mapa/satélite em escala real ou em branco, com exportação em imagem;
+- **Croqui digital** com o traçado real das ruas do local (OpenStreetMap, em estilo plano) ou em branco, em escala real, com exportação em imagem;
 - **Calculadora TAF** (NI nº 3.3/EMBM/2023, Anexo “E”).
 
 Publicado em **https://190alertas.github.io/home/** como PWA (instalável e funciona sem internet).
@@ -106,5 +106,5 @@ configurável). Férias e afastamentos descontam a carga proporcionalmente; cada
 ## Privacidade
 
 Nada do que é digitado é enviado a servidores do projeto. Rascunhos, escala e croquis ficam somente no
-aparelho. O croqui usa mapas do OpenStreetMap e imagens da Esri; a busca de endereços usa o Nominatim.
+aparelho. O croqui usa o mapa e o traçado das ruas do OpenStreetMap (Overpass API); a busca de endereços usa o Nominatim.
 Estatísticas anônimas de uso via Google Analytics. Veja os Termos de Uso no próprio app (`/home/termos`).

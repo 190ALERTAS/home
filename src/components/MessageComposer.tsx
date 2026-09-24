@@ -4,6 +4,7 @@ import { canShare, copyText, openWhatsApp, shareText } from '../lib/share';
 import { track } from '../lib/analytics';
 import { toast } from './toast';
 import { confirmDialog } from './dialogs';
+import { NoDock } from './dock';
 
 /** Renderiza a formatação do WhatsApp (*negrito*, _itálico_) na prévia. */
 function renderWhatsApp(text: string): ReactNode[] {
@@ -113,23 +114,25 @@ export function ShareActions({
   };
 
   return (
-    <div className="action-bar">
-      {onClear && (
-        <button type="button" className="btn icon ghost" onClick={onClear} aria-label="Limpar formulário" title="Limpar">
-          <Eraser />
+    <NoDock>
+      <div className="action-bar" role="toolbar" aria-label="Enviar mensagem">
+        {onClear && (
+          <button type="button" className="btn icon ghost" onClick={onClear} aria-label="Limpar formulário" title="Limpar">
+            <Eraser />
+          </button>
+        )}
+        <button type="button" className="btn primary" onClick={copy}>
+          <Copy /> <span className="rotulo">Copiar</span>
         </button>
-      )}
-      <button type="button" className="btn primary" onClick={copy}>
-        <Copy /> Copiar
-      </button>
-      <button type="button" className="btn whatsapp" onClick={whatsapp}>
-        <MessageCircle /> WhatsApp
-      </button>
-      {canShare() && (
-        <button type="button" className="btn icon" onClick={share} aria-label="Compartilhar" title="Compartilhar">
-          <Share2 />
+        <button type="button" className="btn whatsapp" onClick={whatsapp}>
+          <MessageCircle /> <span className="rotulo">WhatsApp</span>
         </button>
-      )}
-    </div>
+        {canShare() && (
+          <button type="button" className="btn icon" onClick={share} aria-label="Compartilhar" title="Compartilhar">
+            <Share2 />
+          </button>
+        )}
+      </div>
+    </NoDock>
   );
 }
