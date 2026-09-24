@@ -50,7 +50,7 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
           <span key={d}>{d}</span>
         ))}
       </div>
-      <div className="cal-grid" role="grid" aria-label="Calendário do mês">
+      <div className="cal-grid" role="group" aria-label="Dias do mês">
         {celulas.map((data, i) => {
           if (!data) return <span key={`v${i}`} className="day vazio" aria-hidden />;
           const itens = porData.get(data) ?? [];

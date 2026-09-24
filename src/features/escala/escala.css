@@ -238,7 +238,7 @@
 }
 
 .cal-head span:first-child {
-  color: color-mix(in srgb, var(--primary-hi) 75%, var(--text-3));
+  color: var(--primary-hi);
 }
 
 .day {
@@ -283,7 +283,7 @@
 }
 
 .day.dom .n {
-  color: color-mix(in srgb, var(--primary-hi) 70%, var(--text-2));
+  color: var(--primary-hi);
 }
 
 .day.hoje {

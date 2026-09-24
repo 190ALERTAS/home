@@ -88,14 +88,14 @@
 }
 
 .btn.whatsapp {
-  --btn-bg: #1fae5b;
+  --btn-bg: #15803d;
   --btn-fg: #fff;
   --btn-border: transparent;
-  box-shadow: 0 8px 22px rgba(31, 174, 91, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 22px rgba(21, 128, 61, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .btn.whatsapp:hover {
-  background: #22bd63;
+  background: #166534;
 }
 
 .btn.sm {

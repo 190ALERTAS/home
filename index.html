@@ -31,6 +31,7 @@
           else if (localStorage.getItem('darkMode') === 'false') tema = 'light';
         } catch (e) {}
         document.documentElement.setAttribute('data-theme', tema);
+        document.documentElement.style.background = tema === 'light' ? '#f3f3f5' : '#0a0a0c';
         var meta = document.querySelector('meta[name="theme-color"]');
         if (meta) meta.setAttribute('content', tema === 'light' ? '#f4f4f6' : '#0a0a0c');
       })();
@@ -47,12 +48,17 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Esqueleto exibido até o app iniciar (primeira pintura instantânea) -->
+      <div style="position:fixed;inset:0 0 auto 0;height:58px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#0a0a0c;border-bottom:1px solid #1d1d22;font:800 22px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:.04em;color:#f4f4f6">
+        <span style="color:#ff1f3d">190</span>ALERTAS
+      </div>
+    </div>
     <script>
       // Se o app não iniciar (rede muito lenta ou publicação em andamento), orienta o usuário.
       setTimeout(function () {
         var root = document.getElementById('root');
-        if (root && !root.hasChildNodes()) {
+        if (root && document.documentElement.getAttribute('data-app') !== 'ok') {
           root.innerHTML =
             '<div style="max-width:420px;margin:18vh auto;padding:24px;font-family:system-ui,sans-serif;text-align:center;color:#b6b6c0">' +
             '<div style="font:800 34px system-ui,sans-serif;color:#fff"><span style="color:#ff1f3d">190</span> ALERTAS</div>' +

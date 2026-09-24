@@ -59,6 +59,14 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Links dentro de texto corrido: sublinhados (não dependem só da cor). */
+p a,
+li a,
+.privacidade a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 h1,
 h2,
 h3,

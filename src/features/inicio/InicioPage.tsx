@@ -60,7 +60,7 @@ export default function InicioPage() {
     <div className="page inicio">
       <section className="home-hero">
         <div className="home-mascote">
-          <img src={mascote} alt="Mascote do 190 ALERTAS" width={132} height={132} />
+          <img src={mascote} alt="Mascote do 190 ALERTAS" width={132} height={132} fetchPriority="high" />
         </div>
         <div className="home-txt">
           <span className="eyebrow">De praça para praça</span>
