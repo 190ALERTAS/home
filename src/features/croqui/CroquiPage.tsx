@@ -20,6 +20,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Field, Switch, gap } from '../../components/ui';
+import { CampoData, CampoHora } from '../../components/pickers';
 import { toast } from '../../components/toast';
 import { confirmDialog } from '../../components/dialogs';
 import { idbDel, idbGet, idbSet } from '../../lib/idb';
@@ -528,10 +529,10 @@ export default function CroquiPage() {
               </Field>
               <div className="grid-2">
                 <Field label="Data">
-                  <input className="input" type="date" value={doc.info.data} onChange={(e) => setInfo({ data: e.target.value })} />
+                  <CampoData rotulo="Data do croqui" titulo="Data" value={doc.info.data} onChange={(data) => setInfo({ data })} />
                 </Field>
                 <Field label="Hora">
-                  <input className="input" type="time" value={doc.info.hora} onChange={(e) => setInfo({ hora: e.target.value })} />
+                  <CampoHora rotulo="Hora do croqui" titulo="Hora" value={doc.info.hora} onChange={(hora) => setInfo({ hora })} />
                 </Field>
               </div>
               <Field label="Local">

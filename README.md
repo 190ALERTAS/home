@@ -1,8 +1,8 @@
-# 190 🚨 ALERTAS — versão 5
+# 190 ALERTAS — versão 5
 
 Ferramentas de apoio operacional para a Brigada Militar (PMRS), feitas **de praça para praça**:
 
-- **Release** de ocorrência no padrão (título com 🚔, 🦅 ou ⚡), pronto para o WhatsApp;
+- **Release** de ocorrência no padrão do batalhão (título com 🚔, 🦅 ou ⚡), pronto para o WhatsApp;
 - **Alerta de Veículo** (furto/roubo) em segundos;
 - **Minha Escala**: turnos, horas, extras, férias, EDT/RSP, gerador de escala e relatório em PDF;
 - **Croqui digital** sobre mapa/satélite em escala real ou em branco, com exportação em imagem;
@@ -18,7 +18,8 @@ Idealizado e criado por **Sd Ferrão — 32º BPM**.
 
 - [TypeScript](https://www.typescriptlang.org/) + [React 19](https://react.dev/) + [Vite 8](https://vite.dev/)
 - PWA com [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox): cache offline e aviso de nova versão
-- [Leaflet](https://leafletjs.com/) (mapa do croqui), [jsPDF](https://github.com/parallax/jsPDF) (PDF da escala), [Lucide](https://lucide.dev/) (ícones), fontes Barlow
+- [Leaflet](https://leafletjs.com/) (mapa do croqui), [jsPDF](https://github.com/parallax/jsPDF) (PDF da escala), [Lucide](https://lucide.dev/) (ícones)
+- Fontes [IBM Plex Sans e IBM Plex Mono](https://www.ibm.com/plex/) (empacotadas com o app, funcionam offline)
 - Testes com [Vitest](https://vitest.dev/)
 
 Não há servidor nem banco de dados: tudo roda no navegador e os dados ficam no aparelho do usuário.
@@ -42,7 +43,7 @@ src/
   app/            casco do app (navegação, tema, atualização do PWA)
   components/     componentes de interface reutilizáveis
   features/
-    release/      formatador do release (format.ts) + tela
+    release/      formatador do release (format.ts), modelo de referência (Formato.txt) + tela
     veiculo/      alerta de veículo
     escala/       modelo, cálculo, migração, gerador, PDF e telas da escala
     croqui/       editor vetorial, símbolos, captura do mapa e exportação
@@ -54,7 +55,22 @@ scripts/          pós-build (páginas .html para os links diretos)
 public/           ícones, imagem de compartilhamento e o sw.js antigo (desativador)
 ```
 
-As cores ficam em `src/styles/tokens.css` (tema escuro e claro).
+## Identidade visual
+
+- Visual sóbrio e técnico: grafite azulado, vermelho institucional, tipografia IBM Plex (texto) e
+  IBM Plex Mono (datas, horas, números e rótulos).
+- Emblema: escudo geométrico com o número 190, desenhado em vetor em `src/components/Emblema.tsx`.
+  Os ícones do PWA, o `favicon.ico`, `public/icons/emblema.svg` e a imagem de compartilhamento
+  (`public/og.jpg`) são gerados a partir dele. O emblema também aparece no PDF da escala e na imagem do croqui.
+- As cores ficam em `src/styles/tokens.css` (tema escuro e claro).
+- Datas e horas usam seletores próprios (`src/components/pickers.tsx`), que abrem numa folha/janela
+  sempre inteira na tela — os seletores nativos do navegador podiam abrir fora da tela.
+
+## Padrão do release
+
+O texto gerado segue **exatamente** o modelo `src/features/release/Formato.txt` (rótulos em negrito do
+WhatsApp, linhas em branco nas mesmas posições e todos os campos sempre presentes). Um teste automatizado
+compara a saída com esse arquivo, caractere por caractere.
 
 ## Publicação (GitHub Pages)
 

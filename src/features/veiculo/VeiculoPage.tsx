@@ -1,5 +1,5 @@
 import { useId, useRef } from 'react';
-import { KeyRound, Pencil, Siren, TriangleAlert, UserX } from 'lucide-react';
+import { CarFront, KeyRound, Pencil, Siren, UserX } from 'lucide-react';
 import { AutoTextarea, Card, Field, PageHead, gap } from '../../components/ui';
 import { DateTimeFields, RecentInput } from '../../components/fields';
 import { MessagePreview, ShareActions } from '../../components/MessageComposer';
@@ -57,7 +57,7 @@ export default function VeiculoPage() {
 
   return (
     <div className="page split-page">
-      <PageHead icon={TriangleAlert} title="Alerta de Veículo" subtitle="Furto ou roubo: preencha e dispare em segundos." />
+      <PageHead icon={CarFront} title="Alerta de veículo" subtitle="Furto ou roubo: preencha e dispare em segundos." />
 
       <div className="split">
         <div className="section">

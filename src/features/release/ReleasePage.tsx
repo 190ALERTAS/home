@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import { FileText, Plus, Trash2, UserRound, Mic } from 'lucide-react';
-import { Card, Field, PageHead, Seg, Switch, AutoTextarea, gap } from '../../components/ui';
+import { Card, Field, PageHead, Seg, AutoTextarea, gap } from '../../components/ui';
 import { DateTimeFields, RecentInput } from '../../components/fields';
 import { MessagePreview, ShareActions } from '../../components/MessageComposer';
 import { confirmDialog } from '../../components/dialogs';
@@ -27,11 +27,10 @@ const K_CIDADES = '190a:recentes:cidades';
 const K_FATOS = '190a:recentes:fatos';
 const DIA = 24 * 60 * 60 * 1000;
 
-type Draft = Omit<ReleaseData, 'icone' | 'unidade' | 'negrito'>;
+type Draft = Omit<ReleaseData, 'icone' | 'unidade'>;
 interface Prefs {
   icone: ReleaseIcone;
   unidade: string;
-  negrito: boolean;
 }
 
 const novoDetido = (): Detido => ({ id: uid(), nome: '', complemento: '', rg: '' });
@@ -45,7 +44,6 @@ function novoRascunho(): Draft {
     numero: '',
     bairro: '',
     cidade: readRecent(K_CIDADES)[0] ?? '',
-    houveApreensao: false,
     apreensoes: [],
     detidos: [novoDetido()],
     historico: '',
@@ -55,11 +53,11 @@ function novoRascunho(): Draft {
 }
 
 export default function ReleasePage() {
-  const [prefs, setPrefs] = usePersistentState<Prefs>(K_PREFS, { icone: '🦅', unidade: '', negrito: false });
+  const [prefs, setPrefs] = usePersistentState<Prefs>(K_PREFS, { icone: '🦅', unidade: '' });
   const [draft, setDraft, resetDraft] = usePersistentState<Draft>(K_DRAFT, novoRascunho, { ttlMs: DIA });
   const ids = { unidade: useId(), fato: useId(), log: useId(), num: useId(), bairro: useId(), cidade: useId(), hist: useId(), ba: useId(), dp: useId() };
 
-  const data: ReleaseData = { ...draft, icone: prefs.icone, unidade: prefs.unidade, negrito: prefs.negrito };
+  const data: ReleaseData = { ...draft, icone: prefs.icone, unidade: prefs.unidade };
   const texto = formatRelease(data);
   const pendentes = camposPendentes(data);
 
@@ -191,51 +189,47 @@ export default function ReleasePage() {
           </Card>
 
           <Card title="Apreensão">
-            <div className="stack">
-              <Switch
-                checked={draft.houveApreensao}
-                onChange={(on) =>
-                  setDraft((d) => ({
-                    ...d,
-                    houveApreensao: on,
-                    apreensoes: on && d.apreensoes.length === 0 ? [''] : d.apreensoes,
-                  }))
-                }
-                label="Houve apreensão"
-                description={draft.houveApreensao ? 'Um item por linha.' : 'Desligado: sai “Sem Apreensões”.'}
-              />
-              {draft.houveApreensao && (
-                <div className="stack" style={gap(8)}>
-                  {draft.apreensoes.map((item, i) => (
-                    <div className="item-row" key={i}>
-                      <input
-                        className="input"
-                        value={item}
-                        placeholder={i === 0 ? '01 revólver calibre .38' : 'Outro item'}
-                        aria-label={`Item apreendido ${i + 1}`}
-                        onChange={(e) => set('apreensoes', draft.apreensoes.map((x, j) => (j === i ? e.target.value : x)))}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            set('apreensoes', [...draft.apreensoes, '']);
-                          }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className="btn icon ghost"
-                        aria-label="Remover item"
-                        onClick={() => set('apreensoes', draft.apreensoes.filter((_, j) => j !== i))}
-                      >
-                        <Trash2 />
-                      </button>
-                    </div>
-                  ))}
-                  <button type="button" className="btn add-btn" onClick={() => set('apreensoes', [...draft.apreensoes, ''])}>
-                    <Plus /> Adicionar item
+            <div className="stack" style={gap(8)}>
+              {draft.apreensoes.map((item, i) => (
+                <div className="item-row" key={i}>
+                  <input
+                    className="input"
+                    value={item}
+                    placeholder={i === 0 ? '01 revólver calibre .38' : 'Outro item'}
+                    aria-label={`Item apreendido ${i + 1}`}
+                    onChange={(e) => set('apreensoes', draft.apreensoes.map((x, j) => (j === i ? e.target.value : x)))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        set('apreensoes', [...draft.apreensoes, '']);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="btn icon ghost"
+                    aria-label="Remover item"
+                    onClick={() => set('apreensoes', draft.apreensoes.filter((_, j) => j !== i))}
+                  >
+                    <Trash2 />
                   </button>
                 </div>
+              ))}
+              {draft.apreensoes.length === 0 && (
+                <p className="subtle" style={{ fontSize: 14 }}>
+                  Nenhum item: a linha abaixo de APREENSÃO fica em branco, como no modelo.
+                </p>
               )}
+              <div className="row wrap" style={gap(8)}>
+                <button type="button" className="btn add-btn grow" onClick={() => set('apreensoes', [...draft.apreensoes, ''])}>
+                  <Plus /> Adicionar item
+                </button>
+                {draft.apreensoes.length === 0 && (
+                  <button type="button" className="chip" onClick={() => set('apreensoes', ['Sem Apreensões'])}>
+                    Sem Apreensões
+                  </button>
+                )}
+              </div>
             </div>
           </Card>
 
@@ -267,8 +261,8 @@ export default function ReleasePage() {
                     <input
                       className="input"
                       value={det.complemento}
-                      placeholder="Idade / alcunha"
-                      aria-label="Complemento (idade ou alcunha)"
+                      placeholder="Complemento"
+                      aria-label="Complemento, entre o nome e o RG (idade, alcunha…)"
                       onChange={(e) => setDetido(det.id, { complemento: e.target.value })}
                     />
                     <input
@@ -284,7 +278,7 @@ export default function ReleasePage() {
               ))}
               {draft.detidos.length === 0 && (
                 <p className="subtle" style={{ fontSize: 14 }}>
-                  Sem detidos: sai “INDIVÍDUOS DETIDOS: Nenhum”.
+                  Sem detidos: a linha abaixo de INDIVÍDUOS DETIDOS fica em branco.
                 </p>
               )}
               <button type="button" className="btn add-btn" onClick={() => set('detidos', [...draft.detidos, novoDetido()])}>
@@ -336,8 +330,7 @@ export default function ReleasePage() {
           </Card>
 
           <Card title="Registro">
-            <div className="stack">
-              <div className="grid-2">
+            <div className="grid-2">
                 <Field label="BA" htmlFor={ids.ba}>
                   <input
                     id={ids.ba}
@@ -358,13 +351,6 @@ export default function ReleasePage() {
                     onChange={(e) => set('dp', e.target.value)}
                   />
                 </Field>
-              </div>
-              <Switch
-                checked={prefs.negrito}
-                onChange={(negrito) => setPrefs((p) => ({ ...p, negrito }))}
-                label="Rótulos em negrito"
-                description="Usa *negrito* do WhatsApp em FATO, DATA, HORA…"
-              />
             </div>
           </Card>
         </div>

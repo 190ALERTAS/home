@@ -12,10 +12,9 @@ function read(): Theme {
 
 export function setTheme(theme: Theme): void {
   document.documentElement.setAttribute('data-theme', theme);
-  document.documentElement.style.background = theme === 'light' ? '#f3f3f5' : '#0a0a0c';
-  document
-    .querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', theme === 'light' ? '#f4f4f6' : '#0a0a0c');
+  document.documentElement.style.background = theme === 'light' ? '#f1f3f6' : '#0b0f14';
+  // A barra superior é escura nos dois temas; a barra do navegador acompanha.
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#0e131a' : '#0b0f14');
   writeString(KEY, theme);
   listeners.forEach((l) => l());
 }

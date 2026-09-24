@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>190 ALERTAS</title>
     <meta name="description" content="Ferramentas de apoio operacional para a Brigada Militar: release, alerta de veículo, croqui, escala e TAF." />
-    <meta name="theme-color" content="#0a0a0c" />
+    <meta name="theme-color" content="#0b0f14" />
     <meta name="color-scheme" content="dark light" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="190 ALERTAS" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="190 🚨 ALERTAS" />
-    <meta property="og:description" content="De praça para praça: release, alerta de veículo, croqui, escala e TAF na palma da mão." />
+    <meta property="og:title" content="190 ALERTAS" />
+    <meta property="og:description" content="Ferramentas de apoio operacional: release, alerta de veículo, croqui, escala e TAF. Funciona offline." />
     <meta property="og:image" content="https://190alertas.github.io/home/og.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="%BASE_URL%favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%icons/emblema.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="%BASE_URL%icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-icon.png" />
     <script>
@@ -31,9 +32,9 @@
           else if (localStorage.getItem('darkMode') === 'false') tema = 'light';
         } catch (e) {}
         document.documentElement.setAttribute('data-theme', tema);
-        document.documentElement.style.background = tema === 'light' ? '#f3f3f5' : '#0a0a0c';
+        document.documentElement.style.background = tema === 'light' ? '#f1f3f6' : '#0b0f14';
         var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', tema === 'light' ? '#f4f4f6' : '#0a0a0c');
+        if (meta) meta.setAttribute('content', tema === 'light' ? '#0e131a' : '#0b0f14');
       })();
     </script>
     <!-- Google Analytics (estatísticas anônimas de uso; nenhum conteúdo digitado é enviado) -->
@@ -50,8 +51,8 @@
   <body>
     <div id="root">
       <!-- Esqueleto exibido até o app iniciar (primeira pintura instantânea) -->
-      <div style="position:fixed;inset:0 0 auto 0;height:58px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#0a0a0c;border-bottom:1px solid #1d1d22;font:800 22px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:.04em;color:#f4f4f6">
-        <span style="color:#ff1f3d">190</span>ALERTAS
+      <div style="position:fixed;inset:0 0 auto 0;height:56px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#0b0f14;border-bottom:1px solid #1c232d;font:700 18px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:.02em;color:#e7ecf2">
+        <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3.2L54.4 9.2Q56 9.6 56 11.3V35.2Q56 37 54.8 38.3L34 59.2Q32 61.2 30 59.2L9.2 38.3Q8 37 8 35.2V11.3Q8 9.6 9.6 9.2Z" fill="#c8192f"/><path d="M32 7L52.6 12.5V35L32 55.8L11.4 35V12.5Z" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1.1"/><path d="M25.17 36.99L15.94 36.99L15.94 34.42L19.27 34.42L19.27 24.2L19.08 24.2L16.99 27.16L14.95 25.79L17.62 22.01L22.27 22.01L22.27 34.42L25.17 34.42L25.17 36.99ZM37.07 27.68Q37.07 29.31 36.63 30.73Q36.19 32.16 35.5 33.34Q34.81 34.52 33.93 35.45Q33.05 36.37 32.19 36.99L27.96 36.99Q29.23 36.05 30.23 35.18Q31.23 34.31 31.97 33.42Q32.71 32.53 33.18 31.56Q33.65 30.59 33.85 29.48L33.5 29.48Q33.2 30.38 32.52 31Q31.83 31.63 30.6 31.63Q28.8 31.63 27.76 30.41Q26.72 29.2 26.72 26.92Q26.72 24.48 28.04 23.11Q29.36 21.75 31.89 21.75Q34.51 21.75 35.79 23.27Q37.07 24.8 37.07 27.68ZM31.89 29.16Q32.88 29.16 33.36 28.61Q33.85 28.06 33.85 27.03L33.85 26.34Q33.85 25.31 33.36 24.77Q32.88 24.22 31.89 24.22Q30.91 24.22 30.42 24.77Q29.94 25.31 29.94 26.34L29.94 27.03Q29.94 28.06 30.42 28.61Q30.91 29.16 31.89 29.16ZM43.89 37.25Q42.54 37.25 41.57 36.81Q40.61 36.37 39.98 35.44Q39.34 34.5 39.04 33.03Q38.74 31.56 38.74 29.5Q38.74 27.44 39.04 25.97Q39.34 24.5 39.98 23.56Q40.61 22.63 41.57 22.19Q42.54 21.75 43.89 21.75Q45.25 21.75 46.21 22.19Q47.18 22.63 47.81 23.56Q48.44 24.5 48.75 25.97Q49.05 27.44 49.05 29.5Q49.05 31.56 48.75 33.03Q48.44 34.5 47.81 35.44Q47.18 36.37 46.21 36.81Q45.25 37.25 43.89 37.25ZM43.89 34.67Q44.43 34.67 44.8 34.51Q45.16 34.35 45.37 34Q45.59 33.64 45.69 33.06Q45.78 32.48 45.78 31.63L45.78 27.37Q45.78 25.68 45.37 25Q44.97 24.33 43.89 24.33Q42.82 24.33 42.41 25Q42 25.68 42 27.37L42 31.63Q42 32.48 42.1 33.06Q42.2 33.64 42.41 34Q42.63 34.35 42.99 34.51Q43.36 34.67 43.89 34.67Z" fill="#fff"/></svg><span>190 <span style="font-weight:600;letter-spacing:.14em">ALERTAS</span></span>
       </div>
     </div>
     <script>
@@ -60,10 +61,10 @@
         var root = document.getElementById('root');
         if (root && document.documentElement.getAttribute('data-app') !== 'ok') {
           root.innerHTML =
-            '<div style="max-width:420px;margin:18vh auto;padding:24px;font-family:system-ui,sans-serif;text-align:center;color:#b6b6c0">' +
-            '<div style="font:800 34px system-ui,sans-serif;color:#fff"><span style="color:#ff1f3d">190</span> ALERTAS</div>' +
+            '<div style="max-width:420px;margin:18vh auto;padding:24px;font-family:system-ui,sans-serif;text-align:center;color:#aab4c0">' +
+            '<div style="font:700 30px system-ui,sans-serif;letter-spacing:.02em;color:#e7ecf2">190 <span style="font-weight:600;letter-spacing:.14em">ALERTAS</span></div>' +
             '<p>Carregando… Se esta mensagem continuar, verifique a conexão e recarregue a página.</p>' +
-            '<button onclick="location.reload()" style="margin-top:12px;padding:12px 22px;border:0;border-radius:10px;background:#e5162c;color:#fff;font-weight:700">Recarregar</button></div>';
+            '<button onclick="location.reload()" style="margin-top:12px;padding:12px 22px;border:0;border-radius:8px;background:#d42a3f;color:#fff;font-weight:600">Recarregar</button></div>';
         }
       }, 8000);
     </script>

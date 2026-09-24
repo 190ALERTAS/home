@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { CalendarX, Palmtree, Stethoscope } from 'lucide-react';
 import { Sheet } from '../../../components/Sheet';
 import { Field, gap } from '../../../components/ui';
+import { CampoData } from '../../../components/pickers';
 import { addDays, diffDays, formatDateBR } from '../../../lib/date';
 import { ROTULO_MARCACAO, type TipoMarcacao } from '../model';
 import { marcar } from '../ops';
@@ -81,10 +82,10 @@ export function PeriodoSheet({ open, onClose, inicioSugerido }: { open: boolean;
         </div>
         <div className="grid-2">
           <Field label="De">
-            <input className="input" type="date" value={de} onChange={(e) => e.target.value && setDe(e.target.value)} />
+            <CampoData rotulo="De" titulo="Início do período" atalhos={false} value={de} onChange={setDe} />
           </Field>
           <Field label="Até">
-            <input className="input" type="date" value={ate} min={de} onChange={(e) => e.target.value && setAte(e.target.value)} />
+            <CampoData rotulo="Até" titulo="Fim do período" atalhos={false} value={ate} min={de} onChange={setAte} />
           </Field>
         </div>
         {valido && (

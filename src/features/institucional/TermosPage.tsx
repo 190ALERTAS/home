@@ -6,7 +6,7 @@ import './termos.css';
 export default function TermosPage() {
   return (
     <div className="page termos">
-      <PageHead icon={ScrollText} title="Termos de Uso" subtitle="Termos de Uso e Política de Privacidade do 190 🚨 ALERTAS" />
+      <PageHead icon={ScrollText} title="Termos de uso" subtitle="Termos de Uso e Política de Privacidade do 190 ALERTAS" />
       <article className="card pad">
         <p className="subtle">
           <em>Última atualização: 24 de setembro de 2026 (versão 5)</em>
@@ -15,7 +15,7 @@ export default function TermosPage() {
         <h2>Termos de Uso</h2>
         <ol>
           <li>
-            <strong>Aceitação dos termos:</strong> ao acessar ou utilizar o 190 🚨 ALERTAS, você concorda com estes Termos de Uso e com a
+            <strong>Aceitação dos termos:</strong> ao acessar ou utilizar o 190 ALERTAS, você concorda com estes Termos de Uso e com a
             Política de Privacidade descritos aqui.
           </li>
           <li>
@@ -44,7 +44,7 @@ export default function TermosPage() {
         <h2>Política de Privacidade</h2>
         <ol>
           <li>
-            <strong>Sem servidor de dados:</strong> o 190 🚨 ALERTAS não possui banco de dados nem servidor próprio. Nada do que você digita
+            <strong>Sem servidor de dados:</strong> o 190 ALERTAS não possui banco de dados nem servidor próprio. Nada do que você digita
             é enviado para os responsáveis pela plataforma.
           </li>
           <li>
@@ -76,11 +76,11 @@ export default function TermosPage() {
         </ol>
 
         <p>
-          Ao utilizar o 190 🚨 ALERTAS, você concorda com os Termos de Uso e a Política de Privacidade aqui estabelecidos. Se não concordar,
+          Ao utilizar o 190 ALERTAS, você concorda com os Termos de Uso e a Política de Privacidade aqui estabelecidos. Se não concordar,
           por favor, não utilize a plataforma.
         </p>
         <p>
-          Agradecemos por confiar no 190 🚨 ALERTAS. Estamos comprometidos em oferecer uma ferramenta segura e eficiente para as forças de
+          Agradecemos por confiar no 190 ALERTAS. Estamos comprometidos em oferecer uma ferramenta segura e eficiente para as forças de
           segurança pública.
         </p>
 
@@ -89,7 +89,7 @@ export default function TermosPage() {
             <strong>Atenciosamente,</strong>
           </p>
           <p>Sd Ferrão — 32º BPM</p>
-          <p>190 🚨 ALERTAS</p>
+          <p>190 ALERTAS</p>
         </div>
       </article>
     </div>

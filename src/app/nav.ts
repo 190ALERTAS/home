@@ -6,7 +6,7 @@ import {
   MessageSquareText,
   PencilRuler,
   ScrollText,
-  Siren,
+  CarFront,
   type LucideIcon,
 } from 'lucide-react';
 import type { RouteId } from '../lib/router';
@@ -31,25 +31,25 @@ export const NAV: Record<RouteId, NavEntry> = {
   veiculos: {
     id: 'veiculos',
     label: 'Alerta',
-    long: 'Alerta de Veículo',
+    long: 'Alerta de veículo',
     desc: 'Furto e roubo de veículos em segundos',
-    icon: Siren,
+    icon: CarFront,
   },
   escala: {
     id: 'escala',
     label: 'Escala',
-    long: 'Minha Escala',
+    long: 'Minha escala',
     desc: 'Turnos, horas e extras do mês',
     icon: CalendarDays,
   },
   croqui: {
     id: 'croqui',
     label: 'Croqui',
-    long: 'Croqui Digital',
+    long: 'Croqui digital',
     desc: 'Croqui de acidente sobre mapa ou em branco',
     icon: PencilRuler,
   },
-  taf: { id: 'taf', label: 'TAF', long: 'Calculadora TAF', desc: 'Pontuação do teste físico', icon: Dumbbell },
+  taf: { id: 'taf', label: 'TAF', long: 'Calculadora TAF', desc: 'Pontuação do teste de aptidão física', icon: Dumbbell },
   sugestoes: {
     id: 'sugestoes',
     label: 'Sugestões',
@@ -57,7 +57,7 @@ export const NAV: Record<RouteId, NavEntry> = {
     desc: 'Envie ideias e correções',
     icon: MessageSquareText,
   },
-  termos: { id: 'termos', label: 'Termos', long: 'Termos de Uso', desc: 'Termos e privacidade', icon: ScrollText },
+  termos: { id: 'termos', label: 'Termos', long: 'Termos de uso', desc: 'Termos e privacidade', icon: ScrollText },
 };
 
 /** Itens fixos da barra inferior (o 5º botão é "Mais"). */

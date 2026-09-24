@@ -1,24 +1,25 @@
 import { useState, type ReactNode } from 'react';
 import { Download, Ellipsis, Moon, Share, SquarePlus, Sun, WifiOff } from 'lucide-react';
-import mascote from '../assets/mascote.webp';
 import { linkProps, type RouteId } from '../lib/router';
 import { toggleTheme, useTheme } from '../lib/theme';
 import { useInstall, useOnline } from '../lib/pwa';
 import { Sheet } from '../components/Sheet';
 import { toast } from '../components/toast';
 import { gap } from '../components/ui';
+import { Emblema } from '../components/Emblema';
 import { APP_VERSION, BOTTOM, MORE, NAV, SIDE_EXTRA, SIDE_MAIN } from './nav';
 
 export function Brand({ onClick }: { onClick?: () => void }) {
   return (
-    <a className="brand" {...linkProps('inicio', onClick)} aria-label="190 ALERTAS — início">
-      <span className="brand-avatar">
-        <img src={mascote} alt="" width={34} height={34} />
-      </span>
+    <a className="brand" {...linkProps('inicio', onClick)}>
+      <Emblema size={32} />
       <span className="brand-word">
-        <span className="n">190</span>
-        <span className="t">ALERTAS</span>
+        <span className="nome">
+          190 <span>ALERTAS</span>
+        </span>
+        <span className="sub">Apoio operacional</span>
       </span>
+      <span className="sr-only">(início)</span>
     </a>
   );
 }
@@ -96,10 +97,10 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
         )}
         <InstallButton onIOSHelp={() => setIosHelp(true)} />
         <ThemeButton />
-        <span className="siren-bar" aria-hidden />
       </header>
 
       <nav className="sidebar" aria-label="Navegação principal">
+        <div className="side-titulo">Ferramentas</div>
         {SIDE_MAIN.map((id) => {
           const Icon = NAV[id].icon;
           return (
@@ -118,9 +119,9 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
           );
         })}
         <div className="side-foot">
-          Versão {APP_VERSION}
+          v{APP_VERSION}
           <br />
-          Criado por Sd Ferrão · 32º BPM
+          Sd Ferrão · 32º BPM
         </div>
       </nav>
 
@@ -171,7 +172,7 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
                   {...linkProps(id, () => setMoreOpen(false))}
                   style={{ color: 'inherit', textDecoration: 'none' }}
                 >
-                  <span className="ico" style={route === id ? { background: 'var(--primary-soft)', color: 'var(--primary-hi)' } : undefined}>
+                  <span className="ico" style={route === id ? { borderColor: 'var(--primary-line)', color: 'var(--primary-hi)' } : undefined}>
                     <Icon />
                   </span>
                   <span className="txt">

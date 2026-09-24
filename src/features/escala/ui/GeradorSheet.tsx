@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Wand2 } from 'lucide-react';
 import { Sheet } from '../../../components/Sheet';
 import { Field, Seg, Switch, gap } from '../../../components/ui';
+import { CampoData } from '../../../components/pickers';
 import { DIAS_SEMANA_CURTOS, addDays, formatDateBR, formatMinutes, lastDayOfMonth, shiftMonth, weekdayOf } from '../../../lib/date';
 import { track } from '../../../lib/analytics';
 import { PRESETS, aplicarGerador, preverGerador, type Padrao, type SlotCiclo } from '../gerador';
@@ -141,14 +142,25 @@ export function GeradorSheet({ open, onClose, mes, inicioSugerido }: { open: boo
 
         <div className="grid-2">
           <Field label={padrao.tipo === 'ciclo' ? '1º dia de serviço' : 'A partir de'}>
-            <input className="input" type="date" value={inicio} onChange={(e) => e.target.value && setInicio(e.target.value)} />
+            <CampoData
+              rotulo={padrao.tipo === 'ciclo' ? '1º dia de serviço' : 'A partir de'}
+              atalhos={false}
+              value={inicio}
+              onChange={setInicio}
+            />
           </Field>
           <Field label="Até">
-            {ate === 'data' ? (
-              <input className="input" type="date" value={fimData} onChange={(e) => e.target.value && setFimData(e.target.value)} />
-            ) : (
-              <input className="input" readOnly value={formatDateBR(fim)} onFocus={() => setAte('data')} />
-            )}
+            <CampoData
+              rotulo="Até"
+              titulo="Gerar até"
+              atalhos={false}
+              value={fim}
+              min={inicio}
+              onChange={(v) => {
+                setFimData(v);
+                setAte('data');
+              }}
+            />
           </Field>
         </div>
         <Seg<Ate>

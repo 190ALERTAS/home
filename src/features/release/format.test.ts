@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import modelo from './Formato.txt?raw';
 import {
   acrescentarTrecho,
   camposPendentes,
@@ -8,8 +9,10 @@ import {
   type ReleaseData,
 } from './format';
 
-const HISTORICO =
-  'A equipe da Força Tática, formada pelo Sd Igor, Sd Miltom e Sd Zenatti realizou a prisão do senhor Anderson, durante abordagem ao mesmo foi constatado que havia em seu desfavor um mandado de prisão cível N° do Mandado: 5000349-11.2024.8.21.0132.01.0009-07, diante disso encaminhou o mesmo a upa e posteriormente a delegacia de policia para registro. Não foi necessário o uso de algemas em razão da cooperação do mesmo. Conforme ocorrência registrada sob nº 7523/2026/100942.';
+/** Modelo enviado pelo usuário (Formato.txt), com quebras de linha normalizadas. */
+const MODELO = modelo.replace(/\r\n?/g, '\n');
+const LINHAS = MODELO.split('\n');
+const HISTORICO = LINHAS[16];
 
 function exemplo(over: Partial<ReleaseData> = {}): ReleaseData {
   return {
@@ -22,90 +25,75 @@ function exemplo(over: Partial<ReleaseData> = {}): ReleaseData {
     numero: '175',
     bairro: 'Centenário',
     cidade: 'Sapiranga',
-    houveApreensao: false,
     apreensoes: [],
-    detidos: [{ id: '1', nome: 'Anderson Leandro Bairros', complemento: '35 anos', rg: '2104033028' }],
+    detidos: [{ id: '1', nome: 'Anderson Leandro Bairros', complemento: '', rg: '2104033028' }],
     historico: HISTORICO,
     ba: '9297/2026',
     dp: '7523/2026/100929',
-    negrito: false,
     ...over,
   };
 }
 
+const linhas = (d: ReleaseData) => formatRelease(d).split('\n');
+
 describe('formatRelease', () => {
-  it('gera exatamente o padrão solicitado', () => {
-    expect(formatRelease(exemplo())).toBe(
-      [
-        '🦅32º BPM - FORÇA TÁTICA🦅',
-        'FATO: MANDADO DE PRISÃO',
-        'DATA: 23/09/2026',
-        'HORA: 16:05',
-        'ENDEREÇO: RUA ITABUNA, N° 175 - CENTENÁRIO, SAPIRANGA',
-        'APREENSÃO: Sem Apreensões',
-        'INDIVÍDUOS DETIDOS:',
-        'Anderson Leandro Bairros - 35 anos, RG N° 2104033028',
-        'HISTÓRICO:',
-        HISTORICO,
-        'BA: 9297/2026',
-        'DP: 7523/2026/100929',
-      ].join('\n'),
-    );
+  it('reproduz o Formato.txt caractere por caractere', () => {
+    // A única diferença aceita é o espaço acidental digitado depois do fato no arquivo.
+    const esperado = MODELO.replace('*FATO:* MANDADO DE PRISÃO \n', '*FATO:* MANDADO DE PRISÃO\n');
+    expect(formatRelease(exemplo())).toBe(esperado);
+  });
+
+  it('mantém as linhas em branco e os rótulos em negrito nas mesmas posições', () => {
+    const l = linhas(exemplo());
+    expect(l).toHaveLength(21);
+    expect(l[0]).toBe('🦅*32º BPM - FORÇA TÁTICA*🦅');
+    expect([l[1], l[6], l[7], l[9], l[10], l[13], l[15], l[17], l[18]]).toEqual(Array(9).fill(''));
+    expect(l[8]).toBe('*APREENSÃO:* ');
+    expect(l[11]).toBe('*INDIVÍDUOS DETIDOS:* ');
+    expect(l[14]).toBe('*HISTÓRICO:*');
   });
 
   it('permite trocar o ícone do título', () => {
-    expect(formatRelease(exemplo({ icone: '🚔' })).split('\n')[0]).toBe('🚔32º BPM - FORÇA TÁTICA🚔');
-    expect(formatRelease(exemplo({ icone: '⚡' })).split('\n')[0]).toBe('⚡32º BPM - FORÇA TÁTICA⚡');
+    expect(linhas(exemplo({ icone: '🚔' }))[0]).toBe('🚔*32º BPM - FORÇA TÁTICA*🚔');
+    expect(linhas(exemplo({ icone: '⚡' }))[0]).toBe('⚡*32º BPM - FORÇA TÁTICA*⚡');
   });
 
-  it('omite o complemento vazio do detido em vez de deixar " - ,"', () => {
-    const txt = formatRelease(exemplo({ detidos: [{ id: '1', nome: 'Anderson Leandro Bairros', complemento: '', rg: '2104033028' }] }));
-    expect(txt).toContain('\nAnderson Leandro Bairros, RG N° 2104033028\n');
+  it('lista as apreensões abaixo do rótulo, uma por linha', () => {
+    const txt = formatRelease(exemplo({ apreensoes: ['01 revólver calibre .38', ' 05 munições ', '', '01 celular\n R$ 50,00'] }));
+    expect(txt).toContain(
+      '*APREENSÃO:* \n01 revólver calibre .38\n05 munições\n01 celular\nR$ 50,00\n\n*INDIVÍDUOS DETIDOS:* \n',
+    );
   });
 
-  it('lista vários detidos, um por linha, e ignora linhas vazias', () => {
+  it('lista vários detidos, um por linha, e ignora os vazios', () => {
     const txt = formatRelease(
       exemplo({
         detidos: [
-          { id: '1', nome: 'João da Silva', complemento: '', rg: '111' },
+          { id: '1', nome: 'João da Silva', complemento: '35 anos', rg: '111' },
           { id: '2', nome: '', complemento: '', rg: '' },
-          { id: '3', nome: 'Pedro Machado', complemento: 'vulgo "Magrão"', rg: '' },
+          { id: '3', nome: 'Pedro Machado', complemento: '', rg: '222' },
         ],
       }),
     );
-    expect(txt).toContain('INDIVÍDUOS DETIDOS:\nJoão da Silva, RG N° 111\nPedro Machado - vulgo "Magrão"\nHISTÓRICO:');
-  });
-
-  it('informa "Nenhum" quando não há detidos', () => {
-    expect(formatRelease(exemplo({ detidos: [] }))).toContain('INDIVÍDUOS DETIDOS: Nenhum\nHISTÓRICO:');
-  });
-
-  it('formata apreensões (uma na mesma linha, várias em lista)', () => {
-    expect(formatRelease(exemplo({ houveApreensao: true, apreensoes: ['01 revólver calibre .38'] }))).toContain(
-      'APREENSÃO: 01 revólver calibre .38\n',
+    expect(txt).toContain(
+      '*INDIVÍDUOS DETIDOS:* \nJoão da Silva - 35 anos, RG N° 111\nPedro Machado - , RG N° 222\n\n*HISTÓRICO:*',
     );
-    expect(
-      formatRelease(exemplo({ houveApreensao: true, apreensoes: ['01 revólver calibre .38', ' 05 munições ', ''] })),
-    ).toContain('APREENSÃO:\n01 revólver calibre .38\n05 munições\nINDIVÍDUOS DETIDOS:');
-    // interruptor desligado ignora itens digitados
-    expect(formatRelease(exemplo({ houveApreensao: false, apreensoes: ['x'] }))).toContain('APREENSÃO: Sem Apreensões');
   });
 
-  it('omite BA e DP quando vazios', () => {
-    const txt = formatRelease(exemplo({ ba: '', dp: ' ' }));
-    expect(txt.endsWith(HISTORICO)).toBe(true);
+  it('deixa a linha em branco quando não há detidos (estrutura igual ao modelo)', () => {
+    const l = linhas(exemplo({ detidos: [] }));
+    expect(l).toHaveLength(21);
+    expect(l[12]).toBe('');
   });
 
-  it('aplica negrito do WhatsApp quando habilitado', () => {
-    const txt = formatRelease(exemplo({ negrito: true }));
-    expect(txt.split('\n')[0]).toBe('*🦅32º BPM - FORÇA TÁTICA🦅*');
-    expect(txt).toContain('*FATO:* MANDADO DE PRISÃO');
-    expect(txt).toContain('*DP:* 7523/2026/100929');
+  it('mantém BA e DP no final mesmo quando ainda não foram preenchidos', () => {
+    const l = linhas(exemplo({ ba: '', dp: ' ' }));
+    expect(l.slice(-2)).toEqual(['*BA:* ', '*DP:* ']);
   });
 
-  it('preserva quebras de linha do histórico e remove espaços sobrando', () => {
-    const txt = formatRelease(exemplo({ historico: '  Linha 1   \n\nLinha 2  \n\n' }));
-    expect(txt).toContain('HISTÓRICO:\nLinha 1\n\nLinha 2\nBA:');
+  it('preserva o texto e as quebras internas do histórico, sem sobras nas pontas', () => {
+    const txt = formatRelease(exemplo({ historico: '\n  Linha 1   \n\nLinha 2  \n\n' }));
+    expect(txt).toContain('*HISTÓRICO:*\n\nLinha 1\n\nLinha 2\n\n\n*BA:*');
   });
 });
 
@@ -126,9 +114,15 @@ describe('formatEndereco', () => {
 });
 
 describe('formatDetido', () => {
+  it('segue "nome - complemento, RG N° número"', () => {
+    expect(formatDetido({ nome: 'Anderson Leandro Bairros', complemento: '', rg: '2104033028' })).toBe(
+      'Anderson Leandro Bairros - , RG N° 2104033028',
+    );
+    expect(formatDetido({ nome: ' Fulano  de Tal ', complemento: '35 anos', rg: '123' })).toBe('Fulano de Tal - 35 anos, RG N° 123');
+  });
   it('normaliza RG já digitado com prefixo', () => {
-    expect(formatDetido({ nome: 'Fulano', complemento: '', rg: 'RG nº 123' })).toBe('Fulano, RG N° 123');
-    expect(formatDetido({ nome: 'Fulano', complemento: '', rg: 'rg: 123' })).toBe('Fulano, RG N° 123');
+    expect(formatDetido({ nome: 'Fulano', complemento: '', rg: 'RG nº 123' })).toBe('Fulano - , RG N° 123');
+    expect(formatDetido({ nome: 'Fulano', complemento: '', rg: 'rg: 123' })).toBe('Fulano - , RG N° 123');
   });
 });
 
