@@ -1,0 +1,74 @@
+/* ---------- Sugestões: caixa de feedback ---------- */
+
+.sugestoes-form {
+  container-type: inline-size;
+}
+
+.sugestoes-contato {
+  display: grid;
+  gap: 16px;
+}
+
+/* Nome e e-mail lado a lado quando o cartão é largo */
+@container (min-width: 520px) {
+  .sugestoes-contato {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sugestoes-tipo button {
+  padding: 0 6px;
+}
+
+.sugestoes-form .field.invalid .hint {
+  color: var(--primary-hi);
+}
+
+.sugestoes-isca {
+  display: none;
+}
+
+.sugestoes-nota {
+  font-size: 13px;
+  text-align: center;
+}
+
+.sugestoes-ok {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  animation: rise-in var(--dur) var(--ease-out);
+}
+
+.sugestoes-ok-icone {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.sugestoes-ok-icone svg {
+  width: 30px;
+  height: 30px;
+}
+
+.sugestoes-ok h2 {
+  font-size: 22px;
+  outline: none;
+}
+
+.sugestoes-ok p {
+  max-width: 460px;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.sugestoes-ok .btn {
+  margin-top: 6px;
+}

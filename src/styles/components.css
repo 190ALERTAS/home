@@ -345,6 +345,49 @@
   height: 16px;
 }
 
+/* Botão "/" dos campos BA e DP (o teclado numérico do celular não tem a barra) */
+.input-group .addon.barra {
+  min-width: 44px;
+  justify-content: center;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  touch-action: manipulation;
+}
+
+.input-group .addon.barra:active {
+  background: var(--primary-soft);
+  color: var(--primary-hi);
+}
+
+/* BA e DP lado a lado só quando cabem os números inteiros ("7523/2026/100929") */
+.registro {
+  container-type: inline-size;
+}
+
+.registro-campos {
+  display: grid;
+  gap: 12px;
+}
+
+@container (min-width: 480px) {
+  .registro-campos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.registro-dica {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.registro-dica b {
+  font-family: var(--font-mono);
+  color: var(--text-2);
+}
+
 /* ---------- Chips ---------- */
 
 .chips {

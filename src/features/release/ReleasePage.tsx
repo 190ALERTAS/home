@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import { FileText, Plus, Trash2, UserRound, Mic } from 'lucide-react';
 import { Card, Field, PageHead, Seg, AutoTextarea, gap } from '../../components/ui';
 import { DateTimeFields, RecentInput } from '../../components/fields';
@@ -15,6 +15,7 @@ import {
   acrescentarTrecho,
   camposPendentes,
   formatRelease,
+  normalizarRegistro,
   trechosHistorico,
   type Detido,
   type ReleaseData,
@@ -34,7 +35,7 @@ interface Prefs {
   unidade: string;
 }
 
-const novoDetido = (): Detido => ({ id: uid(), nome: '', complemento: '', rg: '' });
+const novoDetido = (): Detido => ({ id: uid(), nome: '', rg: '' });
 
 function novoRascunho(): Draft {
   return {
@@ -185,9 +186,10 @@ export default function ReleasePage() {
               {draft.apreensoes.map((item, i) => (
                 <div className="item-row" key={i}>
                   <input
-                    className="input"
+                    className="input upper"
                     value={item}
-                    placeholder={i === 0 ? '01 revólver calibre .38' : 'Outro item'}
+                    autoCapitalize="characters"
+                    placeholder={i === 0 ? '1UN REVÓLVER CAL .38' : 'Outro item'}
                     aria-label={`Item apreendido ${i + 1}`}
                     onChange={(e) => set('apreensoes', draft.apreensoes.map((x, j) => (j === i ? e.target.value : x)))}
                     onKeyDown={(e) => {
@@ -242,30 +244,22 @@ export default function ReleasePage() {
                     </button>
                   </div>
                   <input
-                    className="input"
+                    className="input upper"
                     value={det.nome}
                     placeholder="Nome completo"
-                    aria-label="Nome completo"
-                    autoCapitalize="words"
+                    aria-label={`Nome completo do indivíduo ${i + 1}`}
+                    autoCapitalize="characters"
                     onChange={(e) => setDetido(det.id, { nome: e.target.value })}
                   />
-                  <div className="grid-2">
-                    <input
-                      className="input"
-                      value={det.complemento}
-                      placeholder="Complemento"
-                      aria-label="Complemento, entre o nome e o RG (idade, alcunha…)"
-                      onChange={(e) => setDetido(det.id, { complemento: e.target.value })}
-                    />
-                    <input
-                      className="input"
-                      value={det.rg}
-                      placeholder="RG"
-                      aria-label="RG"
-                      inputMode="numeric"
-                      onChange={(e) => setDetido(det.id, { rg: e.target.value })}
-                    />
-                  </div>
+                  <input
+                    className="input"
+                    value={det.rg}
+                    placeholder="RG"
+                    aria-label={`RG do indivíduo ${i + 1}`}
+                    inputMode="numeric"
+                    autoComplete="off"
+                    onChange={(e) => setDetido(det.id, { rg: e.target.value })}
+                  />
                 </div>
               ))}
               {draft.detidos.length === 0 && (
@@ -321,29 +315,18 @@ export default function ReleasePage() {
             </div>
           </Card>
 
-          <Card title="Registro">
-            <div className="grid-2">
-                <Field label="BA" htmlFor={ids.ba}>
-                  <input
-                    id={ids.ba}
-                    className="input"
-                    value={draft.ba}
-                    placeholder="9297/2026"
-                    inputMode="numeric"
-                    onChange={(e) => set('ba', e.target.value)}
-                  />
-                </Field>
-                <Field label="DP" htmlFor={ids.dp}>
-                  <input
-                    id={ids.dp}
-                    className="input"
-                    value={draft.dp}
-                    placeholder="7523/2026/100929"
-                    inputMode="numeric"
-                    onChange={(e) => set('dp', e.target.value)}
-                  />
-                </Field>
+          <Card title="Registro" className="registro">
+            <div className="registro-campos">
+              <Field label="BA" htmlFor={ids.ba}>
+                <CampoRegistro id={ids.ba} rotulo="BA" value={draft.ba} placeholder="9297/2026" onChange={(v) => set('ba', v)} />
+              </Field>
+              <Field label="DP" htmlFor={ids.dp}>
+                <CampoRegistro id={ids.dp} rotulo="DP" value={draft.dp} placeholder="7523/2026/100929" onChange={(v) => set('dp', v)} />
+              </Field>
             </div>
+            <p className="subtle registro-dica">
+              Toque em <b>/</b> para separar os números. Ponto, vírgula ou traço também viram barra.
+            </p>
           </Card>
         </div>
 
@@ -355,6 +338,76 @@ export default function ReleasePage() {
       </div>
 
       <ShareActions text={texto} missing={pendentes} onClear={limpar} onUsed={usado} trackId="release" />
+    </div>
+  );
+}
+
+/**
+ * Número do BA/DP ("7523/2026/100929"): teclado numérico do celular, que não tem
+ * a barra, mais um botão "/" que a insere onde está o cursor.
+ */
+function CampoRegistro({
+  id,
+  rotulo,
+  value,
+  onChange,
+  placeholder,
+}: {
+  id: string;
+  rotulo: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+
+  /** `digitado`: o campo já mostra `bruto` (veio do teclado), então o cursor só muda se o texto mudar. */
+  const aplicar = (bruto: string, cursor: number, digitado: boolean) => {
+    const novo = normalizarRegistro(bruto);
+    onChange(novo);
+    const el = ref.current;
+    if ((digitado && novo === bruto) || !el || document.activeElement !== el) return;
+    // O React troca o valor e o cursor iria para o fim: devolve-o para onde o usuário estava.
+    const pos = Math.min(novo.length, normalizarRegistro(bruto.slice(0, cursor)).length);
+    requestAnimationFrame(() => el.setSelectionRange(pos, pos));
+  };
+
+  const inserirBarra = () => {
+    const el = ref.current;
+    if (!el) return;
+    const focado = document.activeElement === el;
+    const ini = focado ? (el.selectionStart ?? value.length) : value.length;
+    const fim = focado ? (el.selectionEnd ?? value.length) : value.length;
+    el.focus();
+    aplicar(`${value.slice(0, ini)}/${value.slice(fim)}`, ini + 1, false);
+  };
+
+  return (
+    <div className="input-group">
+      <input
+        ref={ref}
+        id={id}
+        className="input"
+        value={value}
+        placeholder={placeholder}
+        inputMode="decimal"
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
+        onChange={(e) => aplicar(e.target.value, e.target.selectionStart ?? e.target.value.length, true)}
+      />
+      <button
+        type="button"
+        className="addon barra"
+        aria-label={`Inserir barra no ${rotulo}`}
+        title="Inserir /"
+        // Mantém o foco (e o teclado aberto) no campo ao tocar no botão.
+        onPointerDown={(e) => e.preventDefault()}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={inserirBarra}
+      >
+        /
+      </button>
     </div>
   );
 }

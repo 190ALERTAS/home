@@ -7,8 +7,6 @@ export type ReleaseIcone = (typeof ICONES)[number];
 export interface Detido {
   id: string;
   nome: string;
-  /** Texto entre o nome e o RG (idade, alcunha…). Pode ficar vazio, como no padrão. */
-  complemento: string;
   rg: string;
 }
 
@@ -53,26 +51,35 @@ export function formatEndereco(d: Pick<ReleaseData, 'logradouro' | 'numero' | 'b
   return s;
 }
 
-/**
- * "Anderson Leandro Bairros - , RG N° 2104033028" — o separador " - " e o ", RG N°"
- * ficam sempre, exatamente como no modelo, mesmo com o complemento vazio.
- */
-export function formatDetido(d: Pick<Detido, 'nome' | 'complemento' | 'rg'>): string {
-  const nome = clean(d.nome);
-  const complemento = clean(d.complemento);
-  const rg = clean(d.rg).replace(/^RG\s*(N\s*[º°.]?)?\s*:?\s*/i, '');
-  return `${nome} - ${complemento}, RG N° ${rg}`;
+/** Marcador de lista já digitado pelo usuário ("- ", "• "), para não sair duplicado. */
+const semMarcador = (s: string) => s.replace(/^\s*[-–—•·]+\s*/, '');
+
+/** "- JOSÉ DA SILVA (RG: 1234567855)". Sem RG, fica só o nome. */
+export function formatDetido(d: Pick<Detido, 'nome' | 'rg'>): string {
+  const nome = up(semMarcador(d.nome));
+  const rg = up(d.rg).replace(/^RG\s*(N\s*[º°O.]?)?\s*:?\s*/, '');
+  return ['-', nome, rg && `(RG: ${rg})`].filter(Boolean).join(' ');
 }
 
 export function detidosValidos(d: Pick<ReleaseData, 'detidos'>): Detido[] {
-  return d.detidos.filter((x) => x.nome.trim() || x.rg.trim() || x.complemento.trim());
+  return d.detidos.filter((x) => x.nome.trim() || x.rg.trim());
 }
 
+/** Itens apreendidos preenchidos, um por linha (sem o marcador de lista). */
 export function apreensoesValidas(d: Pick<ReleaseData, 'apreensoes'>): string[] {
   return d.apreensoes
     .flatMap((item) => item.split(/\r?\n/))
-    .map(clean)
+    .map((item) => clean(semMarcador(item)))
     .filter(Boolean);
+}
+
+/**
+ * BA e DP são números separados por "/" ("7523/2026/100929"). O teclado numérico
+ * do celular não tem a barra, então ponto, vírgula, traço ou espaço digitados logo
+ * depois de um número viram "/" (e barras repetidas viram uma só).
+ */
+export function normalizarRegistro(valor: string): string {
+  return valor.replace(/(\d)[\s/.,;\-–—\\|]+(?=\d|$)/g, '$1/');
 }
 
 function normalizarHistorico(texto: string): string {
@@ -92,7 +99,7 @@ function normalizarHistorico(texto: string): string {
  */
 export function formatRelease(d: ReleaseData): string {
   const unidade = up(d.unidade);
-  const apreensoes = apreensoesValidas(d);
+  const apreensoes = apreensoesValidas(d).map((item) => `- ${up(item)}`);
   const detidos = detidosValidos(d).map(formatDetido);
 
   return [
@@ -111,7 +118,6 @@ export function formatRelease(d: ReleaseData): string {
     ...(detidos.length ? detidos : ['']),
     '',
     '*HISTÓRICO:*',
-    '',
     normalizarHistorico(d.historico),
     '',
     '',

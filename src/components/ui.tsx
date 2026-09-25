@@ -42,6 +42,7 @@ export function Field({
   htmlFor,
   aside,
   className,
+  hintId,
 }: {
   label: ReactNode;
   required?: boolean;
@@ -51,6 +52,8 @@ export function Field({
   htmlFor?: string;
   aside?: ReactNode;
   className?: string;
+  /** Id da dica, para o campo apontar para ela com aria-describedby. */
+  hintId?: string;
 }) {
   return (
     <div className={`field${invalid ? ' invalid' : ''}${className ? ` ${className}` : ''}`}>
@@ -64,7 +67,11 @@ export function Field({
         {aside && <span style={{ marginLeft: 'auto', textTransform: 'none', letterSpacing: 0 }}>{aside}</span>}
       </label>
       {children}
-      {hint && <div className="hint">{hint}</div>}
+      {hint && (
+        <div className="hint" id={hintId}>
+          {hint}
+        </div>
+      )}
     </div>
   );
 }
