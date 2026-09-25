@@ -105,6 +105,6 @@ configurável). Férias e afastamentos descontam a carga proporcionalmente; cada
 
 ## Privacidade
 
-Nada do que é digitado é enviado a servidores do projeto. Rascunhos, escala e croquis ficam somente no
-aparelho. O croqui usa o mapa e o traçado das ruas do OpenStreetMap (Overpass API); a busca de endereços usa o Nominatim.
+Nada do que é digitado nas ferramentas é enviado a servidores do projeto. Rascunhos, escala e croquis ficam somente no
+aparelho. A página Sugestões envia a mensagem (nome, e-mail, tipo e texto) por e-mail ao desenvolvedor via Web3Forms. O croqui usa o mapa e o traçado das ruas do OpenStreetMap (Overpass API); a busca de endereços usa o Nominatim.
 Estatísticas anônimas de uso via Google Analytics. Veja os Termos de Uso no próprio app (`/home/termos`).

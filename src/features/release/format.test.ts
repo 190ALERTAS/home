@@ -6,30 +6,34 @@ import {
   formatDetido,
   formatEndereco,
   formatRelease,
+  normalizarRegistro,
   type ReleaseData,
 } from './format';
 
 /** Modelo enviado pelo usuário (Formato.txt), com quebras de linha normalizadas. */
 const MODELO = modelo.replace(/\r\n?/g, '\n');
 const LINHAS = MODELO.split('\n');
-const HISTORICO = LINHAS[16];
+const HISTORICO = LINHAS[17];
 
 function exemplo(over: Partial<ReleaseData> = {}): ReleaseData {
   return {
     icone: '🦅',
     unidade: '32º BPM - Força Tática',
-    fato: 'Mandado de prisão',
-    data: '2026-09-23',
-    hora: '16:05',
-    logradouro: 'Rua Itabuna',
-    numero: '175',
-    bairro: 'Centenário',
-    cidade: 'Sapiranga',
-    apreensoes: [],
-    detidos: [{ id: '1', nome: 'Anderson Leandro Bairros', complemento: '', rg: '2104033028' }],
+    fato: 'Porte ilegal de arma de fogo',
+    data: '2026-09-24',
+    hora: '20:23',
+    logradouro: 'Rua Nobel',
+    numero: '78',
+    bairro: 'Canudos',
+    cidade: 'Novo Hamburgo',
+    apreensoes: ['20un de munições diversas', '1un revolver cal .38'],
+    detidos: [
+      { id: '1', nome: 'José da Silva', rg: '1234567855' },
+      { id: '2', nome: 'Manuel de Oliveira', rg: '9939773781' },
+    ],
     historico: HISTORICO,
-    ba: '9297/2026',
-    dp: '7523/2026/100929',
+    ba: '1111/1111/1111',
+    dp: '1111/1111/1111',
     ...over,
   };
 }
@@ -38,19 +42,18 @@ const linhas = (d: ReleaseData) => formatRelease(d).split('\n');
 
 describe('formatRelease', () => {
   it('reproduz o Formato.txt caractere por caractere', () => {
-    // A única diferença aceita é o espaço acidental digitado depois do fato no arquivo.
-    const esperado = MODELO.replace('*FATO:* MANDADO DE PRISÃO \n', '*FATO:* MANDADO DE PRISÃO\n');
-    expect(formatRelease(exemplo())).toBe(esperado);
+    expect(formatRelease(exemplo())).toBe(MODELO);
   });
 
   it('mantém as linhas em branco e os rótulos em negrito nas mesmas posições', () => {
     const l = linhas(exemplo());
-    expect(l).toHaveLength(21);
+    expect(l).toHaveLength(22);
     expect(l[0]).toBe('🦅*32º BPM - FORÇA TÁTICA*🦅');
-    expect([l[1], l[6], l[7], l[9], l[10], l[13], l[15], l[17], l[18]]).toEqual(Array(9).fill(''));
+    expect([l[1], l[6], l[7], l[11], l[15], l[18], l[19]]).toEqual(Array(7).fill(''));
     expect(l[8]).toBe('*APREENSÃO:* ');
-    expect(l[11]).toBe('*INDIVÍDUOS DETIDOS:* ');
-    expect(l[14]).toBe('*HISTÓRICO:*');
+    expect(l[12]).toBe('*INDIVÍDUOS DETIDOS:* ');
+    // O histórico vem logo abaixo do rótulo, sem linha em branco.
+    expect(l.slice(16, 18)).toEqual(['*HISTÓRICO:*', HISTORICO]);
   });
 
   it('permite trocar o ícone do título', () => {
@@ -58,32 +61,32 @@ describe('formatRelease', () => {
     expect(linhas(exemplo({ icone: '⚡' }))[0]).toBe('⚡*32º BPM - FORÇA TÁTICA*⚡');
   });
 
-  it('lista as apreensões abaixo do rótulo, uma por linha', () => {
-    const txt = formatRelease(exemplo({ apreensoes: ['01 revólver calibre .38', ' 05 munições ', '', '01 celular\n R$ 50,00'] }));
+  it('lista as apreensões com "- ", em maiúsculas, uma por linha', () => {
+    const txt = formatRelease(
+      exemplo({ apreensoes: ['01 revólver calibre .38', ' 05 munições ', '', '01 celular\n R$ 50,00', '- 1 balança', '• 2 rádios'] }),
+    );
     expect(txt).toContain(
-      '*APREENSÃO:* \n01 revólver calibre .38\n05 munições\n01 celular\nR$ 50,00\n\n*INDIVÍDUOS DETIDOS:* \n',
+      '*APREENSÃO:* \n- 01 REVÓLVER CALIBRE .38\n- 05 MUNIÇÕES\n- 01 CELULAR\n- R$ 50,00\n- 1 BALANÇA\n- 2 RÁDIOS\n\n*INDIVÍDUOS DETIDOS:* \n',
     );
   });
 
-  it('lista vários detidos, um por linha, e ignora os vazios', () => {
+  it('lista os detidos com "- NOME (RG: número)" e ignora os vazios', () => {
     const txt = formatRelease(
       exemplo({
         detidos: [
-          { id: '1', nome: 'João da Silva', complemento: '35 anos', rg: '111' },
-          { id: '2', nome: '', complemento: '', rg: '' },
-          { id: '3', nome: 'Pedro Machado', complemento: '', rg: '222' },
+          { id: '1', nome: 'João da Silva', rg: '111' },
+          { id: '2', nome: '', rg: '' },
+          { id: '3', nome: 'Pedro Machado', rg: '' },
         ],
       }),
     );
-    expect(txt).toContain(
-      '*INDIVÍDUOS DETIDOS:* \nJoão da Silva - 35 anos, RG N° 111\nPedro Machado - , RG N° 222\n\n*HISTÓRICO:*',
-    );
+    expect(txt).toContain('*INDIVÍDUOS DETIDOS:* \n- JOÃO DA SILVA (RG: 111)\n- PEDRO MACHADO\n\n*HISTÓRICO:*');
   });
 
-  it('deixa a linha em branco quando não há detidos (estrutura igual ao modelo)', () => {
-    const l = linhas(exemplo({ detidos: [] }));
-    expect(l).toHaveLength(21);
-    expect(l[12]).toBe('');
+  it('deixa uma linha em branco quando não há apreensões nem detidos (estrutura igual ao modelo)', () => {
+    const l = linhas(exemplo({ apreensoes: [], detidos: [] }));
+    expect(l).toHaveLength(20);
+    expect(l.slice(8, 13)).toEqual(['*APREENSÃO:* ', '', '', '*INDIVÍDUOS DETIDOS:* ', '']);
   });
 
   it('mantém BA e DP no final mesmo quando ainda não foram preenchidos', () => {
@@ -93,7 +96,7 @@ describe('formatRelease', () => {
 
   it('preserva o texto e as quebras internas do histórico, sem sobras nas pontas', () => {
     const txt = formatRelease(exemplo({ historico: '\n  Linha 1   \n\nLinha 2  \n\n' }));
-    expect(txt).toContain('*HISTÓRICO:*\n\nLinha 1\n\nLinha 2\n\n\n*BA:*');
+    expect(txt).toContain('*HISTÓRICO:*\nLinha 1\n\nLinha 2\n\n\n*BA:*');
   });
 });
 
@@ -114,15 +117,39 @@ describe('formatEndereco', () => {
 });
 
 describe('formatDetido', () => {
-  it('segue "nome - complemento, RG N° número"', () => {
-    expect(formatDetido({ nome: 'Anderson Leandro Bairros', complemento: '', rg: '2104033028' })).toBe(
-      'Anderson Leandro Bairros - , RG N° 2104033028',
-    );
-    expect(formatDetido({ nome: ' Fulano  de Tal ', complemento: '35 anos', rg: '123' })).toBe('Fulano de Tal - 35 anos, RG N° 123');
+  it('segue "- NOME (RG: número)"', () => {
+    expect(formatDetido({ nome: 'José da Silva', rg: '1234567855' })).toBe('- JOSÉ DA SILVA (RG: 1234567855)');
+    expect(formatDetido({ nome: ' Fulano  de Tal ', rg: ' 123 ' })).toBe('- FULANO DE TAL (RG: 123)');
   });
-  it('normaliza RG já digitado com prefixo', () => {
-    expect(formatDetido({ nome: 'Fulano', complemento: '', rg: 'RG nº 123' })).toBe('Fulano - , RG N° 123');
-    expect(formatDetido({ nome: 'Fulano', complemento: '', rg: 'rg: 123' })).toBe('Fulano - , RG N° 123');
+  it('sem RG fica só o nome; sem nome, só o RG', () => {
+    expect(formatDetido({ nome: 'Fulano', rg: '' })).toBe('- FULANO');
+    expect(formatDetido({ nome: '', rg: '123' })).toBe('- (RG: 123)');
+  });
+  it('normaliza RG já digitado com prefixo e marcador já digitado no nome', () => {
+    expect(formatDetido({ nome: 'Fulano', rg: 'RG nº 123' })).toBe('- FULANO (RG: 123)');
+    expect(formatDetido({ nome: 'Fulano', rg: 'rg: 123' })).toBe('- FULANO (RG: 123)');
+    expect(formatDetido({ nome: '- Fulano', rg: '1' })).toBe('- FULANO (RG: 1)');
+  });
+});
+
+describe('normalizarRegistro (BA e DP)', () => {
+  it('mantém números já separados por "/"', () => {
+    expect(normalizarRegistro('1111/1111/1111')).toBe('1111/1111/1111');
+    expect(normalizarRegistro('7523/2026/100929')).toBe('7523/2026/100929');
+    expect(normalizarRegistro('')).toBe('');
+  });
+  it('troca ponto, vírgula, traço e espaço digitados entre números por "/"', () => {
+    expect(normalizarRegistro('9297.2026')).toBe('9297/2026');
+    expect(normalizarRegistro('7523,2026-100929')).toBe('7523/2026/100929');
+    expect(normalizarRegistro('9297 / 2026')).toBe('9297/2026');
+    expect(normalizarRegistro('9297//2026')).toBe('9297/2026');
+    // enquanto digita: o separador logo depois do número já vira barra
+    expect(normalizarRegistro('9297.')).toBe('9297/');
+    expect(normalizarRegistro('9297 ')).toBe('9297/');
+  });
+  it('não mexe em texto que não é separador entre números', () => {
+    expect(normalizarRegistro('9297/2026 e 9298/2026')).toBe('9297/2026 e 9298/2026');
+    expect(normalizarRegistro('BA 9297/2026')).toBe('BA 9297/2026');
   });
 });
 

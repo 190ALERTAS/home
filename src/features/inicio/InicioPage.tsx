@@ -192,7 +192,8 @@ export default function InicioPage() {
       <section className="privacidade">
         <Lock size={16} />
         <p>
-          Nada do que você digita é enviado para servidores: rascunhos, escala e croquis ficam salvos só neste aparelho.{' '}
+          Nada do que você digita nas ferramentas é enviado para servidores: rascunhos, escala e croquis ficam salvos só neste
+          aparelho.{' '}
           <a {...linkProps('termos')}>Termos e privacidade</a>
         </p>
       </section>

@@ -45,19 +45,21 @@ export default function TermosPage() {
         <ol>
           <li>
             <strong>Sem servidor de dados:</strong> o 190 ALERTAS não possui banco de dados nem servidor próprio. Nada do que você digita
-            é enviado para os responsáveis pela plataforma.
+            nas ferramentas é enviado para os responsáveis pela plataforma — só as mensagens que você decide enviar pela página
+            Sugestões.
           </li>
           <li>
             <strong>Dados salvos no aparelho:</strong> para você não perder o trabalho, ficam salvos apenas no armazenamento local deste
-            aparelho/navegador: os rascunhos do release e do alerta (apagados automaticamente após 24 e 12 horas), a sua escala e o
-            croqui em andamento. Você pode apagá-los a qualquer momento pelos botões de limpar/apagar do próprio app ou limpando os dados
+            aparelho/navegador: os rascunhos do release e do alerta (apagados automaticamente após 24 e 12 horas), a sua escala, o
+            croqui em andamento e o rascunho da página Sugestões, com o nome e o e-mail informados (apagado após 30 dias sem uso). Você pode apagá-los a qualquer momento pelos botões de limpar/apagar do próprio app ou limpando os dados
             do navegador. Os dados da escala não são sincronizados entre aparelhos: faça backups pelo menu da escala.
           </li>
           <li>
             <strong>Serviços de terceiros:</strong> no Croqui, o mapa e o traçado das ruas vêm do OpenStreetMap (servidores de mapas e
             Overpass) e a busca de endereços usa o Nominatim (OpenStreetMap); esses serviços recebem a área do mapa exibida e o texto
-            pesquisado. O
-            botão “WhatsApp” abre o WhatsApp com o texto gerado, e o formulário de Sugestões é hospedado no Google Forms.
+            pesquisado. O botão “WhatsApp” abre o WhatsApp com o texto gerado. As mensagens enviadas pela página Sugestões (nome,
+            e-mail, tipo e texto, com a versão do app) são entregues por e-mail ao responsável pela plataforma por meio do serviço
+            Web3Forms.
           </li>
           <li>
             <strong>Estatísticas de uso:</strong> utilizamos o Google Analytics para contar acessos e o uso das funções de forma anônima
