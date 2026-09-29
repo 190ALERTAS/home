@@ -9,7 +9,7 @@ export default function TermosPage() {
       <PageHead icon={ScrollText} title="Termos de uso" subtitle="Termos de Uso e Política de Privacidade do 190 ALERTAS" />
       <article className="card pad">
         <p className="subtle">
-          <em>Última atualização: 24 de setembro de 2026 (versão 5)</em>
+          <em>Última atualização: 28 de setembro de 2026 (versão 5)</em>
         </p>
 
         <h2>Termos de Uso</h2>
@@ -37,27 +37,37 @@ export default function TermosPage() {
             plataforma.
           </li>
           <li>
-            <strong>Conta:</strong> não há cadastro, login ou qualquer vinculação de conta do usuário.
+            <strong>Conta:</strong> não há cadastro. O login com o Google é opcional e serve apenas para sincronizar a Minha escala entre os
+            seus aparelhos (veja a Política de Privacidade).
           </li>
         </ol>
 
         <h2>Política de Privacidade</h2>
         <ol>
           <li>
-            <strong>Sem servidor de dados:</strong> o 190 ALERTAS não possui banco de dados nem servidor próprio. Nada do que você digita
-            nas ferramentas é enviado para os responsáveis pela plataforma — só as mensagens que você decide enviar pela página
-            Sugestões.
+            <strong>Sem servidor de dados:</strong> o 190 ALERTAS não possui servidor próprio. Nada do que você digita nas ferramentas é
+            enviado para os responsáveis pela plataforma — só as mensagens que você decide enviar pela página Sugestões e, se você
+            ativar, a sincronização opcional da escala descrita abaixo.
           </li>
           <li>
             <strong>Dados salvos no aparelho:</strong> para você não perder o trabalho, ficam salvos apenas no armazenamento local deste
             aparelho/navegador: os rascunhos do release e do alerta (apagados automaticamente após 24 e 12 horas), a sua escala, o
             croqui em andamento e o rascunho da página Sugestões, com o nome e o e-mail informados (apagado após 30 dias sem uso). Você pode apagá-los a qualquer momento pelos botões de limpar/apagar do próprio app ou limpando os dados
-            do navegador. Os dados da escala não são sincronizados entre aparelhos: faça backups pelo menu da escala.
+            do navegador. Por padrão os dados da escala não saem do aparelho: faça backups pelo menu da escala.
+          </li>
+          <li>
+            <strong>Sincronização opcional da escala:</strong> se você escolher entrar com a sua conta Google em Minha escala →
+            Configurações → Conexão e sincronização, uma cópia da escala (lançamentos, turnos salvos, carga horária e a identificação
+            do relatório) passa a ser guardada no Firebase (Google), em uma área ligada à sua conta e acessada pelo app somente com o
+            seu login. O app lê o nome e o e-mail da conta apenas para exibi-los a você. A sincronização acontece no máximo uma vez a
+            cada 12 horas, manual ou automática. Você pode sair da conta ou apagar a cópia na nuvem a qualquer momento nas mesmas
+            configurações. Quem administra o projeto no Firebase tem acesso técnico ao banco de dados; por isso, não registre
+            informações sigilosas nas observações dos lançamentos.
           </li>
           <li>
             <strong>Serviços de terceiros:</strong> no Croqui, o mapa e o traçado das ruas vêm do OpenStreetMap (servidores de mapas e
             Overpass) e a busca de endereços usa o Nominatim (OpenStreetMap); esses serviços recebem a área do mapa exibida e o texto
-            pesquisado. O botão “WhatsApp” abre o WhatsApp com o texto gerado. As mensagens enviadas pela página Sugestões (nome,
+            pesquisado. O login e a sincronização opcional da escala usam o Google (Firebase Authentication e Cloud Firestore). O botão “WhatsApp” abre o WhatsApp com o texto gerado. As mensagens enviadas pela página Sugestões (nome,
             e-mail, tipo e texto, com a versão do app) são entregues por e-mail ao responsável pela plataforma por meio do serviço
             Web3Forms.
           </li>

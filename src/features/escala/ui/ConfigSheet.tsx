@@ -8,6 +8,8 @@ import { formatMinutes, shiftMinutes } from '../../../lib/date';
 import { uid } from '../../../lib/id';
 import { EDT_PADRAO, METAS_PADRAO, type Config, type DiasNoMes, type ModeloTurno } from '../model';
 import { atualizar, useEscala } from '../store';
+import { SyncLinha } from './SyncStatus';
+import { SyncSheet } from './SyncSheet';
 
 const DIAS: DiasNoMes[] = ['31', '30', '29', '28'];
 
@@ -33,6 +35,7 @@ export function ConfigSheet({ open, onClose }: { open: boolean; onClose: () => v
   const [edt, setEdt] = useState('');
   const [perfil, setPerfil] = useState(db.config.perfil);
   const [modelos, setModelos] = useState<ModeloTurno[]>(db.modelos);
+  const [syncAberto, setSyncAberto] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -92,6 +95,14 @@ export function ConfigSheet({ open, onClose }: { open: boolean; onClose: () => v
       }
     >
       <div className="stack" style={gap(22)}>
+        <section className="stack" style={gap(10)}>
+          <div className="eyebrow">Conexão e sincronização</div>
+          <div className="list">
+            <SyncLinha onClick={() => setSyncAberto(true)} />
+          </div>
+          <SyncSheet open={syncAberto} onClose={() => setSyncAberto(false)} />
+        </section>
+
         <section className="stack" style={gap(10)}>
           <div className="row">
             <div className="eyebrow grow">Carga horária mensal (horas)</div>

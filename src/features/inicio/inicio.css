@@ -6,22 +6,44 @@
 
 /* ---------- Painel (cabeçalho da página inicial) ---------- */
 
+/* Escuro no tema escuro (como sempre foi); no claro acompanha os tokens do tema. */
 .painel {
+  --p-borda: #1f2731;
+  --p-fundo: #0e131a;
+  --p-grade: rgba(255, 255, 255, 0.035);
+  --p-texto: #e7ecf2;
+  --p-mudo: #8893a0;
+  --p-linha: rgba(255, 255, 255, 0.08);
+  --p-link: rgba(255, 255, 255, 0.3);
+  --p-ok: #3cc47c;
+  --p-off: #e9a63c;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 18px;
   padding: 20px 18px 16px;
-  border: 1px solid #1f2731;
+  border: 1px solid var(--p-borda);
   border-radius: var(--radius-lg);
-  background-color: #0e131a;
+  background-color: var(--p-fundo);
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    linear-gradient(var(--p-grade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--p-grade) 1px, transparent 1px);
   background-size: 24px 24px;
   background-position: -1px -1px;
-  color: #e7ecf2;
+  color: var(--p-texto);
   overflow: hidden;
+}
+
+[data-theme='light'] .painel {
+  --p-borda: var(--border);
+  --p-fundo: var(--surface);
+  --p-grade: var(--grid-line);
+  --p-texto: var(--text);
+  --p-mudo: var(--text-3);
+  --p-linha: var(--border);
+  --p-link: rgba(18, 24, 32, 0.3);
+  --p-ok: var(--green);
+  --p-off: var(--amber);
 }
 
 .painel::before {
@@ -41,7 +63,7 @@
 }
 
 .painel-topo .eyebrow {
-  color: #8893a0;
+  color: var(--p-mudo);
 }
 
 .painel h1 {
@@ -56,7 +78,7 @@
   gap: 12px 20px;
   margin: 0;
   padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--p-linha);
 }
 
 /* No celular, o próximo serviço ocupa a linha inteira */
@@ -80,7 +102,7 @@
   font-size: 10.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8893a0;
+  color: var(--p-mudo);
 }
 
 .painel-status dd {
@@ -96,7 +118,7 @@
 .painel-status dd a {
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-decoration-color: var(--p-link);
   text-underline-offset: 3px;
 }
 
@@ -108,11 +130,11 @@
 }
 
 .painel-status dd.ok {
-  color: #3cc47c;
+  color: var(--p-ok);
 }
 
 .painel-status dd.off {
-  color: #e9a63c;
+  color: var(--p-off);
 }
 
 /* ---------- Novidades ---------- */

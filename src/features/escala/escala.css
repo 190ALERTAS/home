@@ -775,3 +775,141 @@ button.entry:hover {
   color: var(--text-3);
   line-height: 1.5;
 }
+
+/* ---------- Sincronização entre aparelhos ---------- */
+
+/* Cor do estado: --tom (ok / pendente / erro / ocupado) */
+.sync-topo.ok,
+.sync-ico.ok {
+  --tom: var(--green);
+}
+
+.sync-topo.pendente,
+.sync-ico.pendente {
+  --tom: var(--amber);
+}
+
+.sync-topo.erro,
+.sync-ico.erro {
+  --tom: var(--primary-hi);
+}
+
+.sync-topo.ocupado,
+.sync-ico.ocupado {
+  --tom: var(--blue);
+}
+
+.sync-topo.off {
+  --tom: var(--text-3);
+}
+
+/* Indicador discreto à direita de "Resumo do mês": nuvem colorida + duas linhas de texto.
+   Em telas estreitas o cabeçalho do cartão quebra e o indicador desce, alinhado à direita. */
+.esc-resumo .card-title {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.esc-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px 6px;
+}
+
+.sync-topo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 2px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+  transition: background-color var(--dur);
+}
+
+.sync-topo:hover {
+  background: var(--surface-2);
+}
+
+.sync-topo > svg,
+.sync-topo > .spinner {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--tom);
+}
+
+.sync-topo .txt {
+  line-height: 1.2;
+}
+
+.sync-topo strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.sync-topo.erro strong {
+  color: var(--tom);
+}
+
+.sync-topo small {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+/* Avanço da janela de 12 h: enche até liberar a próxima sincronização */
+.sync-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.sync-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+  transition: width 600ms var(--ease-out);
+}
+
+.sync-bar.pronta i {
+  background: var(--green);
+}
+
+/* Ícone de estado (painel e linha das configurações) */
+.sync-ico,
+.list-item .ico.sync-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--tom, var(--text-2));
+}
+
+.sync-ico svg,
+.sync-ico .spinner {
+  width: 20px;
+  height: 20px;
+}
+
+.sync-estado .kpi .v.green {
+  color: var(--green);
+}

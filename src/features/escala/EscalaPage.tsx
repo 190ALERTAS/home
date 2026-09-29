@@ -11,7 +11,7 @@ import {
   ListChecks,
   MessageCircle,
   Palmtree,
-  Settings2,
+  Settings,
   Share2,
   Trash2,
   Undo2,
@@ -43,6 +43,9 @@ import { SelecaoBar } from './ui/Selecao';
 import { ListaMes } from './ui/Lista';
 import { MesPicker } from './ui/MesPicker';
 import { AnoView } from './ui/AnoView';
+import { SyncIndicador } from './ui/SyncStatus';
+import { SyncSheet } from './ui/SyncSheet';
+import { getSync, useSync } from './sync/estado';
 import './escala.css';
 
 const K_AVISO_MIGRACAO = '190a:escala:aviso-migracao-visto';
@@ -57,7 +60,8 @@ export default function EscalaPage() {
   const [ano, setAno] = useState(parseMonthKey(monthKeyOf(hoje)).year);
   const [dia, setDia] = useState<string | null>(null);
   const [selecao, setSelecao] = useState<Set<string> | null>(null);
-  const [sheet, setSheet] = useState<null | 'gerador' | 'periodo' | 'config' | 'menu' | 'mes'>(null);
+  const [sheet, setSheet] = useState<null | 'gerador' | 'periodo' | 'config' | 'menu' | 'mes' | 'sync'>(null);
+  const sincronizando = useSync().ativo;
   const [aviso, setAviso] = useState<Aviso | undefined>();
   const [importacao, setImportacao] = useState<Importacao | null>(null);
   const [pdfCarregando, setPdfCarregando] = useState(false);
@@ -182,7 +186,9 @@ export default function EscalaPage() {
     setSheet(null);
     const ok1 = await confirmDialog({
       title: 'Apagar TODOS os registros?',
-      message: 'Isso remove toda a sua escala deste aparelho. Considere fazer um backup antes.',
+      message: getSync().ativo
+        ? 'Isso remove toda a sua escala deste aparelho e, na próxima sincronização, dos seus outros aparelhos e da nuvem. Considere fazer um backup antes.'
+        : 'Isso remove toda a sua escala deste aparelho. Considere fazer um backup antes.',
       confirmLabel: 'Continuar',
       danger: true,
     });
@@ -207,7 +213,7 @@ export default function EscalaPage() {
         actions={
           <>
             <button type="button" className="icon-btn" aria-label="Configurações da escala" onClick={() => setSheet('config')}>
-              <Settings2 />
+              <Settings />
             </button>
             <button type="button" className="icon-btn" aria-label="Mais ações" onClick={() => setSheet('menu')}>
               <Ellipsis />
@@ -257,7 +263,7 @@ export default function EscalaPage() {
       </div>
 
       {visao === 'ano' ? (
-        <Card title={`Resumo de ${ano}`}>
+        <Card title={`Resumo de ${ano}`} className="esc-resumo" actions={<SyncIndicador onClick={() => setSheet('sync')} />}>
           <AnoView
             db={db}
             ano={ano}
@@ -273,12 +279,16 @@ export default function EscalaPage() {
           <div className="section">
             <Card
               title="Resumo do mês"
+              className="esc-resumo"
               actions={
-                mes !== monthKeyOf(hoje) ? (
-                  <button type="button" className="btn sm ghost" onClick={() => irMes(monthKeyOf(hoje))}>
-                    Hoje
-                  </button>
-                ) : undefined
+                <span className="esc-acoes">
+                  {mes !== monthKeyOf(hoje) && (
+                    <button type="button" className="btn sm ghost" onClick={() => irMes(monthKeyOf(hoje))}>
+                      Hoje
+                    </button>
+                  )}
+                  <SyncIndicador onClick={() => setSheet('sync')} />
+                </span>
               }
             >
               <Resumo r={resumo} />
@@ -344,7 +354,10 @@ export default function EscalaPage() {
               Carga horária: {formatMinutes(db.config.metas['31'])} em meses de 31 dias, {formatMinutes(db.config.metas['30'])} em
               meses de 30 dias e {formatMinutes(db.config.metas['28'])}/{formatMinutes(db.config.metas['29'])} em fevereiro. Férias e
               afastamentos descontam a carga proporcionalmente; cada EDT/RSP desconta {formatMinutes(db.config.edtMinutos)}. O turno
-              conta no mês em que começa. Dados salvos apenas neste aparelho — faça backups.
+              conta no mês em que começa.{' '}
+              {sincronizando
+                ? 'Dados salvos neste aparelho e sincronizados com a sua conta Google — continue fazendo backups.'
+                : 'Dados salvos apenas neste aparelho — faça backups.'}
             </p>
           </div>
         </div>
@@ -357,6 +370,7 @@ export default function EscalaPage() {
       <GeradorSheet open={sheet === 'gerador'} onClose={() => setSheet(null)} mes={mes} inicioSugerido={inicioSugerido} />
       <PeriodoSheet open={sheet === 'periodo'} onClose={() => setSheet(null)} inicioSugerido={inicioSugerido} />
       <ConfigSheet open={sheet === 'config'} onClose={() => setSheet(null)} />
+      <SyncSheet open={sheet === 'sync'} onClose={() => setSheet(null)} />
       <MesPicker open={sheet === 'mes'} onClose={() => setSheet(null)} mes={mes} entries={db.entries} onEscolher={irMes} />
 
       <Sheet open={sheet === 'menu'} onClose={() => setSheet(null)} title="Escala" subtitle={monthLabel(mes)}>

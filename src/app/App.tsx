@@ -8,6 +8,7 @@ import InicioPage from '../features/inicio/InicioPage';
 import ReleasePage from '../features/release/ReleasePage';
 import VeiculoPage from '../features/veiculo/VeiculoPage';
 import { NotFoundPage } from '../features/inicio/NotFoundPage';
+import { iniciarSyncAutomatico } from '../features/escala/sync/auto';
 
 const loaders = {
   escala: () => import('../features/escala/EscalaPage'),
@@ -86,6 +87,9 @@ export function App() {
       if (window.cancelIdleCallback && typeof h === 'number') window.cancelIdleCallback(h);
     };
   }, []);
+
+  // Sincronização automática da escala (só age se a conta estiver conectada e a janela de 12 h liberar).
+  useEffect(() => iniciarSyncAutomatico(), []);
 
   const Page = id === 'notfound' ? NotFoundPage : PAGES[id];
 

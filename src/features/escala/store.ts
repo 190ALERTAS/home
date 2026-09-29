@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { dbVazio, type Entry, type EscalaDB } from './model';
 import { mesclar, migrarV1, normalizarV2, paraV1 } from './migrate';
+import { iguaisInst, instantaneoDe, type Instantaneo } from './sync/merge';
 import { toast } from '../../components/toast';
 
 /**
@@ -172,7 +173,13 @@ export function atualizar(fn: (db: EscalaDB) => EscalaDB, rotulo?: string): bool
     if (pilhaDesfazer.length > 30) pilhaDesfazer.shift();
   }
   estado = next;
-  const ok = salvar(kvNavegador, next);
+  const ok = persistir(next);
+  emitir();
+  return ok;
+}
+
+function persistir(db: EscalaDB): boolean {
+  const ok = salvar(kvNavegador, db);
   falhouSalvar = !ok;
   if (!ok) {
     toast({
@@ -182,8 +189,28 @@ export function atualizar(fn: (db: EscalaDB) => EscalaDB, rotulo?: string): bool
       duration: 8000,
     });
   }
-  emitir();
   return ok;
+}
+
+/**
+ * Aplica o resultado de uma sincronização (não entra no "desfazer"). O histórico de desfazer é
+ * descartado: voltar a um estado anterior à sincronização apagaria, na próxima, o que veio da nuvem.
+ * Retorna true se a escala mudou.
+ */
+export function substituirDaNuvem(inst: Instantaneo): boolean {
+  const atual = getEscala();
+  if (iguaisInst(instantaneoDe(atual), inst)) return false;
+  estado = {
+    ...atual,
+    entries: inst.entries,
+    modelos: inst.modelos,
+    config: inst.config,
+    meta: { ...atual.meta, atualizadoEm: new Date().toISOString() },
+  };
+  pilhaDesfazer.length = 0;
+  persistir(estado);
+  emitir();
+  return true;
 }
 
 export function podeDesfazer(): boolean {
