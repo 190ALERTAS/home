@@ -1,0 +1,2 @@
+# Mantém o código sempre com fim de linha LF (evita que uploads/checkouts no Windows reescrevam todos os arquivos)
+* text=auto eol=lf
