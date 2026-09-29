@@ -870,6 +870,53 @@ button.entry:hover {
   white-space: nowrap;
 }
 
+/* Celular: o bloco de duas linhas não cabe ao lado do título (no Galaxy S23, 360 px, faltam ~30 px).
+   Em vez de quebrar solto e à direita, o indicador ganha uma linha própria, alinhada ao título, com
+   o estado e o detalhe lado a lado. O botão "Hoje" continua à direita da primeira linha. */
+@media (max-width: 419px) {
+  .esc-resumo .card-title {
+    row-gap: 2px;
+  }
+
+  .esc-resumo .card-title .actions,
+  .esc-acoes {
+    display: contents;
+  }
+
+  .esc-resumo .card-title .btn {
+    margin-left: auto;
+  }
+
+  .esc-resumo .sync-topo {
+    order: 2;
+    flex: 1 0 100%;
+    min-width: 0;
+    min-height: 30px;
+    padding: 2px 0;
+  }
+
+  .esc-resumo .sync-topo .txt {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .esc-resumo .sync-topo strong {
+    flex: none;
+  }
+
+  .esc-resumo .sync-topo small {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .esc-resumo .sync-topo small::before {
+    content: '· ';
+  }
+}
+
 /* Avanço da janela de 12 h: enche até liberar a próxima sincronização */
 .sync-bar {
   height: 6px;
