@@ -115,6 +115,13 @@ service cloud.firestore {
 - Ordem de grandeza no pior caso (todos com 2 aparelhos, editando nos dois todo dia): o teto de **gravações** comporta ~5 mil pessoas e o de **leituras** ~12 mil. Em uso real o teto sobe, porque só grava quem mudou algo. Se um dia chegar perto, comprimir o documento (reduz armazenamento e saída de dados) ou migrar para o plano Blaze com orçamento e alertas são os próximos passos.
 - `sync/motor.test.ts` simula dias de uso contínuo, cliques repetidos, duas abas e falhas, e confere esses limites.
 
+**Sessão do Google ("Sessão expirada")**. Ao iniciar, o SDK do Firebase recarrega o usuário na rede e, se isso falhar com qualquer erro que não seja "sem rede" (ex.: 429, 5xx, resposta de proxy/firewall), **apaga a sessão guardada** — e o app não tem como distinguir isso de um logout real (`nuvem.ts → usuarioAtual`). Por isso:
+
+- o motor registra **quando e por quê** (`precisaEntrarEm`, `motivoSessao`: `sem-sessao` ou o código do erro) e o painel mostra uma nota explicando, com o motivo técnico para diagnóstico;
+- erros de token recusado (`auth/user-token-expired`, `auth/user-disabled`, `unauthenticated`…) contam como sessão perdida, não como "falha";
+- o aviso **se cura sozinho**: ao abrir o painel e no ciclo do automático (`revalidarSessao`, sem ler a nuvem nem gastar a janela de 12 h) a sessão é conferida de novo, e só é pedido novo login se ela realmente não voltou (nunca com outra conta Google);
+- a leitura da sessão tem limite de 20 s: rede lenta/bloqueada vira falha transitória (com recuo), não "sessão expirada".
+
 Configuração necessária no console do Firebase (projeto `alertas-190`): **Authentication → Método de login → Google** ativado e **Authentication → Configurações → Domínios autorizados** com `190alertas.github.io` (e `localhost` para desenvolvimento). Mantenha o projeto no plano **Spark** (sem faturamento) para que o uso nunca gere cobrança.
 
 ## Dados da Escala (migração da versão 4)
@@ -128,9 +135,14 @@ A versão 4 guardava a escala na chave `registros` do `localStorage`. Na primeir
 
 O arquivo `registros.json` exportado pela versão 4 também pode ser importado em *Minha Escala → ⋯ → Importar backup*.
 
-Carga horária padrão: **177h em meses de 31 dias** e **170h em meses de 30 dias** (fevereiro: 160h/165h,
+Carga horária padrão: **177h em meses de 31 dias** e **171h em meses de 30 dias** (fevereiro: 160h/165h,
 configurável). Férias e afastamentos descontam a carga proporcionalmente; cada EDT/RSP desconta 6h
 (configurável). O turno conta no mês em que começa.
+
+Até a versão 5.1.0 o mês de 30 dias era 170h. Como o valor fica gravado no aparelho (e na nuvem), quem nunca o
+alterou é levado para 171h automaticamente, **uma única vez**: a configuração carrega o carimbo `padraoRev`
+(`model.ts` → `atualizarPadrao`, aplicado em `normalizarV2`, portanto igual na leitura local, da nuvem e da base de
+sincronização — a migração nunca aparece como "alteração" a mesclar). Valores personalizados são mantidos.
 
 ## Privacidade
 

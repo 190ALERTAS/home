@@ -1,6 +1,16 @@
 import { isHM, isISODate, pad2 } from '../../lib/date';
 import { uid } from '../../lib/id';
-import { configPadrao, dbVazio, MODELOS_PADRAO, ordenar, type Entry, type EscalaDB, type ModeloTurno } from './model';
+import {
+  atualizarPadrao,
+  configPadrao,
+  dbVazio,
+  MODELOS_PADRAO,
+  ordenar,
+  type Config,
+  type Entry,
+  type EscalaDB,
+  type ModeloTurno,
+} from './model';
 
 /**
  * Formato v1 (versão 4 do app, chave "registros" no localStorage):
@@ -165,9 +175,13 @@ export function normalizarV2(raw: unknown): EscalaDB | null {
   const x = raw as Partial<EscalaDB>;
   if (x.version !== 2 || !Array.isArray(x.entries)) return null;
   const base = dbVazio();
-  const config = { ...configPadrao(), ...(x.config ?? {}) };
-  config.metas = { ...configPadrao().metas, ...(x.config?.metas ?? {}) };
-  config.perfil = { ...configPadrao().perfil, ...(x.config?.perfil ?? {}) };
+  // O carimbo da revisão do padrão (padraoRev) só vale se veio nos dados: herdá-lo dos valores de
+  // fábrica faria uma configuração antiga (170h) parecer já migrada.
+  const { padraoRev: _revFabrica, ...fabrica } = configPadrao();
+  const config: Config = { ...fabrica, ...(x.config ?? {}) };
+  config.metas = { ...fabrica.metas, ...(x.config?.metas ?? {}) };
+  config.perfil = { ...fabrica.perfil, ...(x.config?.perfil ?? {}) };
+  if (typeof config.padraoRev !== 'number') delete config.padraoRev;
   const modelos = Array.isArray(x.modelos)
     ? x.modelos.filter(
         (m): m is ModeloTurno => !!m && typeof m.nome === 'string' && isHM(m.start) && isHM(m.end) && typeof m.id === 'string',
@@ -177,7 +191,7 @@ export function normalizarV2(raw: unknown): EscalaDB | null {
     version: 2,
     entries: ordenar(x.entries.filter(entradaValida)),
     modelos,
-    config,
+    config: atualizarPadrao(config),
     meta: { ...base.meta, ...(x.meta ?? {}) },
   };
 }

@@ -17,7 +17,14 @@ export function vencida(agora = Date.now()): boolean {
 
 export function iniciarSyncAutomatico(): () => void {
   const verificar = () => {
-    if (document.visibilityState !== 'visible' || !navigator.onLine || !vencida()) return;
+    if (document.visibilityState !== 'visible' || !navigator.onLine) return;
+    const s = getSync();
+    if (s.ativo && s.auto && s.precisaEntrar) {
+      // Sessão dada como perdida: confere se voltou antes de desistir (é barato: o SDK guarda o usuário).
+      void import('./motor').then((m) => m.revalidarSessao()).then((voltou) => voltou && verificar());
+      return;
+    }
+    if (!vencida()) return;
     void import('./motor').then((m) => m.sincronizar('auto'));
   };
   const onVisivel = () => verificar();

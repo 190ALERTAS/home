@@ -41,7 +41,14 @@ export interface SyncPersistido {
   erro?: string;
   /** A sessão do Google caducou: é preciso entrar de novo. */
   precisaEntrar?: boolean;
+  /** Instante (ms) em que a sessão foi dada como perdida — para a nota do painel. */
+  precisaEntrarEm?: number;
+  /** O que indicou a perda: "sem-sessao" (o navegador não tinha mais o login) ou o código do erro. */
+  motivoSessao?: string;
 }
+
+/** Zera tudo o que descreve uma sessão perdida (entrou de novo, sincronizou ou desconectou). */
+export const SESSAO_OK = { precisaEntrar: undefined, precisaEntrarEm: undefined, motivoSessao: undefined } as const;
 
 export interface SyncEstado extends SyncPersistido {
   ocupado: boolean;
@@ -64,6 +71,8 @@ function carregar(): SyncEstado {
     permanente: s.permanente === true ? true : undefined,
     erro: texto(s.erro),
     precisaEntrar: s.precisaEntrar === true ? true : undefined,
+    precisaEntrarEm: s.precisaEntrar === true ? tempo(s.precisaEntrarEm) : undefined,
+    motivoSessao: s.precisaEntrar === true ? texto(s.motivoSessao) : undefined,
     ocupado: false,
   };
 }
@@ -183,6 +192,31 @@ export function situacao(s: SyncEstado, pendente: boolean): Situacao {
   if (s.precisaEntrar) return 'sessao';
   if (s.erro) return 'erro';
   return pendente ? 'pendente' : 'ok';
+}
+
+export interface NotaSessao {
+  titulo: string;
+  texto: string;
+  /** Código técnico do motivo (para diagnóstico); ausente em avisos gravados por versões anteriores. */
+  codigo?: string;
+}
+
+/**
+ * Nota do painel quando a sessão do Google foi dada como perdida: o que houve, desde quando e o que
+ * fazer. O motivo vem do motor — "sem-sessao" (o navegador não tinha mais o login) ou o código do
+ * erro que o Google devolveu.
+ */
+export function notaSessao(s: SyncEstado, agora: number): NotaSessao {
+  const desde = s.precisaEntrarEm != null ? ` · ${formatarQuando(s.precisaEntrarEm, agora)}` : '';
+  const porQue =
+    s.motivoSessao && s.motivoSessao !== 'sem-sessao'
+      ? 'O Google recusou renovar o seu login (senha trocada, acesso revogado ou conta desativada).'
+      : 'O navegador não tinha mais o seu login guardado na hora de sincronizar. Isso acontece quando os dados do site são limpos, quando a senha da conta é trocada ou o acesso é revogado, ou quando a rede (proxy/firewall) bloqueia a renovação do login — comum em computadores de trabalho.';
+  return {
+    titulo: `Sessão do Google encerrada${desde}`,
+    texto: `${porQue} A escala deste aparelho está intacta e a cópia na nuvem não foi alterada. Ao entrar de novo, os dois lados são mesclados, sem apagar nada.`,
+    codigo: s.motivoSessao,
+  };
 }
 
 /** Relógio que "bate" enquanto há algo a mostrar (contagem regressiva). */

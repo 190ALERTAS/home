@@ -4,8 +4,8 @@ import { Sheet } from '../../../components/Sheet';
 import { Switch, gap } from '../../../components/ui';
 import { confirmDialog } from '../../../components/dialogs';
 import { useOnline } from '../../../lib/pwa';
-import { definirSync, formatarQuando, formatarRestante, INTERVALO_MS } from '../sync/estado';
-import { apagarNuvem, conectar, desconectar, sincronizar, type Resultado } from '../sync/motor';
+import { definirSync, formatarQuando, formatarRestante, notaSessao, INTERVALO_MS } from '../sync/estado';
+import { apagarNuvem, conectar, desconectar, revalidarSessao, sincronizar, type Resultado } from '../sync/motor';
 import { useStatusSync, type StatusSync } from '../sync/useStatus';
 import { BarraJanela, descrever } from './SyncStatus';
 
@@ -64,12 +64,18 @@ function Estado({ st }: { st: StatusSync }) {
 export function SyncSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const st = useStatusSync();
   const { s, janela: j, pendente } = st;
+  const nota = notaSessao(s, st.agora);
   const online = useOnline();
   const [retorno, setRetorno] = useState<Retorno | null>(null);
 
   useEffect(() => {
     if (!open) setRetorno(null);
   }, [open]);
+
+  // Abriu o painel com a sessão dada como perdida: confere se ela voltou antes de pedir novo login.
+  useEffect(() => {
+    if (open && s.precisaEntrar) void revalidarSessao();
+  }, [open, s.precisaEntrar]);
 
   const entrar = async () => {
     setRetorno(null);
@@ -175,7 +181,15 @@ export function SyncSheet({ open, onClose }: { open: boolean; onClose: () => voi
           {s.precisaEntrar && (
             <div className="callout amber" role="alert">
               <CloudAlert />
-              <div>Sua sessão do Google expirou. Entre de novo para voltar a sincronizar; a escala deste aparelho está intacta.</div>
+              <div>
+                <strong>{nota.titulo}</strong>
+                <div>{nota.texto}</div>
+                {nota.codigo && (
+                  <div className="mono subtle" style={{ fontSize: 12, marginTop: 6 }}>
+                    motivo: {nota.codigo}
+                  </div>
+                )}
+              </div>
             </div>
           )}
           {retorno && (

@@ -43,6 +43,11 @@ export interface Config {
   /** Minutos descontados da meta por dia de EDT/RSP. */
   edtMinutos: number;
   perfil: { nome: string; matricula: string; unidade: string };
+  /**
+   * Revisão da tabela de cargas padrão já aplicada a esta configuração (ver PADRAO_REV).
+   * Ausente = configuração anterior à revisão 2, quando o mês de 30 dias valia 170h.
+   */
+  padraoRev?: number;
 }
 
 export interface EscalaDB {
@@ -60,15 +65,35 @@ export interface EscalaDB {
 export const HORA = 60;
 
 /**
- * Carga horária padrão: 177h em meses de 31 dias e 170h em meses de 30 dias.
+ * Carga horária padrão: 177h em meses de 31 dias e 171h em meses de 30 dias.
  * Fevereiro (28/29 dias) é configurável; padrão de 160h/165h.
  */
 export const METAS_PADRAO: Record<DiasNoMes, number> = {
   '28': 160 * HORA,
   '29': 165 * HORA,
-  '30': 170 * HORA,
+  '30': 171 * HORA,
   '31': 177 * HORA,
 };
+
+/**
+ * Revisão da tabela de cargas padrão. A 2 trocou o mês de 30 dias de 170h para 171h.
+ * Como o valor fica gravado no aparelho (e na nuvem), quem nunca mexeu nele ainda tem 170h:
+ * `atualizarPadrao` leva esse valor para o novo padrão uma única vez e carimba a revisão.
+ */
+export const PADRAO_REV = 2;
+const META_30_ANTIGA = 170 * HORA;
+
+/**
+ * Migra uma configuração gravada antes da revisão 2: se o mês de 30 dias ainda está no valor
+ * antigo (170h), passa para o novo padrão. Qualquer outro valor (personalizado) é mantido.
+ * Idempotente e determinística — roda igual em todo aparelho, na leitura local, da nuvem e da base
+ * de sincronização, então a migração nunca aparece como "alteração" a ser mesclada.
+ */
+export function atualizarPadrao(config: Config): Config {
+  if ((config.padraoRev ?? 1) >= PADRAO_REV) return config;
+  const metas = config.metas['30'] === META_30_ANTIGA ? { ...config.metas, '30': METAS_PADRAO['30'] } : config.metas;
+  return { ...config, metas, padraoRev: PADRAO_REV };
+}
 
 export const EDT_PADRAO = 6 * HORA;
 
@@ -89,6 +114,7 @@ export function configPadrao(): Config {
     metas: { ...METAS_PADRAO },
     edtMinutos: EDT_PADRAO,
     perfil: { nome: '', matricula: '', unidade: '' },
+    padraoRev: PADRAO_REV,
   };
 }
 

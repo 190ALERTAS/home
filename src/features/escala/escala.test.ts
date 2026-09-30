@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { calcularResumo, duplicados, proximoTurno, turnosFrequentes } from './calc';
-import { interpretarBackup, mesclar, migrarV1, paraV1, parseHorasV1 } from './migrate';
-import { configPadrao, dbVazio, type Entry, type Turno } from './model';
+import { interpretarBackup, mesclar, migrarV1, normalizarV2, paraV1, parseHorasV1 } from './migrate';
+import { PADRAO_REV, configPadrao, dbVazio, type Entry, type Turno } from './model';
 import { adicionarTurno, aplicarTurno, editarTurno, limparDias, marcar, removerMes } from './ops';
 import { PRESETS, aplicarGerador, preverGerador } from './gerador';
 import { K_BACKUP_V1, K_ESPELHO, K_V1, K_V2, assinatura, carregar, salvar, type KV } from './store';
@@ -82,9 +82,9 @@ describe('migração da versão 4', () => {
 describe('resumo mensal', () => {
   const cfg = configPadrao();
 
-  it('usa 177h em meses de 31 dias e 170h em meses de 30 dias', () => {
+  it('usa 177h em meses de 31 dias e 171h em meses de 30 dias', () => {
     expect(calcularResumo([], '2026-10', cfg).meta).toBe(177 * 60);
-    expect(calcularResumo([], '2026-09', cfg).meta).toBe(170 * 60);
+    expect(calcularResumo([], '2026-09', cfg).meta).toBe(171 * 60);
     expect(calcularResumo([], '2026-02', cfg).meta).toBe(160 * 60);
     expect(calcularResumo([], '2028-02', cfg).meta).toBe(165 * 60);
   });
@@ -95,9 +95,9 @@ describe('resumo mensal', () => {
     const r = calcularResumo(db.entries, '2026-09', cfg);
     expect(r.turnos).toBe(15);
     expect(r.trabalhado).toBe(180 * 60);
-    expect(r.normais).toBe(170 * 60);
-    expect(r.extras).toBe(10 * 60);
-    expect(r.saldo).toBe(10 * 60);
+    expect(r.normais).toBe(171 * 60);
+    expect(r.extras).toBe(9 * 60);
+    expect(r.saldo).toBe(9 * 60);
     expect(r.faltam).toBe(0);
   });
 
@@ -115,6 +115,58 @@ describe('resumo mensal', () => {
   it('respeita metas configuradas pelo usuário', () => {
     const c = { ...cfg, metas: { ...cfg.metas, '28': 150 * 60 } };
     expect(calcularResumo([], '2026-02', c).meta).toBe(150 * 60);
+  });
+});
+
+describe('padrão de carga horária (mês de 30 dias: 171h)', () => {
+  /** Escala gravada antes da revisão 2: sem "padraoRev" e com os 170h que eram o padrão. */
+  const antigo = (meta30: number, extra: Record<string, unknown> = {}) => ({
+    version: 2,
+    entries: [],
+    config: { metas: { '28': 9600, '29': 9900, '30': meta30, '31': 10620 }, edtMinutos: 360, ...extra },
+  });
+
+  it('o padrão de fábrica é 171h e já nasce carimbado', () => {
+    const c = configPadrao();
+    expect(c.metas['30']).toBe(171 * 60);
+    expect(c.padraoRev).toBe(PADRAO_REV);
+  });
+
+  it('quem nunca mexeu (170h gravado) passa para 171h, uma única vez', () => {
+    const db = normalizarV2(antigo(170 * 60))!;
+    expect(db.config.metas['30']).toBe(171 * 60);
+    expect(db.config.padraoRev).toBe(PADRAO_REV);
+    // idempotente: reler o que acabou de sair não muda nada
+    expect(normalizarV2(JSON.parse(JSON.stringify(db)))!.config).toEqual(db.config);
+  });
+
+  it('valor personalizado é mantido (só recebe o carimbo)', () => {
+    const db = normalizarV2(antigo(168 * 60))!;
+    expect(db.config.metas['30']).toBe(168 * 60);
+    expect(db.config.padraoRev).toBe(PADRAO_REV);
+  });
+
+  it('170h digitado de propósito depois da revisão não é trocado', () => {
+    const db = normalizarV2(antigo(170 * 60, { padraoRev: PADRAO_REV }))!;
+    expect(db.config.metas['30']).toBe(170 * 60);
+  });
+
+  it('não herda o carimbo dos valores de fábrica quando a configuração vem sem ele', () => {
+    expect(normalizarV2({ version: 2, entries: [] })!.config.metas['30']).toBe(171 * 60);
+    expect(normalizarV2(antigo(170 * 60, { padraoRev: 'lixo' }))!.config.metas['30']).toBe(171 * 60);
+  });
+
+  it('abrir o app com a escala antiga mostra 171h e o resumo do mês usa 171h', () => {
+    const kv = memKV({ [K_V2]: JSON.stringify(antigo(170 * 60)) });
+    const { db } = carregar(kv);
+    expect(calcularResumo([], '2026-09', db.config).meta).toBe(171 * 60);
+  });
+
+  it('configurações de nuvem e da base antigas convergem para o mesmo valor (sem "alteração" a mesclar)', () => {
+    const a = normalizarV2(antigo(170 * 60))!.config;
+    const b = normalizarV2(antigo(170 * 60))!.config;
+    expect(a).toEqual(b);
+    expect(a.metas['30']).toBe(171 * 60);
   });
 });
 
