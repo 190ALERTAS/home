@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Moon } from 'lucide-react';
+import { Moon, Sun, SunMoon } from 'lucide-react';
 import { DIAS_SEMANA_CURTOS, crossesMidnight, daysInMonth, formatMinutes, pad2, parseMonthKey } from '../../../lib/date';
 import type { Entry, Turno } from '../model';
 
@@ -68,6 +68,7 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
             turnos.length ? 'trabalho' : '',
             ferias ? 'ferias' : afast ? 'afastamento' : '',
             edt ? 'edt' : '',
+            dup ? 'dup' : '',
             data === hoje ? 'hoje' : '',
             dom ? 'dom' : '',
             selecao?.has(data) ? 'sel' : '',
@@ -79,6 +80,7 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
             ferias ? 'férias' : '',
             afast ? 'afastamento' : '',
             edt ? 'EDT/RSP' : '',
+            dup ? 'possível lançamento em dobro' : '',
           ]
             .filter(Boolean)
             .join(', ');
@@ -91,14 +93,20 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
               aria-label={`Dia ${dia}${descricao ? `: ${descricao}` : ''}`}
               aria-pressed={selecao ? selecao.has(data) : undefined}
             >
-              <span className="n">{dia}</span>
-              {dup && <span className="dup" title="Possível lançamento em dobro" />}
+              <span className="top">
+                <span className="n">{dia}</span>
+                {turnos.length > 0 &&
+                  (noturnos === 0 ? (
+                    <Sun className="per dia" />
+                  ) : noturnos === turnos.length ? (
+                    <Moon className="per noite" />
+                  ) : (
+                    <SunMoon className="per misto" />
+                  ))}
+              </span>
               {turnos.length > 0 ? (
                 <span>
-                  <span className="h">
-                    {horasCurtas(minutos)}
-                    {noturnos > 0 && <Moon className="lua" />}
-                  </span>
+                  <span className="h">{horasCurtas(minutos)}</span>
                   <span
                     className={`bar${noturnos === turnos.length ? ' noite' : noturnos > 0 ? ' misto' : ''}`}
                     style={{ width: `${Math.min(100, (minutos / 720) * 100)}%` }}
