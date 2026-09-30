@@ -2,6 +2,7 @@ import { track } from '../../../lib/analytics';
 import { getEscala, substituirDaNuvem } from '../store';
 import { iguaisInst, instantaneoDe, mesclar3 } from './merge';
 import {
+  SESSAO_OK,
   definirSync,
   formatarRestante,
   getSync,
@@ -44,6 +45,7 @@ export function mensagemDeErro(e: unknown): string | null {
   if (code === 'permission-denied') return 'A nuvem recusou o acesso. Saia e entre de novo com a sua conta Google.';
   if (code === 'resource-exhausted') return 'O limite gratuito diário da nuvem foi atingido. Tente de novo amanhã.';
   if (code === 'aborted' || code === 'failed-precondition') return 'Outro aparelho sincronizou ao mesmo tempo. Tente de novo em instantes.';
+  if (msg === 'auth-timeout') return 'A verificação do login demorou demais (rede lenta ou bloqueada). Tente de novo em instantes.';
   if (msg === 'esquema-novo') return 'A nuvem tem dados de uma versão mais nova do app. Atualize o app e tente de novo.';
   if (msg === 'nuvem-invalida') return 'Os dados na nuvem estão ilegíveis. Nada foi alterado; use “Apagar cópia na nuvem” para recomeçar.';
   if (!navigator.onLine) return 'Sem conexão com a internet.';
@@ -61,6 +63,36 @@ function erroPermanente(e: unknown): boolean {
     msg === 'esquema-novo' ||
     msg === 'nuvem-invalida'
   );
+}
+
+/**
+ * Erros em que o Google/Firebase recusa o login guardado (senha trocada, acesso revogado, conta
+ * desativada, token inválido). Aqui a sessão realmente acabou: é "entrar de novo", não "falha".
+ */
+const ERROS_DE_SESSAO = new Set([
+  'unauthenticated',
+  'auth/user-token-expired',
+  'auth/invalid-user-token',
+  'auth/user-disabled',
+  'auth/user-not-found',
+  'auth/requires-recent-login',
+]);
+
+function codigoDeSessao(e: unknown): string | null {
+  const code = typeof e === 'object' && e && 'code' in e ? String((e as { code: unknown }).code) : '';
+  return ERROS_DE_SESSAO.has(code) ? code : null;
+}
+
+/** Marca a sessão como perdida, guardando quando e por quê (vira a nota do painel). Mantém o 1º horário. */
+function sessaoPerdida(motivo: string, agora: number): Resultado {
+  definirSync({
+    precisaEntrar: true,
+    precisaEntrarEm: getSync().precisaEntrarEm ?? agora,
+    motivoSessao: motivo,
+    erro: undefined,
+    tentativa: agora,
+  });
+  return falha('sessao', 'Sua sessão do Google expirou. Entre novamente.');
 }
 
 /**
@@ -106,14 +138,13 @@ async function executar(origem: Origem): Promise<Resultado> {
   try {
     const nuvem = await carregarNuvem();
     const usuario = await nuvem.usuarioAtual();
-    if (!usuario) {
-      definirSync({ precisaEntrar: true, erro: undefined, tentativa: agora });
-      return falha('sessao', 'Sua sessão do Google expirou. Entre novamente.');
-    }
+    if (!usuario) return sessaoPerdida('sem-sessao', agora);
     const r = await rodar(nuvem, usuario);
     track('escala_sync', { origem });
     return r;
   } catch (e) {
+    const sessao = codigoDeSessao(e);
+    if (sessao) return sessaoPerdida(sessao, Date.now());
     const mensagem = mensagemDeErro(e) ?? 'Não foi possível sincronizar agora.';
     definirSync({
       erro: mensagem,
@@ -150,9 +181,29 @@ async function rodar(nuvem: typeof import('./nuvem'), usuario: Usuario): Promise
     falhas: undefined,
     permanente: undefined,
     erro: undefined,
-    precisaEntrar: undefined,
+    ...SESSAO_OK,
   });
   return { ok: true, enviou: gravou, recebeu };
+}
+
+/**
+ * Confere de novo uma sessão marcada como perdida. O SDK só lê a sessão guardada no navegador ao
+ * iniciar; se ela aparece (outra aba entrou, uma leitura que falhou uma vez), limpa o aviso em vez
+ * de exigir um login à toa — sem isso o aviso ficava gravado para sempre e desligava o automático.
+ * Não é uma sincronização: não lê a nuvem e não gasta a janela de 12 h. Devolve true se a sessão voltou.
+ */
+export async function revalidarSessao(): Promise<boolean> {
+  const s = getSync();
+  if (!s.ativo || !s.precisaEntrar || s.ocupado || !navigator.onLine) return false;
+  try {
+    const usuario = await (await carregarNuvem()).usuarioAtual();
+    // Outra conta Google no mesmo navegador não serve: misturaria duas escalas.
+    if (!usuario || (s.uid && usuario.uid !== s.uid)) return false;
+    definirSync({ ...SESSAO_OK, erro: undefined, tentativa: undefined, falhas: undefined });
+    return true;
+  } catch {
+    return false; // sem resposta agora: o aviso continua e a checagem se repete depois
+  }
 }
 
 /** Abre o login do Google e, conectado, faz a primeira sincronização. */
@@ -179,7 +230,7 @@ export async function conectar(): Promise<Resultado> {
       falhas: undefined,
       permanente: undefined,
       erro: undefined,
-      precisaEntrar: undefined,
+      ...SESSAO_OK,
     });
   } catch (e) {
     const mensagem = mensagemDeErro(e);
@@ -208,7 +259,7 @@ export async function desconectar(): Promise<void> {
     nome: undefined,
     ultima: undefined,
     erro: undefined,
-    precisaEntrar: undefined,
+    ...SESSAO_OK,
     tentativa: undefined,
     falhas: undefined,
     permanente: undefined,

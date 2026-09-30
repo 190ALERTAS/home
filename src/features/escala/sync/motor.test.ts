@@ -229,3 +229,138 @@ describe('consumo de leituras da nuvem (plano gratuito)', () => {
     expect(t.estado.getSync().falhas).toBeUndefined();
   });
 });
+
+describe('sessão do Google', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 8, 28, 10, 0));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.doUnmock('./nuvem');
+  });
+
+  const ana: Usuario = { uid: 'u1', email: 'a@b.com', nome: 'Ana' };
+
+  /** Conecta e avança para a janela aberta, pronto para o próximo passo. */
+  async function conectado() {
+    const t = await montar();
+    await t.motor.conectar();
+    vi.setSystemTime(new Date(2026, 8, 29, 11, 0));
+    return t;
+  }
+
+  it('sem sessão no navegador: registra quando e por quê, sem contar como falha', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    const r = await t.motor.sincronizar('manual');
+    expect(r.ok === false && r.motivo).toBe('sessao');
+    const s = t.estado.getSync();
+    expect(s.precisaEntrar).toBe(true);
+    expect(s.motivoSessao).toBe('sem-sessao');
+    expect(s.precisaEntrarEm).toBe(Date.now());
+    expect(s.falhas).toBeUndefined();
+    expect(s.erro).toBeUndefined();
+  });
+
+  it('guarda o horário da primeira perda, não o da última tentativa', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    await t.motor.sincronizar('manual');
+    const primeira = t.estado.getSync().precisaEntrarEm;
+    vi.setSystemTime(new Date(2026, 8, 29, 18, 0));
+    await t.motor.sincronizar('manual');
+    expect(t.estado.getSync().precisaEntrarEm).toBe(primeira);
+  });
+
+  it('erro de token (o Google recusou renovar o login) também é sessão perdida, não "falha"', async () => {
+    const t = await conectado();
+    t.nuvem.erro = Object.assign(new Error('expirou'), { code: 'auth/user-token-expired' });
+    const r = await t.motor.sincronizar('manual');
+    expect(r.ok === false && r.motivo).toBe('sessao');
+    const s = t.estado.getSync();
+    expect(s.precisaEntrar).toBe(true);
+    expect(s.motivoSessao).toBe('auth/user-token-expired');
+    expect(s.erro).toBeUndefined();
+    expect(s.falhas).toBeUndefined();
+  });
+
+  it('a sessão que volta cura o aviso sozinha e o automático retoma a sincronização', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    await t.motor.sincronizar('manual');
+    expect(t.estado.getSync().precisaEntrar).toBe(true);
+    expect(t.auto.vencida()).toBe(false); // antes: ficava assim para sempre
+
+    t.nuvem.usuario = ana; // ex.: outra aba entrou de novo
+    const antes = t.nuvem.leituras;
+    const parar = t.auto.iniciarSyncAutomatico();
+    await vi.advanceTimersByTimeAsync(10_000);
+    parar();
+    const s = t.estado.getSync();
+    expect(s.precisaEntrar).toBeUndefined();
+    expect(s.precisaEntrarEm).toBeUndefined();
+    expect(s.motivoSessao).toBeUndefined();
+    expect(t.nuvem.leituras - antes).toBe(1);
+  });
+
+  it('enquanto a sessão não volta, o automático não lê a nuvem nem insiste em sincronizar', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    await t.motor.sincronizar('manual');
+    const antes = t.nuvem.tentativas;
+    const parar = t.auto.iniciarSyncAutomatico();
+    await vi.advanceTimersByTimeAsync(24 * H);
+    parar();
+    expect(t.nuvem.tentativas).toBe(antes);
+    expect(t.estado.getSync().precisaEntrar).toBe(true);
+  });
+
+  it('outra conta Google no mesmo navegador não cura o aviso (não mistura escalas)', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    await t.motor.sincronizar('manual');
+    t.nuvem.usuario = { uid: 'u2', email: 'outra@b.com' };
+    expect(await t.motor.revalidarSessao()).toBe(false);
+    expect(t.estado.getSync().precisaEntrar).toBe(true);
+  });
+
+  it('sem internet não revalida', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    await t.motor.sincronizar('manual');
+    t.nuvem.usuario = ana;
+    vi.stubGlobal('navigator', { onLine: false });
+    expect(await t.motor.revalidarSessao()).toBe(false);
+    expect(t.estado.getSync().precisaEntrar).toBe(true);
+  });
+
+  it('revalidar sem aviso de sessão não faz nada', async () => {
+    const t = await conectado();
+    expect(await t.motor.revalidarSessao()).toBe(false);
+  });
+
+  it('sair da conta zera a nota da sessão', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    await t.motor.sincronizar('manual');
+    await t.motor.desconectar();
+    const s = t.estado.getSync();
+    expect(s.precisaEntrar).toBeUndefined();
+    expect(s.precisaEntrarEm).toBeUndefined();
+    expect(s.motivoSessao).toBeUndefined();
+  });
+
+  it('entrar de novo (mesma conta) zera a nota e volta a sincronizar', async () => {
+    const t = await conectado();
+    t.nuvem.usuario = null;
+    await t.motor.sincronizar('manual');
+    t.nuvem.usuario = ana;
+    const r = await t.motor.conectar();
+    expect(r.ok).toBe(true);
+    const s = t.estado.getSync();
+    expect(s.precisaEntrar).toBeUndefined();
+    expect(s.motivoSessao).toBeUndefined();
+  });
+});

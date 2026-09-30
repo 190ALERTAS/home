@@ -62,10 +62,30 @@ const paraUsuario = (u: { uid: string; email: string | null; displayName: string
   nome: u.displayName ?? undefined,
 });
 
-/** Quem está conectado (a sessão é restaurada do armazenamento do navegador), ou null. */
+/** Quanto esperar o SDK restaurar a sessão. Passou disso é rede lenta/bloqueada, não "sem sessão". */
+const ESPERA_SESSAO_MS = 20_000;
+
+/**
+ * Quem está conectado (a sessão é restaurada do armazenamento do navegador), ou null.
+ *
+ * Atenção: ao iniciar, o SDK recarrega o usuário na rede e, se isso falhar com qualquer erro que não
+ * seja "sem rede" (ex.: 429, 5xx, resposta de proxy), ele apaga a sessão guardada. Quem chama não
+ * tem como distinguir isso de uma sessão realmente encerrada — por isso o motor registra o motivo
+ * e revalida (ver motor.ts). Se a restauração demorar demais, lança "auth-timeout" em vez de null.
+ */
 export async function usuarioAtual(): Promise<Usuario | null> {
   const { auth } = iniciar();
-  await auth.authStateReady();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      auth.authStateReady(),
+      new Promise<never>((_, rejeitar) => {
+        timer = setTimeout(() => rejeitar(new Error('auth-timeout')), ESPERA_SESSAO_MS);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
   return auth.currentUser ? paraUsuario(auth.currentUser) : null;
 }
 

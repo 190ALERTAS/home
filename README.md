@@ -115,6 +115,13 @@ service cloud.firestore {
 - Ordem de grandeza no pior caso (todos com 2 aparelhos, editando nos dois todo dia): o teto de **gravações** comporta ~5 mil pessoas e o de **leituras** ~12 mil. Em uso real o teto sobe, porque só grava quem mudou algo. Se um dia chegar perto, comprimir o documento (reduz armazenamento e saída de dados) ou migrar para o plano Blaze com orçamento e alertas são os próximos passos.
 - `sync/motor.test.ts` simula dias de uso contínuo, cliques repetidos, duas abas e falhas, e confere esses limites.
 
+**Sessão do Google ("Sessão expirada")**. Ao iniciar, o SDK do Firebase recarrega o usuário na rede e, se isso falhar com qualquer erro que não seja "sem rede" (ex.: 429, 5xx, resposta de proxy/firewall), **apaga a sessão guardada** — e o app não tem como distinguir isso de um logout real (`nuvem.ts → usuarioAtual`). Por isso:
+
+- o motor registra **quando e por quê** (`precisaEntrarEm`, `motivoSessao`: `sem-sessao` ou o código do erro) e o painel mostra uma nota explicando, com o motivo técnico para diagnóstico;
+- erros de token recusado (`auth/user-token-expired`, `auth/user-disabled`, `unauthenticated`…) contam como sessão perdida, não como "falha";
+- o aviso **se cura sozinho**: ao abrir o painel e no ciclo do automático (`revalidarSessao`, sem ler a nuvem nem gastar a janela de 12 h) a sessão é conferida de novo, e só é pedido novo login se ela realmente não voltou (nunca com outra conta Google);
+- a leitura da sessão tem limite de 20 s: rede lenta/bloqueada vira falha transitória (com recuo), não "sessão expirada".
+
 Configuração necessária no console do Firebase (projeto `alertas-190`): **Authentication → Método de login → Google** ativado e **Authentication → Configurações → Domínios autorizados** com `190alertas.github.io` (e `localhost` para desenvolvimento). Mantenha o projeto no plano **Spark** (sem faturamento) para que o uso nunca gere cobrança.
 
 ## Dados da Escala (migração da versão 4)

@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { configPadrao, MODELOS_PADRAO, type Entry, type Turno } from '../model';
 import { canonico, iguaisInst, mesclar3, type Instantaneo } from './merge';
-import { formatarHa, formatarQuando, formatarRestante, INTERVALO_MS, janela, situacao, type SyncEstado } from './estado';
+import {
+  formatarHa,
+  formatarQuando,
+  formatarRestante,
+  INTERVALO_MS,
+  janela,
+  notaSessao,
+  situacao,
+  type SyncEstado,
+} from './estado';
 
 const turno = (id: string, date: string, start = '07:00', end = '19:00', extra: Partial<Turno> = {}): Turno => ({
   id,
@@ -239,5 +248,31 @@ describe('situação exibida', () => {
     expect(situacao({ ...base, erro: 'x' }, true)).toBe('erro');
     expect(situacao(base, true)).toBe('pendente');
     expect(situacao(base, false)).toBe('ok');
+  });
+});
+
+describe('nota da sessão perdida', () => {
+  const agora = new Date(2026, 8, 28, 15, 0).getTime();
+  const base: SyncEstado = { ativo: true, auto: true, ocupado: false, precisaEntrar: true };
+
+  it('sem sessão no navegador: diz desde quando, tranquiliza e mostra o motivo técnico', () => {
+    const n = notaSessao({ ...base, precisaEntrarEm: new Date(2026, 8, 28, 9, 5).getTime(), motivoSessao: 'sem-sessao' }, agora);
+    expect(n.titulo).toBe('Sessão do Google encerrada · hoje, 09:05');
+    expect(n.texto).toMatch(/dados do site são limpos/);
+    expect(n.texto).toMatch(/intacta/);
+    expect(n.codigo).toBe('sem-sessao');
+  });
+
+  it('login recusado pelo Google: explica a causa e mantém o código do erro', () => {
+    const n = notaSessao({ ...base, precisaEntrarEm: agora, motivoSessao: 'auth/user-token-expired' }, agora);
+    expect(n.texto).toMatch(/recusou renovar/);
+    expect(n.codigo).toBe('auth/user-token-expired');
+  });
+
+  it('aviso gravado por versão anterior (sem horário nem motivo) continua legível', () => {
+    const n = notaSessao(base, agora);
+    expect(n.titulo).toBe('Sessão do Google encerrada');
+    expect(n.codigo).toBeUndefined();
+    expect(n.texto).toMatch(/não tinha mais o seu login/);
   });
 });
