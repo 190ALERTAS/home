@@ -68,4 +68,4 @@ export const MORE: RouteId[] = ['croqui', 'taf', 'sugestoes', 'termos'];
 export const SIDE_MAIN: RouteId[] = ['inicio', 'release', 'veiculos', 'escala', 'croqui', 'taf'];
 export const SIDE_EXTRA: RouteId[] = ['sugestoes', 'termos'];
 
-export const APP_VERSION = '5.1.0';
+export const APP_VERSION = '5.1.1';
