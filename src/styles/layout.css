@@ -27,14 +27,14 @@
   border-bottom: 1px solid var(--topbar-border);
 }
 
-/* Traço vermelho sob a marca */
+/* Traço vermelho sob a barra, na largura toda da tela */
 .topbar::after {
   content: '';
   position: absolute;
   left: 0;
+  right: 0;
   bottom: -1px;
-  width: min(var(--sidebar-w), 46vw);
-  height: 2px;
+  height: 1px;
   background: var(--primary);
 }
 
