@@ -391,14 +391,40 @@
     color: var(--text-3);
   }
 
+  /* Botão que abre as "Notas de atualização" (Shell.tsx) */
   .sidebar .side-foot {
     margin-top: auto;
     padding: 12px 12px 0;
+    border: 0;
     border-top: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
     font-family: var(--font-mono);
     font-size: 11.5px;
     line-height: 1.6;
     color: var(--text-3);
+    text-align: left;
+    transition: color var(--dur);
+  }
+
+  .sidebar .side-foot:hover {
+    color: var(--text-2);
+  }
+
+  .sidebar .side-foot:hover .side-foot-versao {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .side-foot-versao {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .side-foot-versao svg {
+    width: 13px;
+    height: 13px;
   }
 }
 

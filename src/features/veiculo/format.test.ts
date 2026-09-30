@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { camposPendentesAlerta, formatAlerta, tipoPlaca, type AlertaData } from './format';
+import { aparenciaPlaca, camposPendentesAlerta, formatAlerta, tipoPlaca, type AlertaData } from './format';
 
 const base: AlertaData = {
   fato: 'ROUBO DE VEÍCULO',
@@ -47,6 +47,26 @@ describe('tipoPlaca', () => {
     expect(tipoPlaca('ABC-1234')).toBe('antiga');
     expect(tipoPlaca('ABC1234')).toBe('antiga');
     expect(tipoPlaca('final 23')).toBeNull();
+  });
+});
+
+describe('aparenciaPlaca', () => {
+  it('assume Mercosul enquanto não dá para distinguir', () => {
+    expect(aparenciaPlaca('')).toBe('mercosul');
+    expect(aparenciaPlaca('AB')).toBe('mercosul');
+    expect(aparenciaPlaca('ABC1')).toBe('mercosul');
+    expect(aparenciaPlaca('final 23')).toBe('mercosul');
+  });
+
+  it('vira placa cinza assim que o 5º caractere é número', () => {
+    expect(aparenciaPlaca('ABC12')).toBe('antiga');
+    expect(aparenciaPlaca('abc-1234')).toBe('antiga');
+    expect(aparenciaPlaca('ABC 1234')).toBe('antiga');
+  });
+
+  it('continua Mercosul quando o 5º caractere é letra', () => {
+    expect(aparenciaPlaca('ABC1D')).toBe('mercosul');
+    expect(aparenciaPlaca('iyx 1d23')).toBe('mercosul');
   });
 });
 

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Download, Ellipsis, Moon, Share, SquarePlus, Sun, WifiOff } from 'lucide-react';
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Download, Ellipsis, History, Moon, Share, SquarePlus, Sun, WifiOff } from 'lucide-react';
 import { linkProps, type RouteId } from '../lib/router';
 import { toggleTheme, useTheme } from '../lib/theme';
 import { useInstall, useOnline } from '../lib/pwa';
@@ -9,6 +9,9 @@ import { gap } from '../components/ui';
 import { Emblema } from '../components/Emblema';
 import { DockContext } from '../components/dock';
 import { APP_VERSION, BOTTOM, MORE, NAV, SIDE_EXTRA, SIDE_MAIN } from './nav';
+
+// As notas de atualização só são baixadas quando alguém abre a folha (o chunk fica no cache offline do PWA).
+const NotasSheet = lazy(() => import('../features/atualizacoes/NotasSheet'));
 
 export function Brand({ onClick }: { onClick?: () => void }) {
   return (
@@ -82,6 +85,8 @@ export function IOSInstallHelp({ open, onClose }: { open: boolean; onClose: () =
 export function Shell({ route, children }: { route: RouteId | 'notfound'; children: ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const [iosHelp, setIosHelp] = useState(false);
+  // 'fechada' = ainda não baixou; depois da 1ª abertura a folha fica montada e só alterna aberta/oculta.
+  const [notas, setNotas] = useState<'fechada' | 'aberta' | 'oculta'>('fechada');
   const online = useOnline();
   const theme = useTheme();
   const moreActive = MORE.includes(route as RouteId);
@@ -136,11 +141,20 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
             </a>
           );
         })}
-        <div className="side-foot">
-          v{APP_VERSION}
+        <button
+          type="button"
+          className="side-foot"
+          aria-haspopup="dialog"
+          aria-label={`Notas de atualização, versão ${APP_VERSION}`}
+          title="Notas de atualização"
+          onClick={() => setNotas('aberta')}
+        >
+          <span className="side-foot-versao">
+            <History aria-hidden /> v{APP_VERSION}
+          </span>
           <br />
           Sd Ferrão · 32º BPM
-        </div>
+        </button>
       </nav>
 
       <DockContext.Provider value={slotAcoes}>
@@ -214,6 +228,23 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
                 <small>Alternar a aparência do app</small>
               </span>
             </button>
+            <button
+              type="button"
+              className="list-item"
+              aria-haspopup="dialog"
+              onClick={() => {
+                setMoreOpen(false);
+                setNotas('aberta');
+              }}
+            >
+              <span className="ico">
+                <History />
+              </span>
+              <span className="txt">
+                <strong>Notas de atualização</strong>
+                <small>Novidades da versão {APP_VERSION} e das anteriores</small>
+              </span>
+            </button>
           </div>
           <p className="subtle" style={{ textAlign: 'center', fontSize: 13 }}>
             190 ALERTAS · versão {APP_VERSION} · Criado por Sd Ferrão (32º BPM)
@@ -222,6 +253,12 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
       </Sheet>
 
       <IOSInstallHelp open={iosHelp} onClose={() => setIosHelp(false)} />
+
+      {notas !== 'fechada' && (
+        <Suspense fallback={null}>
+          <NotasSheet open={notas === 'aberta'} onClose={() => setNotas('oculta')} />
+        </Suspense>
+      )}
     </div>
   );
 }

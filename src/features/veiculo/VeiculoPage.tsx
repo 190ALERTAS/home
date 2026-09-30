@@ -1,12 +1,20 @@
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import { CarFront, KeyRound, Pencil, Siren, UserX } from 'lucide-react';
-import { AutoTextarea, Card, Field, PageHead, gap } from '../../components/ui';
+import { AutoTextarea, Card, Expansivel, Field, PageHead, gap } from '../../components/ui';
 import { DateTimeFields, RecentInput } from '../../components/fields';
 import { MessagePreview, ShareActions } from '../../components/MessageComposer';
 import { confirmDialog } from '../../components/dialogs';
 import { pushRecent, readRecent, usePersistentState } from '../../lib/storage';
 import { nowHM, todayISO } from '../../lib/date';
-import { CORES, FATOS_ALERTA, camposPendentesAlerta, formatAlerta, tipoPlaca, type AlertaData } from './format';
+import {
+  CORES,
+  FATOS_ALERTA,
+  aparenciaPlaca,
+  camposPendentesAlerta,
+  formatAlerta,
+  tipoPlaca,
+  type AlertaData,
+} from './format';
 import { MODELOS_GRUPOS } from './modelos';
 import { CampoOpcoes } from '../../components/opcoes';
 import './veiculo.css';
@@ -37,7 +45,8 @@ const ICONE_FATO = {
 export default function VeiculoPage() {
   const [d, setD, reset] = usePersistentState<AlertaData>(K_DRAFT, novo, { ttlMs: DOZE_HORAS });
   const outroRef = useRef<HTMLInputElement>(null);
-  const ids = { placa: useId(), modelo: useId(), cor: useId(), cidade: useId(), end: useId(), hist: useId(), outro: useId() };
+  const [corAberta, setCorAberta] = useState(false);
+  const ids = { placa: useId(), modelo: useId(), cidade: useId(), end: useId(), hist: useId(), outro: useId() };
   const set = <K extends keyof AlertaData>(k: K, v: AlertaData[K]) => setD((x) => ({ ...x, [k]: v }));
 
   const fatoPadrao = FATOS_ALERTA.some((f) => f.value === d.fato);
@@ -45,6 +54,9 @@ export default function VeiculoPage() {
   const outro = !fatoPadrao;
   const texto = formatAlerta(d);
   const tipo = tipoPlaca(d.placa);
+  const aparencia = aparenciaPlaca(d.placa);
+  const corTexto = d.cor.trim();
+  const corConhecida = CORES.find((c) => c.nome === corTexto.toLocaleUpperCase('pt-BR'));
 
   const limpar = async () => {
     if (
@@ -122,11 +134,13 @@ export default function VeiculoPage() {
                   ) : null
                 }
               >
-                <div className="plate">
-                  <div className="plate-band">
-                    <span>BRASIL</span>
-                    <span className="flag" aria-hidden />
-                  </div>
+                <div className={`plate ${aparencia}`}>
+                  {aparencia === 'mercosul' && (
+                    <div className="plate-band">
+                      <span>BRASIL</span>
+                      <span className="flag" aria-hidden />
+                    </div>
+                  )}
                   <input
                     id={ids.placa}
                     value={d.placa}
@@ -153,30 +167,51 @@ export default function VeiculoPage() {
                   placeholderBusca="Buscar ou digitar marca e modelo"
                 />
               </Field>
-              <Field label="Cor" htmlFor={ids.cor}>
-                <div className="swatches" role="group" aria-label="Cores">
-                  {CORES.map((c) => (
-                    <button
-                      key={c.nome}
-                      type="button"
-                      className="swatch"
-                      aria-pressed={d.cor.toLocaleUpperCase('pt-BR') === c.nome}
-                      onClick={() => set('cor', d.cor.toLocaleUpperCase('pt-BR') === c.nome ? '' : c.nome)}
-                    >
-                      <span className="dot" style={{ background: c.hex }} />
-                      {c.nome}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  id={ids.cor}
-                  className="input upper"
-                  value={d.cor}
-                  placeholder="Ou digite (ex.: PRATA/PRETA)"
-                  autoCapitalize="characters"
-                  onChange={(e) => set('cor', e.target.value)}
-                />
-              </Field>
+              <Expansivel
+                titulo="Cor"
+                aberto={corAberta}
+                onAlternar={setCorAberta}
+                resumo={
+                  corTexto ? (
+                    <>
+                      {corConhecida && <span className="cor-dot" style={{ background: corConhecida.hex }} aria-hidden />}
+                      <span className="txt">{corTexto}</span>
+                    </>
+                  ) : (
+                    <span className="txt vazio">Selecione a cor</span>
+                  )
+                }
+              >
+                {({ fechar }) => (
+                  <div className="stack" style={gap(12)}>
+                    <div className="swatches" role="group" aria-label="Cores">
+                      {CORES.map((c) => (
+                        <button
+                          key={c.nome}
+                          type="button"
+                          className="swatch"
+                          aria-pressed={d.cor.toLocaleUpperCase('pt-BR') === c.nome}
+                          onClick={() => {
+                            set('cor', d.cor.toLocaleUpperCase('pt-BR') === c.nome ? '' : c.nome);
+                            fechar();
+                          }}
+                        >
+                          <span className="dot" style={{ background: c.hex }} />
+                          {c.nome}
+                        </button>
+                      ))}
+                    </div>
+                    <input
+                      className="input upper"
+                      value={d.cor}
+                      placeholder="Ou digite (ex.: PRATA/PRETA)"
+                      aria-label="Digitar a cor"
+                      autoCapitalize="characters"
+                      onChange={(e) => set('cor', e.target.value)}
+                    />
+                  </div>
+                )}
+              </Expansivel>
             </div>
           </Card>
 

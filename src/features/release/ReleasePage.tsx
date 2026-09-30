@@ -1,6 +1,6 @@
 import { useId, useRef } from 'react';
 import { FileText, Plus, Trash2, UserRound, Mic } from 'lucide-react';
-import { Card, Field, PageHead, Seg, AutoTextarea, gap } from '../../components/ui';
+import { Card, Expansivel, Field, PageHead, Seg, AutoTextarea, gap } from '../../components/ui';
 import { DateTimeFields, RecentInput } from '../../components/fields';
 import { MessagePreview, ShareActions } from '../../components/MessageComposer';
 import { confirmDialog } from '../../components/dialogs';
@@ -63,6 +63,7 @@ export default function ReleasePage() {
   const fatosRecentes = readRecent(K_FATOS).slice(0, 6);
   const texto = formatRelease(data);
   const pendentes = camposPendentes(data);
+  const trechos = trechosHistorico(draft.dp);
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
   const setDetido = (id: string, patch: Partial<Detido>) =>
@@ -294,12 +295,12 @@ export default function ReleasePage() {
                   onChange={(e) => set('historico', e.target.value)}
                 />
               </Field>
-              <div>
-                <div className="eyebrow" style={{ marginBottom: 8 }}>
-                  Inserir frase pronta
-                </div>
+              <Expansivel
+                titulo="Inserir frase pronta"
+                resumo={<span className="txt vazio">{trechos.length} frases</span>}
+              >
                 <div className="chips">
-                  {trechosHistorico(draft.dp).map((t) => (
+                  {trechos.map((t) => (
                     <button
                       key={t.rotulo}
                       type="button"
@@ -311,7 +312,7 @@ export default function ReleasePage() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </Expansivel>
             </div>
           </Card>
 

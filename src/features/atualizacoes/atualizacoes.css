@@ -1,0 +1,138 @@
+/* ==========================================================================
+   Notas de atualização (folha aberta pelo rodapé da barra lateral e pelo menu "Mais")
+   ========================================================================== */
+
+/* Versão instalada em destaque: mesma barra vermelha de 3 px do painel e do tile de Alerta */
+.notas-atual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.notas-atual::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: 3px;
+  border-radius: var(--radius) 0 0 var(--radius);
+  background: var(--primary);
+}
+
+/* Cada versão é um bloco expansível (Expansivel, variante "livre"): selos e data em cima, título embaixo */
+.notas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notas-item .expansivel-titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notas-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.notas-data {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.notas-titulo {
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* ---------- Texto em markdown (Markdown.tsx) ---------- */
+
+.md {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.md > * + * {
+  margin-top: 10px;
+}
+
+.md h4 {
+  margin-top: 16px;
+  font-size: 15.5px;
+  color: var(--text);
+}
+
+.md h5 {
+  margin-top: 12px;
+  font-size: 14.5px;
+  color: var(--text);
+}
+
+.md ul,
+.md ol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.md li.md-n1 {
+  margin-left: 18px;
+}
+
+.md li.md-n2 {
+  margin-left: 36px;
+}
+
+.md strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.md code {
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-3);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.md pre {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-inset);
+  overflow-x: auto;
+}
+
+.md pre code {
+  padding: 0;
+  background: transparent;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+.md blockquote {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--border-strong);
+  color: var(--text-3);
+}
