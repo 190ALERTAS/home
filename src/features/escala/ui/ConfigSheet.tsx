@@ -13,7 +13,7 @@ import { SyncSheet } from './SyncSheet';
 
 const DIAS: DiasNoMes[] = ['31', '30', '29', '28'];
 
-/** Converte "170", "170,5" ou "170:30" em minutos. */
+/** Converte "171", "171,5" ou "171:30" em minutos. */
 function horasParaMinutos(txt: string): number | null {
   const t = txt.trim().replace(',', '.');
   if (!t) return null;
@@ -55,7 +55,7 @@ export function ConfigSheet({ open, onClose }: { open: boolean; onClose: () => v
     for (const d of DIAS) {
       const v = horasParaMinutos(metas[d]);
       if (v == null) {
-        toast({ title: `Carga horária inválida (${d} dias)`, desc: 'Use horas, ex.: 170 ou 170:30', kind: 'error' });
+        toast({ title: `Carga horária inválida (${d} dias)`, desc: 'Use horas, ex.: 171 ou 171:30', kind: 'error' });
         return;
       }
       novasMetas[d] = v;
@@ -68,7 +68,14 @@ export function ConfigSheet({ open, onClose }: { open: boolean; onClose: () => v
     const modelosOk = modelos.filter((m) => m.nome.trim() && m.start && m.end).map((m) => ({ ...m, nome: m.nome.trim() }));
     atualizar((d) => ({
       ...d,
-      config: { metas: novasMetas, edtMinutos: edtMin, perfil: { nome: perfil.nome.trim(), matricula: perfil.matricula.trim(), unidade: perfil.unidade.trim() } },
+      // Mantém o carimbo da revisão do padrão (padraoRev): sem ele, um 170h digitado de propósito
+      // seria tratado como o padrão antigo e trocado por 171h na próxima abertura.
+      config: {
+        ...d.config,
+        metas: novasMetas,
+        edtMinutos: edtMin,
+        perfil: { nome: perfil.nome.trim(), matricula: perfil.matricula.trim(), unidade: perfil.unidade.trim() },
+      },
       modelos: modelosOk,
     }));
     toast({ title: 'Configurações salvas', kind: 'success' });
@@ -138,7 +145,8 @@ export function ConfigSheet({ open, onClose }: { open: boolean; onClose: () => v
             <input className="input" inputMode="decimal" value={edt} onChange={(e) => setEdt(e.target.value)} />
           </Field>
           <p className="subtle" style={{ fontSize: 13 }}>
-            Padrão: 177h (31 dias), 170h (30 dias). Férias e afastamentos descontam a carga proporcionalmente aos dias.
+            Padrão: {minutosParaTexto(METAS_PADRAO['31'])}h (31 dias), {minutosParaTexto(METAS_PADRAO['30'])}h (30 dias). Férias e
+            afastamentos descontam a carga proporcionalmente aos dias.
           </p>
         </section>
 

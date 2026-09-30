@@ -128,9 +128,14 @@ A versão 4 guardava a escala na chave `registros` do `localStorage`. Na primeir
 
 O arquivo `registros.json` exportado pela versão 4 também pode ser importado em *Minha Escala → ⋯ → Importar backup*.
 
-Carga horária padrão: **177h em meses de 31 dias** e **170h em meses de 30 dias** (fevereiro: 160h/165h,
+Carga horária padrão: **177h em meses de 31 dias** e **171h em meses de 30 dias** (fevereiro: 160h/165h,
 configurável). Férias e afastamentos descontam a carga proporcionalmente; cada EDT/RSP desconta 6h
 (configurável). O turno conta no mês em que começa.
+
+Até a versão 5.1.0 o mês de 30 dias era 170h. Como o valor fica gravado no aparelho (e na nuvem), quem nunca o
+alterou é levado para 171h automaticamente, **uma única vez**: a configuração carrega o carimbo `padraoRev`
+(`model.ts` → `atualizarPadrao`, aplicado em `normalizarV2`, portanto igual na leitura local, da nuvem e da base de
+sincronização — a migração nunca aparece como "alteração" a mesclar). Valores personalizados são mantidos.
 
 ## Privacidade
 
