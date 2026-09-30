@@ -51,6 +51,16 @@ export function tipoPlaca(placa: string): TipoPlaca {
 }
 
 /**
+ * Aparência da placa desenhada na tela. Diferente de `tipoPlaca`, decide já durante a digitação:
+ * Mercosul (ABC1D23) e padrão antigo (ABC1234) só se distinguem pelo 5º caractere, então
+ * "ABC12" já vira a placa cinza e qualquer outro caso (vazio, incompleto, letra no 5º) fica Mercosul.
+ */
+export function aparenciaPlaca(placa: string): 'mercosul' | 'antiga' {
+  const p = normalizarPlaca(placa).replace(/-/g, '');
+  return /^[A-Z]{3}\d{2}/.test(p) ? 'antiga' : 'mercosul';
+}
+
+/**
  * Mesmo formato da versão anterior (já conhecido nos grupos), todo em maiúsculas:
  *
  * 🚨 *ALERTA DE ROUBO DE VEÍCULO* 🚨

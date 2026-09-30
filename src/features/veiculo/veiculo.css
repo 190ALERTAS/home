@@ -51,17 +51,56 @@
   color: var(--primary-hi);
 }
 
-/* Placa no estilo Mercosul */
+/*
+ * Placa desenhada na tela. Mercosul por padrão; vira a placa cinza do padrão antigo (.antiga) assim
+ * que o 5º caractere digitado é número (aparenciaPlaca, format.ts). Cores do objeto real, iguais nos
+ * dois temas, por isso ficam em variáveis locais e não nos tokens do app. Proporção real: 400 × 130 mm.
+ */
 .plate {
+  --placa-fundo: #fbfbfb;
+  --placa-borda: #1b1b1b;
+  --placa-tinta: #121212;
+  --placa-dica: #b9b9b9;
+  --placa-faixa: #1a47ad;
+  --placa-rebordo: #d9dbdd;
+  --placa-parafuso: #8f9194;
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 3px solid #1b1b1b;
+  width: 100%;
+  max-width: 360px;
+  margin-inline: auto;
+  aspect-ratio: 40 / 13;
+  border: 3px solid var(--placa-borda);
   border-radius: 10px;
-  background: #fbfbfb;
+  background: var(--placa-fundo);
   overflow: hidden;
   box-shadow: var(--shadow-2);
-  max-width: 360px;
+  transition: background-color var(--dur) var(--ease-out);
+}
+
+.plate.antiga {
+  --placa-fundo: #c4c6c8;
+}
+
+/* Padrão antigo: sem faixa azul; aro em relevo e os dois parafusos de fixação */
+.plate.antiga::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--placa-rebordo);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.plate.antiga::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15px 50%, var(--placa-parafuso) 0 4px, transparent 4.5px),
+    radial-gradient(circle at calc(100% - 15px) 50%, var(--placa-parafuso) 0 4px, transparent 4.5px);
+  pointer-events: none;
 }
 
 .plate-band {
@@ -70,7 +109,7 @@
   justify-content: space-between;
   height: 22px;
   padding: 0 10px;
-  background: #1a47ad;
+  background: var(--placa-faixa);
   color: #fff;
   font-family: var(--font-ui);
   font-size: 11.5px;
@@ -89,11 +128,12 @@
 }
 
 .plate input {
+  flex: 1 1 auto;
   width: 100%;
-  height: 62px;
+  min-height: 0;
   border: 0;
   background: transparent;
-  color: #121212;
+  color: var(--placa-tinta);
   font-family: var(--font-mono);
   font-size: 38px;
   font-weight: 600;
@@ -102,8 +142,12 @@
   text-transform: uppercase;
 }
 
+.plate.antiga input {
+  font-size: 44px;
+}
+
 .plate input::placeholder {
-  color: #b9b9b9;
+  color: var(--placa-dica);
 }
 
 .plate input:focus {
@@ -147,15 +191,26 @@
     border-color var(--dur);
 }
 
-.swatch .dot {
-  width: 28px;
-  height: 28px;
+.swatch .dot,
+.cor-dot {
   border-radius: 50%;
   box-shadow: inset 0 0 0 1px rgba(127, 137, 150, 0.45);
 }
 
+.swatch .dot {
+  width: 28px;
+  height: 28px;
+}
+
+/* Bolinha da cor escolhida, no resumo do bloco expansível "Cor" */
+.cor-dot {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
 .swatch:hover {
-  background: var(--surface-2);
+  background: var(--surface-hover);
 }
 
 .swatch[aria-pressed='true'] {

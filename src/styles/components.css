@@ -1128,6 +1128,119 @@ button.list-item:hover {
   }
 }
 
+/* ---------- Bloco expansível (components/ui.tsx: Expansivel) ---------- */
+
+.expansivel {
+  min-width: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.expansivel-topo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  touch-action: manipulation;
+  transition: background-color var(--dur);
+}
+
+.expansivel-topo:hover {
+  background: var(--surface-hover);
+}
+
+/* O anel de foco fica por dentro da borda do bloco */
+.expansivel-topo:focus-visible {
+  outline-offset: -2px;
+}
+
+.expansivel-titulo {
+  flex: none;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.expansivel-resumo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.expansivel-resumo .txt {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.expansivel-resumo .vazio {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.expansivel-seta {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  color: var(--text-3);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.expansivel-resumo + .expansivel-seta {
+  margin-left: 0;
+}
+
+.expansivel.aberto .expansivel-seta {
+  transform: rotate(180deg);
+}
+
+/* Título (h2–h4) que envolve o botão: só semântica, sem o estilo de título */
+.expansivel-cab {
+  margin: 0;
+  font: inherit;
+  letter-spacing: normal;
+  line-height: inherit;
+}
+
+/* Cabeçalho com conteúdo livre (selos, texto que quebra linha) em vez do rótulo em caixa alta */
+.expansivel.livre .expansivel-topo {
+  padding-block: 10px;
+}
+
+.expansivel.livre .expansivel-titulo {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+}
+
+.expansivel-corpo {
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--border);
+  animation: rise-in var(--dur) var(--ease-out);
+}
+
 /* ---------- Seletores de data e hora (components/pickers.tsx) ---------- */
 
 .campo-picker {

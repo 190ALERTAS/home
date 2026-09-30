@@ -1,5 +1,13 @@
-import { useId, useLayoutEffect, useRef, type CSSProperties, type ReactNode, type TextareaHTMLAttributes } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import {
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type TextareaHTMLAttributes,
+} from 'react';
+import { ChevronDown, type LucideIcon } from 'lucide-react';
 
 /** Espaçamento para .stack/.row via variável CSS: style={gap(8)} */
 export const gap = (px: number): CSSProperties => ({ '--gap': `${px}px` }) as CSSProperties;
@@ -146,6 +154,79 @@ export function Seg<T extends string>({
           {o.label}
         </button>
       ))}
+    </div>
+  );
+}
+
+/* ---------- Bloco expansível (recolhido por padrão) ---------- */
+
+/**
+ * Cabeçalho que abre e fecha um conteúdo (botão com `aria-expanded`, seta que gira e resumo do valor
+ * escolhido à direita). Recolhido por padrão. Sem `aberto`, cuida do próprio estado; com `aberto` +
+ * `onAlternar`, o pai controla. `children` pode ser uma função que recebe `fechar`, que recolhe e
+ * devolve o foco ao cabeçalho (o item tocado deixa de existir na tela).
+ */
+export function Expansivel({
+  titulo,
+  resumo,
+  children,
+  aberto,
+  inicialmenteAberto = false,
+  onAlternar,
+  cabecalho,
+  className,
+}: {
+  titulo: ReactNode;
+  /** Valor atual mostrado à direita do título, mesmo recolhido. */
+  resumo?: ReactNode;
+  children: ReactNode | ((api: { fechar: () => void }) => ReactNode);
+  aberto?: boolean;
+  /** Estado inicial quando o próprio bloco cuida do estado (sem `aberto`). */
+  inicialmenteAberto?: boolean;
+  onAlternar?: (aberto: boolean) => void;
+  /** Envolve o botão num título (h2–h4), para leitores de tela navegarem por ele. */
+  cabecalho?: 2 | 3 | 4;
+  className?: string;
+}) {
+  const idTopo = useId();
+  const idCorpo = useId();
+  const topo = useRef<HTMLButtonElement>(null);
+  const [interno, setInterno] = useState(inicialmenteAberto);
+  const controlado = aberto !== undefined;
+  const open = controlado ? aberto : interno;
+
+  const alternar = (v: boolean) => {
+    if (!controlado) setInterno(v);
+    onAlternar?.(v);
+  };
+  const fechar = () => {
+    alternar(false);
+    topo.current?.focus();
+  };
+
+  const botao = (
+    <button
+      ref={topo}
+      id={idTopo}
+      type="button"
+      className="expansivel-topo"
+      aria-expanded={open}
+      aria-controls={idCorpo}
+      onClick={() => alternar(!open)}
+    >
+      <span className="expansivel-titulo">{titulo}</span>
+      {resumo && <span className="expansivel-resumo">{resumo}</span>}
+      <ChevronDown className="expansivel-seta" aria-hidden />
+    </button>
+  );
+  const Cab = cabecalho ? (`h${cabecalho}` as 'h2' | 'h3' | 'h4') : null;
+
+  return (
+    <div className={`expansivel${open ? ' aberto' : ''}${className ? ` ${className}` : ''}`}>
+      {Cab ? <Cab className="expansivel-cab">{botao}</Cab> : botao}
+      <div id={idCorpo} role="region" aria-labelledby={idTopo} className="expansivel-corpo" hidden={!open}>
+        {typeof children === 'function' ? children({ fechar }) : children}
+      </div>
     </div>
   );
 }
