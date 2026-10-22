@@ -8,7 +8,8 @@ import { toast } from '../components/toast';
 import { gap } from '../components/ui';
 import { Emblema } from '../components/Emblema';
 import { DockContext } from '../components/dock';
-import { APP_VERSION, BOTTOM, DESTAQUE, MORE, NAV, SIDE_EXTRA, SIDE_MAIN } from './nav';
+import { navegarDeslizando } from '../lib/transicao';
+import { APP_VERSION, BOTTOM, DESTAQUE, MORE, NAV, SIDE_EXTRA, SIDE_MAIN, direcaoNav } from './nav';
 
 // As notas de atualização só são baixadas quando alguém abre a folha (o chunk fica no cache offline do PWA).
 const NotasSheet = lazy(() => import('../features/atualizacoes/NotasSheet'));
@@ -92,6 +93,8 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
   const moreActive = MORE.includes(route as RouteId);
   const [slotAcoes, setSlotAcoes] = useState<HTMLDivElement | null>(null);
   const dockRef = useRef<HTMLDivElement>(null);
+  // Itens da barra inferior (e do "Mais") trocam de tela deslizando para o lado do item tocado.
+  const deslizar = (id: RouteId) => navegarDeslizando(id, direcaoNav(route, id));
 
   // Altura da parte inferior fixa (navegação + barra flutuante da tela) → espaço no fim da página e posição dos avisos.
   useEffect(() => {
@@ -172,7 +175,7 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
               <a
                 key={id}
                 className={`nav-item${id === DESTAQUE ? ' nav-destaque' : ''}`}
-                {...linkProps(id)}
+                {...linkProps(id, undefined, deslizar)}
                 aria-current={route === id ? 'page' : undefined}
                 aria-label={NAV[id].long}
               >
@@ -209,7 +212,7 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
                 <a
                   key={id}
                   className="list-item"
-                  {...linkProps(id, () => setMoreOpen(false))}
+                  {...linkProps(id, () => setMoreOpen(false), deslizar)}
                   style={{ color: 'inherit', textDecoration: 'none' }}
                 >
                   <span className="ico" style={route === id ? { borderColor: 'var(--primary-line)', color: 'var(--primary-hi)' } : undefined}>

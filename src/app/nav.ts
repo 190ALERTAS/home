@@ -63,11 +63,24 @@ export const NAV: Record<RouteId, NavEntry> = {
 /** Itens fixos da barra inferior (o 7º botão é "Mais"). A Minha escala é o produto principal. */
 export const BOTTOM: RouteId[] = ['inicio', 'release', 'escala', 'taf', 'croqui', 'veiculos'];
 /** Rota em destaque na barra inferior (ícone sempre vermelho). */
-export const DESTAQUE: RouteId = 'escala';
+export const DESTAQUE: RouteId = 'inicio';
 /** Itens do menu "Mais". */
 export const MORE: RouteId[] = ['sugestoes', 'termos'];
 /** Ordem da barra lateral (desktop). */
 export const SIDE_MAIN: RouteId[] = ['inicio', 'release', 'escala', 'taf', 'croqui', 'veiculos'];
 export const SIDE_EXTRA: RouteId[] = ['sugestoes', 'termos'];
+
+/**
+ * Para que lado a tela desliza ao trocar de item na barra inferior, como num carrossel: o item tocado
+ * à direita entra pela direita, o da esquerda entra pela esquerda. Os itens do "Mais" ficam à direita
+ * de todos os da barra. Mesmo item ou tela fora da barra: sem transição.
+ */
+export function direcaoNav(de: RouteId | 'notfound', para: RouteId): 'direita' | 'esquerda' | null {
+  const ordem: RouteId[] = [...BOTTOM, ...MORE];
+  const i = de === 'notfound' ? -1 : ordem.indexOf(de);
+  const j = ordem.indexOf(para);
+  if (i < 0 || j < 0 || i === j) return null;
+  return j > i ? 'direita' : 'esquerda';
+}
 
 export const APP_VERSION = '5.2.0';

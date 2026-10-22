@@ -243,7 +243,7 @@
   color: #f0495c;
 }
 
-/* Minha escala (produto principal): ícone sempre em vermelho, sem destaque exagerado */
+/* Início: ícone sempre em vermelho, sem destaque exagerado */
 .nav-item.nav-destaque .pill {
   color: #f0495c;
 }
@@ -549,5 +549,111 @@
   .split > .split-aside {
     position: sticky;
     top: calc(var(--topbar-h) + 18px);
+  }
+}
+
+/* ---------- Troca de tela pela barra inferior (celular): deslize horizontal ---------- */
+
+/*
+ * Como um carrossel: a tela atual sai por um lado e a nova entra pelo outro (src/lib/transicao.ts).
+ * Barra superior e navegação recebem nomes próprios para ficarem paradas, por cima do conteúdo.
+ */
+@media (max-width: 899.98px) {
+  .topbar {
+    view-transition-name: topo;
+  }
+
+  .dock {
+    view-transition-name: dock;
+  }
+
+  .main {
+    view-transition-name: tela;
+  }
+}
+
+::view-transition-new(root),
+::view-transition-new(topo),
+::view-transition-new(dock),
+::view-transition-group(topo),
+::view-transition-group(dock) {
+  animation: none;
+}
+
+/* O que não desliza troca na hora: sem isso, a barra flutuante da tela antiga (ex.: Copiar/WhatsApp)
+   apareceria sobreposta à da nova durante o deslize */
+::view-transition-old(root),
+::view-transition-old(topo),
+::view-transition-old(dock) {
+  display: none;
+}
+
+::view-transition-group(tela) {
+  animation-duration: 280ms;
+}
+
+html[data-deslize='direita']::view-transition-old(tela) {
+  animation: 280ms var(--ease-out) both sai-para-esquerda;
+}
+
+html[data-deslize='direita']::view-transition-new(tela) {
+  animation: 280ms var(--ease-out) both entra-pela-direita;
+}
+
+html[data-deslize='esquerda']::view-transition-old(tela) {
+  animation: 280ms var(--ease-out) both sai-para-direita;
+}
+
+html[data-deslize='esquerda']::view-transition-new(tela) {
+  animation: 280ms var(--ease-out) both entra-pela-esquerda;
+}
+
+/*
+ * Navegador sem View Transitions: só a tela nova entra deslizando. Anima o .main (e não a .page, que já
+ * tem o fade-in de entrada: trocar a animação dela no fim faria o fade recomeçar).
+ */
+@media (max-width: 899.98px) {
+  html[data-deslize-simples] .app {
+    overflow-x: clip;
+  }
+
+  html[data-deslize-simples][data-deslize='direita'] .main {
+    animation: 280ms var(--ease-out) both entra-pela-direita;
+  }
+
+  html[data-deslize-simples][data-deslize='esquerda'] .main {
+    animation: 280ms var(--ease-out) both entra-pela-esquerda;
+  }
+}
+
+@keyframes sai-para-esquerda {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes sai-para-direita {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes entra-pela-direita {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes entra-pela-esquerda {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
