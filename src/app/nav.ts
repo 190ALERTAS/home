@@ -83,4 +83,4 @@ export function direcaoNav(de: RouteId | 'notfound', para: RouteId): 'direita' |
   return j > i ? 'direita' : 'esquerda';
 }
 
-export const APP_VERSION = '5.2.0';
+export const APP_VERSION = '5.2.1';
