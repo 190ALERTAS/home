@@ -343,6 +343,21 @@ describe('gerador de escala', () => {
 });
 
 describe('armazenamento e migração automática', () => {
+  it('espelho "registros" relido não duplica turno GSE nem convalescença', () => {
+    const kv = memKV();
+    const db = dbVazio();
+    db.entries = [
+      { id: 'g', kind: 'turno', date: '2026-10-01', start: '07:00', end: '19:00', minutes: 720, servico: 'gse' },
+      { id: 'c', kind: 'afastamento', date: '2026-10-02', motivo: 'convalescenca' },
+      { id: 'e', kind: 'edt', date: '2026-10-03' },
+    ];
+    salvar(kv, db);
+    kv.setItem(K_ESPELHO, 'assinatura-que-falhou'); // ex.: a gravação da assinatura falhou
+    const r = carregar(kv);
+    expect(r.db.entries.map((e) => e.id).sort()).toEqual(['c', 'e', 'g']);
+    expect(r.aviso).toBeUndefined();
+  });
+
   it('primeiro acesso sem dados', () => {
     const kv = memKV();
     const r = carregar(kv);

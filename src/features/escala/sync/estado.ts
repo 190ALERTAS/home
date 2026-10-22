@@ -51,6 +51,8 @@ export interface SyncPersistido {
   tentativa?: number;
   /** Falhas seguidas desde a última sincronização bem-sucedida. */
   falhas?: number;
+  /** A última falha foi de rede (ex.: o celular congelou o app no meio do envio). */
+  falhaRede?: true;
   /** Erro que não se resolve sozinho (permissão, dados ilegíveis, app antigo): o automático não insiste. */
   permanente?: boolean;
   erro?: string;
@@ -85,6 +87,7 @@ function carregar(): SyncEstado {
     consultaOff: s.consultaOff === true ? true : undefined,
     tentativa: tempo(s.tentativa),
     falhas: tempo(s.falhas),
+    falhaRede: s.falhaRede === true ? true : undefined,
     permanente: s.permanente === true ? true : undefined,
     erro: texto(s.erro),
     precisaEntrar: s.precisaEntrar === true ? true : undefined,

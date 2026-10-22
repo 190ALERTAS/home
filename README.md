@@ -135,6 +135,12 @@ são preservados por aparelhos ainda na 5.1, que só não aplicam as regras nova
   carimbo). Comparando *base × local × nuvem* dá para propagar exclusões e edições sem apagar nada por engano; na
   primeira sincronização o resultado é sempre a união dos dois lados. Lógica pura em
   `src/features/escala/sync/merge.ts` (com testes). Bases gravadas pela 5.1 (sem carimbo) passam uma vez pela transação.
+- **Cópia apagada em outro aparelho**: a consulta não distingue documento apagado de documento sem mudança. Os
+  outros aparelhos continuam mostrando "Sincronizado" e recriam a cópia no próximo lançamento, como na versão 5.1.
+- **Falhas**: o automático recua (15 min → 1 h → 4 h → 12 h). Depois de uma falha de rede (ex.: o iPhone congelou o app
+  no meio do envio), abrir ou voltar ao app tenta de novo após 3 min, sem esperar o recuo inteiro. Uma pendência que
+  sobrevive a uma sincronização bem-sucedida (ex.: armazenamento do aparelho cheio) não gera novos envios até o
+  próximo lançamento.
 - **Plano B**: se a consulta for recusada por falta de índice ou por regras que só permitam ler o documento, e a
   transação funcionar, o aparelho passa a sincronizar só pela transação (`consultaOff`), como na versão 5.1.
 - **Firebase sob demanda**: o SDK (Auth + Firestore *lite*) só é baixado quando a pessoa entra ou sincroniza (`sync/nuvem.ts`); quem não usa não paga o peso.

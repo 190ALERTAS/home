@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { dbVazio, type Entry, type EscalaDB } from './model';
-import { mesclar, migrarV1, normalizarV2, paraV1 } from './migrate';
+import { chaveV1, mesclar, migrarV1, normalizarV2, paraV1 } from './migrate';
 import { iguaisInst, instantaneoDe, type Instantaneo } from './sync/merge';
 import { toast } from '../../components/toast';
 
@@ -83,7 +83,7 @@ export function carregar(kv: KV, agora = new Date()): { db: EscalaDB; aviso?: Av
       // "registros" alterado por fora (ex.: uso temporário da versão antiga): incorpora o que faltar.
       if (rawV1 != null && assinatura(rawV1) !== get(kv, K_ESPELHO)) {
         const { entries } = migrarV1(parse(rawV1));
-        const { entries: juntas, adicionadas } = mesclar(db.entries, entries);
+        const { entries: juntas, adicionadas } = mesclar(db.entries, entries, chaveV1);
         const next = adicionadas > 0 ? { ...db, entries: juntas } : db;
         salvar(kv, next);
         return adicionadas > 0 ? { db: next, aviso: { tipo: 'sincronizado', adicionadas } } : { db: next };
@@ -137,6 +137,11 @@ const kvNavegador: KV = {
 };
 
 let estado: EscalaDB | null = null;
+/**
+ * Conta as alterações feitas pelo usuário (lançar, desfazer, outra aba). A sincronização usa para
+ * saber se houve algo novo a enviar; aplicar o que veio da nuvem não conta.
+ */
+let revisao = 0;
 let avisoPendente: Aviso | undefined;
 let falhouSalvar = false;
 const ouvintes = new Set<() => void>();
@@ -173,9 +178,14 @@ export function atualizar(fn: (db: EscalaDB) => EscalaDB, rotulo?: string): bool
     if (pilhaDesfazer.length > 30) pilhaDesfazer.shift();
   }
   estado = next;
+  revisao++;
   const ok = persistir(next);
   emitir();
   return ok;
+}
+
+export function revisaoEscala(): number {
+  return revisao;
 }
 
 function persistir(db: EscalaDB): boolean {
@@ -222,6 +232,7 @@ export function desfazer(): string | null {
   if (!item) return null;
   const atual = getEscala();
   estado = { ...atual, entries: item.entries, meta: { ...atual.meta, atualizadoEm: new Date().toISOString() } };
+  revisao++;
   salvar(kvNavegador, estado);
   emitir();
   return item.rotulo;
@@ -253,6 +264,7 @@ if (typeof window !== 'undefined') {
     const db = normalizarV2(parse(e.newValue));
     if (db) {
       estado = db;
+      revisao++;
       emitir();
     }
   });

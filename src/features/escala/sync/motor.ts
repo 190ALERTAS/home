@@ -1,8 +1,9 @@
 import { track } from '../../../lib/analytics';
-import { getEscala, substituirDaNuvem } from '../store';
+import { getEscala, revisaoEscala, substituirDaNuvem } from '../store';
 import { iguaisInst, instantaneoDe, mesclar3 } from './merge';
 import {
   ANTI_RAJADA_MS,
+  INTERVALO_CHECAGEM_MS,
   SESSAO_OK,
   definirSync,
   esperaAposFalha,
@@ -121,10 +122,37 @@ export function pendenteLocal(uid = getSync().uid): boolean {
   return !base || !iguaisInst(instantaneoDe(getEscala()), base);
 }
 
-/** O automático pode agir agora? (ligado, sem erro permanente, sem sessão perdida, fora do recuo) */
-function automaticoLiberado(s: SyncEstado, agora: number): boolean {
+/**
+ * O automático pode agir agora? (ligado, sem erro permanente, sem sessão perdida, fora do recuo)
+ *
+ * Com a pessoa usando o app (`presenca`: abriu, voltou a ele, abriu a escala, a internet voltou) e a
+ * última falha sendo de rede, o recuo cai para 3 min: o celular que congelou o app no meio de um envio
+ * não pode deixar de mostrar a escala atualizada por 15 min. Erros da nuvem seguem o recuo inteiro.
+ */
+export function automaticoLiberado(s: SyncEstado, agora: number, presenca = false): boolean {
   if (!s.auto || s.permanente || s.precisaEntrar) return false;
-  return !(s.tentativa && agora - s.tentativa < esperaAposFalha(s.falhas ?? 1));
+  if (!s.tentativa) return true;
+  const espera = presenca && s.falhaRede ? Math.min(INTERVALO_CHECAGEM_MS, esperaAposFalha(s.falhas ?? 1)) : esperaAposFalha(s.falhas ?? 1);
+  return agora - s.tentativa >= espera || agora < s.tentativa;
+}
+
+/** Falha de rede (sem conexão de verdade, app congelado, login que não respondeu a tempo). */
+function erroDeRede(e: unknown): boolean {
+  const code = typeof e === 'object' && e && 'code' in e ? String((e as { code: unknown }).code) : '';
+  const msg = e instanceof Error ? e.message : '';
+  return code === 'unavailable' || code === 'deadline-exceeded' || code === 'auth/network-request-failed' || msg === 'auth-timeout';
+}
+
+let revisaoSincronizada: number | null = null;
+
+/**
+ * Revisão da escala (ver `revisaoEscala`) que a última sincronização bem-sucedida levou em conta, ou
+ * null se ainda não houve nenhuma nesta abertura do app. Se a revisão atual é a mesma, não há
+ * lançamento novo: uma pendência que continua (ex.: a base não pôde ser gravada) não deve gerar
+ * outro envio.
+ */
+export function revisaoJaSincronizada(): number | null {
+  return revisaoSincronizada;
 }
 
 /**
@@ -143,22 +171,22 @@ let emAndamento: Promise<Resultado> | null = null;
  * Confere a nuvem e envia o que mudou aqui. Chamadas simultâneas (nesta ou em outra aba)
  * compartilham a mesma execução. Falhas recuam só no automático.
  */
-export function sincronizar(origem: Origem): Promise<Resultado> {
+export function sincronizar(origem: Origem, opcoes: { presenca?: boolean } = {}): Promise<Resultado> {
   if (!emAndamento) {
-    emAndamento = comTrava(() => executar(origem)).finally(() => {
+    emAndamento = comTrava(() => executar(origem, opcoes.presenca ?? false)).finally(() => {
       emAndamento = null;
     });
   }
   return emAndamento;
 }
 
-async function executar(origem: Origem): Promise<Resultado> {
+async function executar(origem: Origem, presenca: boolean): Promise<Resultado> {
   // Outra aba pode ter sincronizado enquanto esta esperava a trava: confere o estado mais recente.
   recarregarSync();
   const s = getSync();
   if (!s.ativo) return falha('erro', 'Conecte uma conta Google primeiro.');
   const agora = Date.now();
-  if ((origem === 'auto' || origem === 'envio') && !automaticoLiberado(s, agora)) return falha('adiado', '');
+  if ((origem === 'auto' || origem === 'envio') && !automaticoLiberado(s, agora, presenca)) return falha('adiado', '');
   if (!navigator.onLine) return falha('offline', 'Sem conexão com a internet.');
   const pendente = pendenteLocal(s.uid);
   if (origem === 'envio' && !pendente) return NADA;
@@ -183,6 +211,7 @@ async function executar(origem: Origem): Promise<Resultado> {
       erro: mensagem,
       tentativa: Date.now(),
       falhas: (getSync().falhas ?? 0) + 1,
+      falhaRede: erroDeRede(e) ? true : undefined,
       permanente: erroPermanente(e) ? true : undefined,
     });
     return falha('erro', mensagem);
@@ -194,6 +223,7 @@ async function executar(origem: Origem): Promise<Resultado> {
 async function rodar(nuvem: typeof import('./nuvem'), usuario: Usuario): Promise<Resultado> {
   const base = lerBase(usuario.uid);
   const local0 = instantaneoDe(getEscala());
+  const revisao0 = revisaoEscala();
   const pendente = !base || !iguaisInst(local0, base);
 
   // Nada a enviar: basta saber se a nuvem mudou. Uma consulta, sem baixar nada se não mudou.
@@ -207,7 +237,7 @@ async function rodar(nuvem: typeof import('./nuvem'), usuario: Usuario): Promise
       recusada = true; // só desliga a consulta se a transação abaixo funcionar
     }
     if (c && !c.mudou) {
-      concluir(usuario);
+      concluir(usuario, revisao0);
       return NADA;
     }
     if (c?.mudou) {
@@ -216,7 +246,7 @@ async function rodar(nuvem: typeof import('./nuvem'), usuario: Usuario): Promise
       // O usuário pode ter editado durante a conferência: mantém o que ele fez (sobe no próximo envio).
       const recebeu = substituirDaNuvem(mesclar3(local0, instantaneoDe(getEscala()), mesclado));
       salvarBase(usuario.uid, mesclado, c.carimbo);
-      concluir(usuario);
+      concluir(usuario, revisao0);
       return { ok: true, enviou: false, recebeu };
     }
   }
@@ -232,12 +262,13 @@ async function rodar(nuvem: typeof import('./nuvem'), usuario: Usuario): Promise
   salvarBase(usuario.uid, mesclado, carimbo);
   // A consulta foi recusada e a transação não: é a consulta que não serve aqui (índice, regras).
   if (recusada) definirSync({ consultaOff: true });
-  concluir(usuario);
+  concluir(usuario, revisao0);
   return { ok: true, enviou: gravou, recebeu };
 }
 
-function concluir(usuario: Usuario): void {
+function concluir(usuario: Usuario, revisao: number): void {
   const agora = Date.now();
+  revisaoSincronizada = revisao;
   definirSync({
     uid: usuario.uid,
     email: usuario.email,
@@ -246,6 +277,7 @@ function concluir(usuario: Usuario): void {
     checado: agora,
     tentativa: undefined,
     falhas: undefined,
+    falhaRede: undefined,
     permanente: undefined,
     erro: undefined,
     ...SESSAO_OK,

@@ -5,6 +5,13 @@ import type { Usuario } from './nuvem';
 
 const H = 3600_000;
 
+/** O documento como o nuvem.ts real o devolve: passa por JSON (Firestore) e pelo normalizarV2. */
+async function comoLido(i: Instantaneo): Promise<Instantaneo> {
+  const { normalizarV2 } = await import('../migrate');
+  const db = normalizarV2({ version: 2, ...JSON.parse(JSON.stringify(i)) })!;
+  return { entries: db.entries, modelos: db.modelos, config: db.config };
+}
+
 /** Nuvem falsa em memória que conta leituras/gravações do Firestore (cada consulta ou transação lê 1 vez). */
 function nuvemFalsa() {
   const n = {
@@ -43,14 +50,14 @@ function nuvemFalsa() {
       n.leituras++;
       n.consultas++;
       if (!n.doc || n.carimbo === carimbo) return { mudou: false };
-      return { mudou: true, remoto: structuredClone(n.doc), carimbo: n.carimbo };
+      return { mudou: true, remoto: await comoLido(n.doc), carimbo: n.carimbo };
     },
     trocar: async (_uid: string, decidir: (r: Instantaneo | null) => { mesclado: Instantaneo; gravar: boolean }) => {
       n.tentativas++;
       if (n.erro) throw n.erro;
       n.leituras++;
       const existia = n.doc != null;
-      const r = decidir(n.doc ? structuredClone(n.doc) : null);
+      const r = decidir(n.doc ? await comoLido(n.doc) : null);
       if (r.gravar) {
         n.doc = structuredClone(r.mesclado);
         n.carimbo = `c${++n.versao}`;
@@ -423,6 +430,65 @@ describe('sincronização sem janela: confere barato e envia logo depois de lan�
     expect(t.nuvem.leituras - leituras).toBeLessThanOrEqual(20);
     expect(t.nuvem.gravacoes - gravacoes).toBe(3);
     expect(t.nuvem.doc!.entries).toHaveLength(3);
+  });
+
+  it('base que não consegue ser gravada não vira uma sincronização a cada 10 s', async () => {
+    const t = await montar();
+    await t.motor.conectar();
+    const parar = t.auto.iniciarSyncAutomatico();
+    await vi.advanceTimersByTimeAsync(2000);
+    // armazenamento cheio/bloqueado só para a base: a sincronização funciona, mas a pendência nunca some
+    const setItem = localStorage.setItem;
+    vi.stubGlobal('localStorage', {
+      getItem: localStorage.getItem,
+      removeItem: localStorage.removeItem,
+      setItem: (k: string, v: string) => {
+        if (k === '190a:escala:sync-base') throw new Error('QuotaExceededError');
+        setItem(k, v);
+      },
+    });
+    const leituras = t.nuvem.leituras;
+    mais(t, 'a');
+    await vi.advanceTimersByTimeAsync(5 * MIN);
+    parar();
+    expect(t.nuvem.doc!.entries.map((e) => e.id)).toEqual(['a']);
+    expect(t.nuvem.leituras - leituras).toBeLessThanOrEqual(2);
+  });
+
+  it('falha de rede ao sair do app não segura a conferência por 15 min quando a pessoa volta', async () => {
+    const t = await montar();
+    await t.motor.conectar();
+    const parar = t.auto.iniciarSyncAutomatico();
+    await vi.advanceTimersByTimeAsync(2000);
+    mais(t, 'a');
+    t.nuvem.erro = Object.assign(new Error('suspenso'), { code: 'unavailable' }); // o iPhone congelou o app no meio do envio
+    t.ocultar();
+    await vi.advanceTimersByTimeAsync(100);
+    expect(t.estado.getSync().falhas).toBe(1);
+    t.nuvem.erro = null;
+    await vi.advanceTimersByTimeAsync(4 * MIN);
+    t.mostrar();
+    await vi.advanceTimersByTimeAsync(1000);
+    parar();
+    expect(t.nuvem.doc!.entries.map((e) => e.id)).toEqual(['a']);
+    expect(t.estado.getSync().falhas).toBeUndefined();
+  });
+
+  it('rede caída e a pessoa entrando e saindo do app: no máximo 1 tentativa a cada 3 min', async () => {
+    const t = await montar();
+    await t.motor.conectar();
+    const parar = t.auto.iniciarSyncAutomatico();
+    await vi.advanceTimersByTimeAsync(2000);
+    t.nuvem.erro = Object.assign(new Error('fora do ar'), { code: 'unavailable' });
+    const antes = t.nuvem.tentativas;
+    for (let i = 0; i < 20; i++) {
+      t.ocultar();
+      await vi.advanceTimersByTimeAsync(30_000);
+      t.mostrar();
+      await vi.advanceTimersByTimeAsync(1000);
+    }
+    parar();
+    expect(t.nuvem.tentativas - antes).toBeLessThanOrEqual(4); // ~10 min de vai e vem
   });
 
   it('falha repetida recua (15 min, 1 h, 4 h, 12 h) e não vira uma leitura a cada poucos minutos', async () => {
