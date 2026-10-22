@@ -213,7 +213,9 @@ export function interpretarBackup(texto: string): Importado {
 
 /** Chave de igualdade para evitar duplicar lançamentos ao mesclar. */
 export function chaveEntrada(e: Entry): string {
-  return e.kind === 'turno' ? `t|${e.date}|${e.start}|${e.end}|${e.minutes}` : `${e.kind}|${e.date}`;
+  // Os campos novos só entram na chave quando existem: as chaves dos lançamentos antigos não mudam.
+  if (e.kind === 'turno') return `t|${e.date}|${e.start}|${e.end}|${e.minutes}${e.servico ? `|${e.servico}` : ''}`;
+  return `${e.kind}|${e.date}${e.motivo ? `|${e.motivo}` : ''}`;
 }
 
 /** Junta entradas novas às existentes, sem repetir as que já existem. */

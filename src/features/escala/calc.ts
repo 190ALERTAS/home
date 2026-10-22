@@ -1,5 +1,5 @@
 import { addDays, daysInMonth, hmToMinutes, parseMonthKey, shiftMinutes } from '../../lib/date';
-import { isTurno, type Config, type DiasNoMes, type Entry, type Turno } from './model';
+import { GSE_LIMITE, isTurno, servicoDe, type Config, type DiasNoMes, type Entry, type Turno } from './model';
 
 export interface ResumoMes {
   mes: string; // AAAA-MM
@@ -15,14 +15,39 @@ export interface ResumoMes {
   descontoEdt: number;
   /** Carga horária a cumprir (meta ajustada). */
   meta: number;
+  /** Horas que contam na carga ordinária: turnos ordinários + 1/3 do sobreaviso (sem GSE). */
   trabalhado: number;
   normais: number;
   extras: number;
   faltam: number;
   saldo: number;
+  /** Todos os turnos do mês, de qualquer tipo de serviço. */
   turnos: number;
   /** trabalhado / meta (pode passar de 1). */
   progresso: number;
+  /** Serviço extraordinário (GSE): soma à parte, fora da carga ordinária. */
+  gse: number;
+  turnosGse: number;
+  /** Passou do limite mensal de GSE (40h). */
+  gseExcedido: boolean;
+  /** Duração cheia dos turnos de sobreaviso e quanto deles conta (1/3). */
+  sobreaviso: number;
+  sobreavisoComputado: number;
+  /** Dias de afastamento por convalescença (já incluídos em diasAfastamento). */
+  diasConvalescenca: number;
+  /** Mais de 1 dia de convalescença e GSE no mesmo mês (NI ADM 033.2, 3.e.2.c). */
+  alertaConvalescencaGse: boolean;
+}
+
+/**
+ * Minutos que o turno soma na carga ordinária. Sobreaviso conta 1/3 (NI ADM 033.2, 3.d.3);
+ * extraordinário (GSE) é contado à parte.
+ */
+export function minutosComputados(t: Turno): number {
+  const s = servicoDe(t);
+  if (s === 'gse') return 0;
+  if (s === 'sobreaviso') return Math.round(t.minutes / 3);
+  return t.minutes;
 }
 
 export function metaDoMes(mes: string, config: Config): number {
@@ -44,17 +69,34 @@ export function calcularResumo(entries: Entry[], mes: string, config: Config): R
   const ferias = new Set<string>();
   const afast = new Set<string>();
   const edt = new Set<string>();
+  const convalescenca = new Set<string>();
   let trabalhado = 0;
   let turnos = 0;
+  let gse = 0;
+  let turnosGse = 0;
+  let sobreaviso = 0;
+  let sobreavisoComputado = 0;
 
   for (const e of doMes) {
     if (e.kind === 'turno') {
-      trabalhado += e.minutes;
+      const computado = minutosComputados(e);
+      trabalhado += computado;
       turnos++;
+      const s = servicoDe(e);
+      if (s === 'gse') {
+        gse += e.minutes;
+        turnosGse++;
+      } else if (s === 'sobreaviso') {
+        sobreaviso += e.minutes;
+        sobreavisoComputado += computado;
+      }
     } else if (e.kind === 'ferias') ferias.add(e.date);
-    else if (e.kind === 'afastamento') afast.add(e.date);
-    else if (e.kind === 'edt') edt.add(e.date);
+    else if (e.kind === 'afastamento') {
+      afast.add(e.date);
+      if (e.motivo === 'convalescenca') convalescenca.add(e.date);
+    } else if (e.kind === 'edt') edt.add(e.date);
   }
+  const diasConvalescenca = [...convalescenca].filter((d) => !ferias.has(d)).length;
 
   // Um dia ausente (férias ou afastamento) conta uma vez só, e não recebe desconto de EDT.
   const ausentes = new Set([...ferias, ...afast]);
@@ -81,6 +123,13 @@ export function calcularResumo(entries: Entry[], mes: string, config: Config): R
     saldo: trabalhado - meta,
     turnos,
     progresso: meta > 0 ? trabalhado / meta : trabalhado > 0 ? 1 : 0,
+    gse,
+    turnosGse,
+    gseExcedido: gse > GSE_LIMITE,
+    sobreaviso,
+    sobreavisoComputado,
+    diasConvalescenca,
+    alertaConvalescencaGse: diasConvalescenca > 1 && turnosGse > 0,
   };
 }
 
@@ -141,6 +190,14 @@ export function duplicados(entries: Entry[]): Set<string> {
     else vistos.set(k, e.id);
   }
   return dup;
+}
+
+/** Dias com turno e indisponibilidade ao mesmo tempo (lançamentos anteriores à versão 5.2). */
+export function conflitos(entries: Entry[]): Set<string> {
+  const comTurno = new Set<string>();
+  const comMarca = new Set<string>();
+  for (const e of entries) (e.kind === 'turno' ? comTurno : comMarca).add(e.date);
+  return new Set([...comTurno].filter((d) => comMarca.has(d)));
 }
 
 export function novoTurnoMinutos(start: string, end: string): number {

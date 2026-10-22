@@ -1,7 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { calcularResumo, duplicados, proximoTurno, turnosFrequentes } from './calc';
+import { calcularResumo, conflitos, duplicados, minutosComputados, proximoTurno, turnosFrequentes } from './calc';
 import { interpretarBackup, mesclar, migrarV1, normalizarV2, paraV1, parseHorasV1 } from './migrate';
-import { PADRAO_REV, configPadrao, dbVazio, type Entry, type Turno } from './model';
+import {
+  GSE_LIMITE,
+  PADRAO_REV,
+  ROTULO_INDISP,
+  ROTULO_SERVICO,
+  configPadrao,
+  dbVazio,
+  indisponibilidadeDe,
+  marcacaoDe,
+  servicoDe,
+  type Entry,
+  type Turno,
+} from './model';
 import { adicionarTurno, aplicarTurno, editarTurno, limparDias, marcar, removerMes } from './ops';
 import { PRESETS, aplicarGerador, preverGerador } from './gerador';
 import { K_BACKUP_V1, K_ESPELHO, K_V1, K_V2, assinatura, carregar, salvar, type KV } from './store';
@@ -351,5 +363,146 @@ describe('próximo serviço (painel inicial)', () => {
   it('turno de 24h termina no dia seguinte; sem turnos futuros não há próximo', () => {
     expect(proximoTurno(lista, '2026-09-28T06:59')).toEqual({ turno: lista[2], emAndamento: true });
     expect(proximoTurno(lista, '2026-09-28T07:00')).toBeNull();
+  });
+});
+
+describe('NI ADM 033.2: tipos de serviço e convalescença', () => {
+  const cfg = configPadrao();
+  const t = (id: string, date: string, start: string, end: string, minutes: number, extra: Partial<Turno> = {}): Turno => ({
+    id,
+    kind: 'turno',
+    date,
+    start,
+    end,
+    minutes,
+    ...extra,
+  });
+  const cnv = (id: string, date: string): Entry => ({ id, kind: 'afastamento', date, motivo: 'convalescenca' });
+
+  it('GSE soma à parte e não entra na carga ordinária', () => {
+    const r = calcularResumo(
+      [t('a', '2026-10-01', '07:00', '19:00', 720), t('b', '2026-10-03', '07:00', '19:00', 720, { servico: 'gse' })],
+      '2026-10',
+      cfg,
+    );
+    expect(r.trabalhado).toBe(720);
+    expect(r.gse).toBe(720);
+    expect(r.turnosGse).toBe(1);
+    expect(r.turnos).toBe(2);
+    expect(r.gseExcedido).toBe(false);
+  });
+
+  it('sobreaviso conta 1/3', () => {
+    const r = calcularResumo([t('a', '2026-10-01', '07:00', '07:00', 1440, { servico: 'sobreaviso' })], '2026-10', cfg);
+    expect(r.trabalhado).toBe(480);
+    expect(r.sobreaviso).toBe(1440);
+    expect(r.sobreavisoComputado).toBe(480);
+    expect(minutosComputados(t('x', '2026-10-01', '07:00', '08:00', 100, { servico: 'sobreaviso' }))).toBe(33);
+  });
+
+  it('GSE acima de 40h acende o alerta', () => {
+    const gse = [1, 2, 3, 4].map((d) => t(`g${d}`, `2026-10-0${d}`, '07:00', '19:00', 720, { servico: 'gse' }));
+    const r = calcularResumo(gse, '2026-10', cfg);
+    expect(r.gse).toBe(48 * 60);
+    expect(GSE_LIMITE).toBe(40 * 60);
+    expect(r.gseExcedido).toBe(true);
+  });
+
+  it('convalescença é afastamento e desconta igual', () => {
+    const com = calcularResumo(
+      [cnv('c1', '2026-10-10'), cnv('c2', '2026-10-11'), t('g', '2026-10-20', '07:00', '19:00', 720, { servico: 'gse' })],
+      '2026-10',
+      cfg,
+    );
+    const comum = calcularResumo(
+      [
+        { id: 'a1', kind: 'afastamento', date: '2026-10-10' },
+        { id: 'a2', kind: 'afastamento', date: '2026-10-11' },
+      ],
+      '2026-10',
+      cfg,
+    );
+    expect(com.diasAfastamento).toBe(2);
+    expect(com.diasConvalescenca).toBe(2);
+    expect(com.descontoAusencias).toBe(comum.descontoAusencias);
+    expect(com.alertaConvalescencaGse).toBe(true);
+    expect(comum.alertaConvalescencaGse).toBe(false);
+  });
+
+  it('um dia só de convalescença não dispara o aviso de GSE', () => {
+    const r = calcularResumo([cnv('c1', '2026-10-10'), t('g', '2026-10-20', '07:00', '19:00', 720, { servico: 'gse' })], '2026-10', cfg);
+    expect(r.alertaConvalescencaGse).toBe(false);
+  });
+
+  it('lançamentos antigos calculam igual à 5.1.2', () => {
+    const { entries } = migrarV1(LEGADO);
+    const r = calcularResumo(entries, '2025-08', cfg);
+    expect(r.trabalhado).toBe(720 + 720 + 0 + 705);
+    expect(r.gse).toBe(0);
+    expect(r.sobreaviso).toBe(0);
+    expect(r.meta).toBe(177 * 60 - Math.round((177 * 60 * 2) / 31) - 360);
+  });
+
+  it('campos novos e desconhecidos sobrevivem ao normalizarV2', () => {
+    const db = dbVazio();
+    db.entries = [
+      t('a', '2026-10-01', '07:00', '19:00', 720, { servico: 'gse' }),
+      t('b', '2026-10-02', '07:00', '19:00', 720, { servico: 'futuro' as never }),
+      cnv('c', '2026-10-03'),
+    ];
+    const lido = normalizarV2(JSON.parse(JSON.stringify(db)))!;
+    expect(lido.entries.map((e) => (e.kind === 'turno' ? e.servico : e.motivo))).toEqual(['gse', 'futuro', 'convalescenca']);
+    expect(servicoDe(lido.entries[1] as Turno)).toBe('ordinario');
+    expect(calcularResumo(lido.entries, '2026-10', cfg).trabalhado).toBe(720);
+  });
+
+  it('a validação da 5.1.2 aceita os lançamentos novos (nada se perde num aparelho antigo)', () => {
+    // Cópia literal da entradaValida da versão 5.1.2 (src/features/escala/migrate.ts).
+    const entradaValida512 = (e: unknown): boolean => {
+      if (!e || typeof e !== 'object') return false;
+      const x = e as Record<string, unknown>;
+      if (typeof x.id !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(String(x.date))) return false;
+      if (x.kind === 'turno')
+        return /^\d{2}:\d{2}$/.test(String(x.start)) && /^\d{2}:\d{2}$/.test(String(x.end)) && typeof x.minutes === 'number' && x.minutes >= 0;
+      return x.kind === 'ferias' || x.kind === 'afastamento' || x.kind === 'edt';
+    };
+    const novos: Entry[] = [
+      t('a', '2026-10-01', '07:00', '19:00', 720, { servico: 'gse' }),
+      t('b', '2026-10-02', '07:00', '07:00', 1440, { servico: 'sobreaviso' }),
+      cnv('c', '2026-10-03'),
+      { id: 'd', kind: marcacaoDe('convalescenca').kind, date: '2026-10-04', motivo: marcacaoDe('convalescenca').motivo },
+    ];
+    expect(novos.every(entradaValida512)).toBe(true);
+  });
+
+  it('rótulos e conversões de indisponibilidade', () => {
+    expect(indisponibilidadeDe(cnv('c', '2026-10-03') as never)).toBe('convalescenca');
+    expect(indisponibilidadeDe({ id: 'e', kind: 'edt', date: '2026-10-03' })).toBe('edt');
+    expect(marcacaoDe('ferias')).toEqual({ kind: 'ferias' });
+    expect(ROTULO_INDISP.convalescenca.curto).toBe('CNV');
+    expect(ROTULO_SERVICO.gse.curto).toBe('GSE');
+    expect(ROTULO_SERVICO.sobreaviso.curto).toBe('SBV');
+  });
+
+  it('conflitos lista dias com turno e indisponibilidade', () => {
+    const e: Entry[] = [
+      t('a', '2026-10-01', '07:00', '19:00', 720),
+      { id: 'b', kind: 'edt', date: '2026-10-01' },
+      { id: 'c', kind: 'ferias', date: '2026-10-02' },
+      t('d', '2026-10-03', '07:00', '19:00', 720),
+    ];
+    expect([...conflitos(e)]).toEqual(['2026-10-01']);
+  });
+
+  it('dados antigos com turno e EDT no mesmo dia ficam intactos', () => {
+    const db = dbVazio();
+    db.entries = [t('a', '2026-10-01', '07:00', '19:00', 720), { id: 'b', kind: 'edt', date: '2026-10-01' }];
+    expect(normalizarV2(JSON.parse(JSON.stringify(db)))!.entries.map((x) => x.id).sort()).toEqual(['a', 'b']);
+  });
+
+  it('importar backup não junta turno ordinário com o mesmo horário em GSE', () => {
+    const base = [t('a', '2026-10-01', '07:00', '19:00', 720)];
+    expect(mesclar(base, [t('x', '2026-10-01', '07:00', '19:00', 720)]).adicionadas).toBe(0);
+    expect(mesclar(base, [t('y', '2026-10-01', '07:00', '19:00', 720, { servico: 'gse' })]).adicionadas).toBe(1);
   });
 });

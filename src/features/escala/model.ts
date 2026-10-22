@@ -7,6 +7,20 @@
 
 export type TipoMarcacao = 'ferias' | 'afastamento' | 'edt';
 
+/**
+ * Tipo de serviço do turno (NI ADM 033.2). Sem o campo, o turno é ordinário — como todos os
+ * lançados até a versão 5.1. É opcional de propósito: um aparelho com versão anterior preserva o
+ * campo e continua lendo o turno (só não aplica a regra).
+ */
+export type TipoServico = 'gse' | 'sobreaviso';
+
+/**
+ * Indisponibilidade como o usuário escolhe na tela. A convalescença é gravada como afastamento com
+ * `motivo` (e não como um `kind` novo): a versão 5.1 descarta lançamentos de tipo desconhecido e,
+ * ao sincronizar, apagaria o lançamento nos outros aparelhos.
+ */
+export type TipoIndisponibilidade = 'ferias' | 'afastamento' | 'convalescenca' | 'edt';
+
 export interface Turno {
   id: string;
   kind: 'turno';
@@ -16,6 +30,8 @@ export interface Turno {
   end: string; // HH:MM
   /** Duração registrada em minutos. */
   minutes: number;
+  /** Ausente = ordinário. Valores desconhecidos (versões futuras) são preservados e contam como ordinário. */
+  servico?: TipoServico;
   note?: string;
 }
 
@@ -23,6 +39,8 @@ export interface Marcacao {
   id: string;
   kind: TipoMarcacao;
   date: string;
+  /** Só em afastamento: dispensa médica para convalescença domiciliar (NI ADM 033.2, 3.e.2.c). */
+  motivo?: 'convalescenca';
   note?: string;
 }
 
@@ -97,6 +115,9 @@ export function atualizarPadrao(config: Config): Config {
 
 export const EDT_PADRAO = 6 * HORA;
 
+/** Limite mensal de serviço extraordinário por militar (NI ADM 033.2, 3.f.1.b). */
+export const GSE_LIMITE = 40 * HORA;
+
 export const MODELOS_PADRAO: ModeloTurno[] = [
   { id: 'diurno', nome: 'Diurno', start: '07:00', end: '19:00' },
   { id: 'noturno', nome: 'Noturno', start: '19:00', end: '07:00' },
@@ -108,6 +129,33 @@ export const ROTULO_MARCACAO: Record<TipoMarcacao, { curto: string; longo: strin
   afastamento: { curto: 'AFT', longo: 'Afastamento' },
   edt: { curto: 'EDT', longo: 'EDT/RSP' },
 };
+
+export const ROTULO_SERVICO: Record<'ordinario' | TipoServico, { curto: string; longo: string }> = {
+  ordinario: { curto: 'ORD', longo: 'Ordinário' },
+  gse: { curto: 'GSE', longo: 'Extra (GSE)' },
+  sobreaviso: { curto: 'SBV', longo: 'Sobreaviso' },
+};
+
+export const ROTULO_INDISP: Record<TipoIndisponibilidade, { curto: string; longo: string }> = {
+  ferias: { curto: 'FÉR', longo: 'Férias' },
+  afastamento: { curto: 'AFT', longo: 'Afastamento' },
+  convalescenca: { curto: 'CNV', longo: 'Convalescença' },
+  edt: { curto: 'EDT', longo: 'EDT/RSP' },
+};
+
+/** Tipo de serviço efetivo: valor ausente ou desconhecido conta como ordinário. */
+export function servicoDe(t: Turno): 'ordinario' | TipoServico {
+  return t.servico === 'gse' || t.servico === 'sobreaviso' ? t.servico : 'ordinario';
+}
+
+export function indisponibilidadeDe(m: Marcacao): TipoIndisponibilidade {
+  return m.kind === 'afastamento' && m.motivo === 'convalescenca' ? 'convalescenca' : m.kind;
+}
+
+/** Como cada indisponibilidade é gravada. */
+export function marcacaoDe(t: TipoIndisponibilidade): { kind: TipoMarcacao; motivo?: 'convalescenca' } {
+  return t === 'convalescenca' ? { kind: 'afastamento', motivo: 'convalescenca' } : { kind: t };
+}
 
 export function configPadrao(): Config {
   return {
