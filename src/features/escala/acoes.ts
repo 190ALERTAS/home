@@ -113,8 +113,10 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
     r.gse ? `GSE: ${formatMinutes(r.gse)} em ${r.turnosGse} turno(s)` : '',
     r.sobreaviso ? `Sobreaviso: ${formatMinutes(r.sobreaviso)} (conta ${formatMinutes(r.sobreavisoComputado)})` : '',
   ].filter(Boolean);
-  doc.text(pdfTxt(detalhes.join('   ·   ')), margem, y);
-  y += 14;
+  // Com GSE e sobreaviso a linha passa da largura da página: quebra em quantas linhas precisar.
+  const linhasDetalhe: string[] = doc.splitTextToSize(pdfTxt(detalhes.join('   ·   ')), W - margem * 2);
+  doc.text(linhasDetalhe, margem, y);
+  y += 14 + (linhasDetalhe.length - 1) * 11;
 
   // Tabela
   const corpo = entriesDoMes(db.entries, mes).map((e) => {
