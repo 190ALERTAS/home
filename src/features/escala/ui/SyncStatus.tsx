@@ -1,5 +1,5 @@
 import { ChevronRight, Cloud, CloudAlert, CloudCheck, CloudOff, CloudUpload, type LucideIcon } from 'lucide-react';
-import { formatarHa, formatarRestante } from '../sync/estado';
+import { formatarHa } from '../sync/estado';
 import { useStatusSync, type StatusSync } from '../sync/useStatus';
 
 export type Tom = 'ok' | 'pendente' | 'erro' | 'ocupado';
@@ -13,7 +13,7 @@ export interface Descricao {
 
 /** Texto e ícone do estado da sincronização (o mesmo no indicador e no painel). */
 export function descrever(st: StatusSync): Descricao {
-  const { s, agora, janela: j } = st;
+  const { s, agora } = st;
   switch (st.situacao) {
     case 'ocupado':
       return { titulo: 'Sincronizando…', detalhe: 'Enviando e recebendo a sua escala', tom: 'ocupado', Icone: Cloud };
@@ -22,11 +22,11 @@ export function descrever(st: StatusSync): Descricao {
     case 'erro':
       return { titulo: 'Falha na sincronização', detalhe: 'Toque para ver o motivo', tom: 'erro', Icone: CloudAlert };
     case 'pendente': {
-      const detalhe = !j.aberta
-        ? 'Seguem na próxima sincronização'
-        : s.auto
-          ? 'Serão enviadas automaticamente ao abrir o app'
-          : 'Toque para sincronizar agora';
+      const detalhe = !s.auto
+        ? 'Toque para sincronizar agora'
+        : !st.online
+          ? 'Serão enviadas quando a internet voltar'
+          : 'Serão enviadas em instantes';
       return { titulo: 'Alterações não enviadas', detalhe, tom: 'pendente', Icone: CloudUpload };
     }
     default:
@@ -39,26 +39,8 @@ export function descrever(st: StatusSync): Descricao {
   }
 }
 
-/** Avanço da janela de 12 h: enche até liberar a próxima sincronização. */
-export function BarraJanela({ progresso, aberta, className }: { progresso: number; aberta: boolean; className?: string }) {
-  const pct = Math.round(progresso * 100);
-  return (
-    <div
-      className={`sync-bar${aberta ? ' pronta' : ''}${className ? ` ${className}` : ''}`}
-      role="progressbar"
-      aria-label="Tempo até a próxima sincronização"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={pct}
-    >
-      <i style={{ width: `${pct}%` }} />
-    </div>
-  );
-}
-
 function textos(st: StatusSync): { l1: string; l2: string } {
-  const { s, janela: j } = st;
-  const resta = formatarRestante(j.restanteMs);
+  const { s, agora } = st;
   switch (st.situacao) {
     case 'ocupado':
       return { l1: 'Sincronizando…', l2: 'Aguarde um instante' };
@@ -69,25 +51,18 @@ function textos(st: StatusSync): { l1: string; l2: string } {
     case 'pendente':
       return {
         l1: 'Alterações não enviadas',
-        l2: j.aberta ? (s.auto ? 'Envio ao abrir o app' : 'Toque para sincronizar') : `Envio em ${resta}`,
+        l2: !s.auto ? 'Toque para sincronizar' : st.online ? 'Enviando em instantes' : 'Envio quando a internet voltar',
       };
-    default:
-      return {
-        l1: 'Sincronizado',
-        l2: j.aberta
-          ? s.auto
-            ? 'Automática ao abrir o app'
-            : 'Nova sincronização liberada'
-          : s.auto
-            ? `Automática em ${resta}`
-            : `Próxima em ${resta}`,
-      };
+    default: {
+      const quando = s.checado ?? s.ultima;
+      return { l1: 'Sincronizado', l2: quando != null ? `Conferido ${formatarHa(agora - quando)}` : 'Escala em dia com a nuvem' };
+    }
   }
 }
 
 /**
  * Indicador discreto à direita de "Resumo do mês": ícone de nuvem colorido pelo estado e duas
- * linhas — o que está acontecendo e quando sincroniza de novo. Sem conta conectada, mostra
+ * linhas — o que está acontecendo e quando conferiu a nuvem pela última vez. Sem conta conectada, mostra
  * "Nuvem não configurada". Em todos os casos o toque abre o painel de sincronização.
  */
 export function SyncIndicador({ onClick }: { onClick: () => void }) {
@@ -111,14 +86,12 @@ export function SyncIndicador({ onClick }: { onClick: () => void }) {
   }
   const { detalhe, tom, Icone } = descrever(st);
   const { l1, l2 } = textos(st);
-  const { janela: j } = st;
-  const proxima = j.aberta ? 'Nova sincronização disponível agora.' : `Próxima sincronização em ${formatarRestante(j.restanteMs)}.`;
   return (
     <button
       type="button"
       className={`sync-topo ${tom}`}
       onClick={onClick}
-      title={`${l1}. ${detalhe}. ${proxima}`}
+      title={`${l1}. ${detalhe}.`}
       aria-label={`${l1}. ${l2}. Abrir sincronização.`}
     >
       {tom === 'ocupado' ? <span className="spinner" aria-hidden /> : <Icone aria-hidden />}

@@ -974,26 +974,6 @@ button.entry:hover {
   }
 }
 
-/* Avanço da janela de 12 h: enche até liberar a próxima sincronização */
-.sync-bar {
-  height: 6px;
-  border-radius: 999px;
-  background: var(--surface-3);
-  overflow: hidden;
-}
-
-.sync-bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--blue);
-  transition: width 600ms var(--ease-out);
-}
-
-.sync-bar.pronta i {
-  background: var(--green);
-}
-
 /* Ícone de estado (painel e linha das configurações) */
 .sync-ico,
 .list-item .ico.sync-ico {

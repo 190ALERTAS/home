@@ -46,6 +46,7 @@ import { AnoView } from './ui/AnoView';
 import { SyncIndicador } from './ui/SyncStatus';
 import { SyncSheet } from './ui/SyncSheet';
 import { getSync, useSync } from './sync/estado';
+import { conferirAoAbrirEscala } from './sync/auto';
 import './escala.css';
 
 const K_AVISO_MIGRACAO = '190a:escala:aviso-migracao-visto';
@@ -65,6 +66,10 @@ export default function EscalaPage() {
   const [aviso, setAviso] = useState<Aviso | undefined>();
   const [importacao, setImportacao] = useState<Importacao | null>(null);
   const [pdfCarregando, setPdfCarregando] = useState(false);
+
+  // Abrir a escala confere a nuvem (se a última conferência tem 3 min ou mais): o que foi lançado em
+  // outro aparelho aparece aqui sem precisar tocar em nada.
+  useEffect(() => conferirAoAbrirEscala(), []);
 
   useEffect(() => {
     const a = consumirAviso();

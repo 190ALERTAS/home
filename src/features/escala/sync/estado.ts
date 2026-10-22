@@ -8,8 +8,19 @@ import type { Instantaneo } from './merge';
  * Nada aqui carrega o Firebase: o painel e o indicador funcionam sem tocar na rede.
  */
 
-/** Uma sincronização por janela de 12 h, manual ou automática: poucas leituras e gravações. */
-export const INTERVALO_MS = 12 * 60 * 60 * 1000;
+/**
+ * Ritmo da sincronização. Conferir a nuvem é barato (uma consulta que só traz o documento se ele
+ * mudou), então dá para conferir sempre que a pessoa volta ao app — o que faz o celular mostrar,
+ * ao abrir, o que acabou de ser lançado no computador. Gravar só acontece quando algo mudou aqui.
+ */
+/** Voltar ao app (ou abrir a tela da escala) confere de novo se a última conferência tem isso ou mais. */
+export const INTERVALO_CHECAGEM_MS = 3 * 60_000;
+/** Com o app aberto e visível, confere de novo a cada hora. */
+export const PERIODICO_MS = 60 * 60_000;
+/** Espera depois da última alteração antes de enviar (junta uma rajada de lançamentos numa gravação). */
+export const ESPERA_ENVIO_MS = 10_000;
+/** Logo depois de uma sincronização, outra (clique repetido, outra aba) não lê a nuvem de novo. */
+export const ANTI_RAJADA_MS = 10_000;
 /**
  * Depois de falhas seguidas a sincronização automática espera cada vez mais (15 min, 1 h, 4 h, 12 h)
  * — uma falha que se repete não pode virar uma leitura na nuvem a cada poucos minutos.
@@ -30,8 +41,12 @@ export interface SyncPersistido {
   uid?: string;
   email?: string;
   nome?: string;
-  /** Instante (ms) da última sincronização concluída — é o que "gasta" a janela. */
+  /** Instante (ms) da última sincronização concluída (envio, recebimento ou conferência). */
   ultima?: number;
+  /** Instante (ms) da última conferência da nuvem concluída. */
+  checado?: number;
+  /** A consulta barata foi recusada neste aparelho (índice, regras): sincroniza só pela transação. */
+  consultaOff?: true;
   /** Instante (ms) da última tentativa que falhou. */
   tentativa?: number;
   /** Falhas seguidas desde a última sincronização bem-sucedida. */
@@ -66,6 +81,8 @@ function carregar(): SyncEstado {
     email: texto(s.email),
     nome: texto(s.nome),
     ultima: tempo(s.ultima),
+    checado: tempo(s.checado),
+    consultaOff: s.consultaOff === true ? true : undefined,
     tentativa: tempo(s.tentativa),
     falhas: tempo(s.falhas),
     permanente: s.permanente === true ? true : undefined,
@@ -118,47 +135,31 @@ if (typeof window !== 'undefined') {
 
 /* ---------- Base (a escala como ficou na última sincronização) ---------- */
 
-export function lerBase(uid: string | undefined): Instantaneo | null {
+/**
+ * A base é a escala como ficou na última sincronização. O carimbo é o "atualizadoEm" que o documento
+ * da nuvem tinha nessa hora: se continua o mesmo, ninguém gravou desde então. Bases gravadas pela
+ * versão 5.1 não têm carimbo — a primeira sincronização passa pela transação e o grava.
+ */
+export interface Base extends Instantaneo {
+  carimbo?: string;
+}
+
+export function lerBase(uid: string | undefined): Base | null {
   if (!uid) return null;
   const raw = readJSON<Record<string, unknown> | null>(K_BASE, null);
   if (!raw || raw.uid !== uid) return null;
   const db = normalizarV2({ version: 2, entries: raw.entries, modelos: raw.modelos, config: raw.config });
-  return db ? { entries: db.entries, modelos: db.modelos, config: db.config } : null;
+  if (!db) return null;
+  const carimbo = typeof raw.carimbo === 'string' && raw.carimbo ? raw.carimbo : undefined;
+  return { entries: db.entries, modelos: db.modelos, config: db.config, ...(carimbo ? { carimbo } : {}) };
 }
 
-export function salvarBase(uid: string, base: Instantaneo): void {
-  writeJSON(K_BASE, { uid, ...base });
+export function salvarBase(uid: string, base: Instantaneo, carimbo?: string): void {
+  writeJSON(K_BASE, { uid, entries: base.entries, modelos: base.modelos, config: base.config, ...(carimbo ? { carimbo } : {}) });
 }
 
 export function limparBase(): void {
   removeKey(K_BASE);
-}
-
-/* ---------- Janela de 12 h ---------- */
-
-export interface Janela {
-  /** Já dá para sincronizar. */
-  aberta: boolean;
-  restanteMs: number;
-  /** 0 logo após sincronizar → 1 quando a janela libera. */
-  progresso: number;
-}
-
-export function janela(ultima: number | undefined, agora: number, intervalo = INTERVALO_MS): Janela {
-  if (ultima == null) return { aberta: true, restanteMs: 0, progresso: 1 };
-  // Relógio do aparelho voltou no tempo: no máximo uma janela inteira de espera.
-  const restanteMs = Math.min(intervalo, Math.max(0, intervalo - (agora - ultima)));
-  return { aberta: restanteMs === 0, restanteMs, progresso: 1 - restanteMs / intervalo };
-}
-
-/** "9h 20min", "35 min", "agora". */
-export function formatarRestante(ms: number): string {
-  const min = Math.ceil(ms / 60_000);
-  if (min <= 0) return 'agora';
-  if (min < 60) return `${min} min`;
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return m ? `${h}h ${m}min` : `${h}h`;
 }
 
 /** "há 35 min", "há 3 h", "há 2 dias". */

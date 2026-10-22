@@ -10,8 +10,18 @@ import {
   type Auth,
 } from 'firebase/auth';
 // Versão "lite" do Firestore: só leitura/gravação pontual (sem conexão aberta, sem cache offline).
-// É tudo o que uma sincronização a cada 12 h precisa e pesa bem menos.
-import { deleteDoc, doc, getFirestore, runTransaction, type Firestore } from 'firebase/firestore/lite';
+// É tudo o que a sincronização precisa e pesa bem menos.
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  runTransaction,
+  where,
+  type Firestore,
+} from 'firebase/firestore/lite';
 import { normalizarV2 } from '../migrate';
 import type { Instantaneo } from './merge';
 
@@ -117,15 +127,38 @@ function paraDocumento(i: Instantaneo) {
   ) as Record<string, unknown>;
 }
 
+const carimboDe = (data: Record<string, unknown> | undefined): string | undefined =>
+  typeof data?.atualizadoEm === 'string' && data.atualizadoEm ? data.atualizadoEm : undefined;
+
+/**
+ * Confere se a nuvem mudou desde o `carimbo` (o "atualizadoEm" da última sincronização). Toda
+ * gravação — deste app ou da versão 5.1, que também grava "atualizadoEm" — troca o valor.
+ *
+ * É uma consulta, não uma leitura do documento: custa 1 leitura e não baixa nada quando o documento
+ * continua igual (a consulta volta vazia). Se mudou, já devolve o documento novo.
+ */
+export async function conferir(
+  uid: string,
+  carimbo: string,
+): Promise<{ mudou: false } | { mudou: true; remoto: Instantaneo; carimbo?: string }> {
+  const { db } = iniciar();
+  const snap = await getDocs(query(collection(db, 'users', uid, 'escala'), where('atualizadoEm', '!=', carimbo)));
+  const achado = snap.docs.find((d) => d.id === 'dados');
+  if (!achado) return { mudou: false };
+  const data = achado.data();
+  return { mudou: true, remoto: lerDocumento(data), carimbo: carimboDe(data) };
+}
+
 /**
  * Uma leitura + (se houver diferença) uma gravação, numa transação: dois aparelhos
  * sincronizando ao mesmo tempo não se atropelam. `decidir` pode ser chamada de novo se a
- * transação for repetida — por isso deve ser uma função pura.
+ * transação for repetida — por isso deve ser uma função pura. Devolve também o carimbo
+ * ("atualizadoEm") com que o documento ficou.
  */
 export async function trocar(
   uid: string,
   decidir: (remoto: Instantaneo | null) => { mesclado: Instantaneo; gravar: boolean },
-): Promise<{ mesclado: Instantaneo; gravou: boolean; existia: boolean }> {
+): Promise<{ mesclado: Instantaneo; gravou: boolean; existia: boolean; carimbo?: string }> {
   const { db } = iniciar();
   const ref = refDe(db, uid);
   return runTransaction(
@@ -134,8 +167,13 @@ export async function trocar(
       const snap = await tx.get(ref);
       const remoto = snap.exists() ? lerDocumento(snap.data()) : null;
       const { mesclado, gravar } = decidir(remoto);
-      if (gravar) tx.set(ref, paraDocumento(mesclado));
-      return { mesclado, gravou: gravar, existia: remoto != null };
+      let carimbo = snap.exists() ? carimboDe(snap.data()) : undefined;
+      if (gravar) {
+        const documento = paraDocumento(mesclado);
+        tx.set(ref, documento);
+        carimbo = carimboDe(documento);
+      }
+      return { mesclado, gravou: gravar, existia: remoto != null, carimbo };
     },
     // Cada repetição da transação lê o documento de novo (e cobra outra leitura): no máximo 2 tentativas.
     { maxAttempts: 2 },

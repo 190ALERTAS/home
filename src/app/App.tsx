@@ -88,7 +88,7 @@ export function App() {
     };
   }, []);
 
-  // Sincronização automática da escala (só age se a conta estiver conectada e a janela de 12 h liberar).
+  // Sincronização automática da escala (só age com a conta conectada e o automático ligado).
   useEffect(() => iniciarSyncAutomatico(), []);
 
   const Page = id === 'notfound' ? NotFoundPage : PAGES[id];

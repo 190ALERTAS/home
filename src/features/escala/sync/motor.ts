@@ -2,15 +2,16 @@ import { track } from '../../../lib/analytics';
 import { getEscala, substituirDaNuvem } from '../store';
 import { iguaisInst, instantaneoDe, mesclar3 } from './merge';
 import {
+  ANTI_RAJADA_MS,
   SESSAO_OK,
   definirSync,
-  formatarRestante,
+  esperaAposFalha,
   getSync,
-  janela,
   lerBase,
   limparBase,
   recarregarSync,
   salvarBase,
+  type SyncEstado,
 } from './estado';
 import type { Usuario } from './nuvem';
 
@@ -18,12 +19,19 @@ import type { Usuario } from './nuvem';
  * Orquestra conectar / sincronizar / sair. O Firebase só é carregado aqui, sob demanda.
  */
 
-/** "conexao": primeira sincronização logo após entrar — não depende da janela de 12 h. */
-export type Origem = 'manual' | 'auto' | 'conexao';
+/**
+ * - "manual": botão "Sincronizar agora" (ignora o recuo após falhas);
+ * - "auto": conferência automática (abrir o app, voltar a ele, de hora em hora);
+ * - "envio": envio automático de uma alteração feita aqui (não faz nada se não há o que enviar);
+ * - "conexao": primeira sincronização logo após entrar.
+ */
+export type Origem = 'manual' | 'auto' | 'conexao' | 'envio';
 
 export type Resultado =
   | { ok: true; enviou: boolean; recebeu: boolean }
-  | { ok: false; motivo: 'janela' | 'offline' | 'sessao' | 'cancelado' | 'ocupado' | 'erro'; mensagem: string };
+  | { ok: false; motivo: 'adiado' | 'offline' | 'sessao' | 'cancelado' | 'ocupado' | 'erro'; mensagem: string };
+
+const NADA: Resultado = { ok: true, enviou: false, recebeu: false };
 
 const falha = (motivo: Extract<Resultado, { ok: false }>['motivo'], mensagem: string): Resultado => ({
   ok: false,
@@ -96,8 +104,8 @@ function sessaoPerdida(motivo: string, agora: number): Resultado {
 }
 
 /**
- * Só uma aba/janela do app sincroniza por vez (Web Locks). Sem isso, duas abas abertas quando a
- * janela libera fariam duas leituras. Sem suporte ao recurso, segue sem trava.
+ * Só uma aba/janela do app sincroniza por vez (Web Locks). Sem isso, duas abas abertas fariam duas
+ * leituras (e talvez duas gravações) da mesma alteração. Sem suporte ao recurso, segue sem trava.
  */
 function comTrava(fn: () => Promise<Resultado>): Promise<Resultado> {
   const locks = typeof navigator !== 'undefined' ? (navigator as Navigator & { locks?: LockManager }).locks : undefined;
@@ -107,11 +115,33 @@ function comTrava(fn: () => Promise<Resultado>): Promise<Resultado> {
   );
 }
 
+/** Há alterações neste aparelho que a nuvem ainda não tem (sem base, tudo conta como pendente). */
+export function pendenteLocal(uid = getSync().uid): boolean {
+  const base = lerBase(uid);
+  return !base || !iguaisInst(instantaneoDe(getEscala()), base);
+}
+
+/** O automático pode agir agora? (ligado, sem erro permanente, sem sessão perdida, fora do recuo) */
+function automaticoLiberado(s: SyncEstado, agora: number): boolean {
+  if (!s.auto || s.permanente || s.precisaEntrar) return false;
+  return !(s.tentativa && agora - s.tentativa < esperaAposFalha(s.falhas ?? 1));
+}
+
+/**
+ * A consulta barata foi recusada por algo que não se resolve tentando de novo (falta de índice,
+ * regras que só permitem ler o documento). A transação continua funcionando: este aparelho passa a
+ * sincronizar só por ela — nunca fica pior que a versão anterior.
+ */
+function consultaRecusada(e: unknown): boolean {
+  const code = typeof e === 'object' && e && 'code' in e ? String((e as { code: unknown }).code) : '';
+  return code === 'failed-precondition' || code === 'invalid-argument' || code === 'permission-denied' || code === 'unimplemented';
+}
+
 let emAndamento: Promise<Resultado> | null = null;
 
 /**
- * Uma sincronização por janela de 12 h (manual ou automática). Falhas não gastam a janela.
- * Chamadas simultâneas (nesta ou em outra aba) compartilham a mesma execução.
+ * Confere a nuvem e envia o que mudou aqui. Chamadas simultâneas (nesta ou em outra aba)
+ * compartilham a mesma execução. Falhas recuam só no automático.
  */
 export function sincronizar(origem: Origem): Promise<Resultado> {
   if (!emAndamento) {
@@ -128,11 +158,14 @@ async function executar(origem: Origem): Promise<Resultado> {
   const s = getSync();
   if (!s.ativo) return falha('erro', 'Conecte uma conta Google primeiro.');
   const agora = Date.now();
-  const j = janela(s.ultima, agora);
-  if (origem !== 'conexao' && !j.aberta) {
-    return falha('janela', `Nova sincronização disponível em ${formatarRestante(j.restanteMs)}.`);
-  }
+  if ((origem === 'auto' || origem === 'envio') && !automaticoLiberado(s, agora)) return falha('adiado', '');
   if (!navigator.onLine) return falha('offline', 'Sem conexão com a internet.');
+  const pendente = pendenteLocal(s.uid);
+  if (origem === 'envio' && !pendente) return NADA;
+  // Clique repetido ou outra aba que acabou de conferir: nada mudou aqui desde então, não lê de novo.
+  if (origem !== 'conexao' && !pendente && s.checado != null && agora - s.checado >= 0 && agora - s.checado < ANTI_RAJADA_MS) {
+    return NADA;
+  }
 
   definirSync({ ocupado: true });
   try {
@@ -140,7 +173,7 @@ async function executar(origem: Origem): Promise<Resultado> {
     const usuario = await nuvem.usuarioAtual();
     if (!usuario) return sessaoPerdida('sem-sessao', agora);
     const r = await rodar(nuvem, usuario);
-    track('escala_sync', { origem });
+    if (origem === 'manual' || origem === 'conexao' || (r.ok && (r.enviou || r.recebeu))) track('escala_sync', { origem });
     return r;
   } catch (e) {
     const sessao = codigoDeSessao(e);
@@ -161,8 +194,34 @@ async function executar(origem: Origem): Promise<Resultado> {
 async function rodar(nuvem: typeof import('./nuvem'), usuario: Usuario): Promise<Resultado> {
   const base = lerBase(usuario.uid);
   const local0 = instantaneoDe(getEscala());
+  const pendente = !base || !iguaisInst(local0, base);
 
-  const { mesclado, gravou } = await nuvem.trocar(usuario.uid, (remoto) => {
+  // Nada a enviar: basta saber se a nuvem mudou. Uma consulta, sem baixar nada se não mudou.
+  let recusada = false;
+  if (!pendente && base.carimbo && !getSync().consultaOff) {
+    let c: Awaited<ReturnType<typeof nuvem.conferir>> | null = null;
+    try {
+      c = await nuvem.conferir(usuario.uid, base.carimbo);
+    } catch (e) {
+      if (codigoDeSessao(e) || !consultaRecusada(e)) throw e;
+      recusada = true; // só desliga a consulta se a transação abaixo funcionar
+    }
+    if (c && !c.mudou) {
+      concluir(usuario);
+      return NADA;
+    }
+    if (c?.mudou) {
+      // Nada local a juntar: o resultado é o que veio da nuvem, sem precisar gravar.
+      const mesclado = mesclar3(base, local0, c.remoto);
+      // O usuário pode ter editado durante a conferência: mantém o que ele fez (sobe no próximo envio).
+      const recebeu = substituirDaNuvem(mesclar3(local0, instantaneoDe(getEscala()), mesclado));
+      salvarBase(usuario.uid, mesclado, c.carimbo);
+      concluir(usuario);
+      return { ok: true, enviou: false, recebeu };
+    }
+  }
+
+  const { mesclado, gravou, carimbo } = await nuvem.trocar(usuario.uid, (remoto) => {
     const m = remoto ? mesclar3(base, local0, remoto) : local0;
     return { mesclado: m, gravar: !remoto || !iguaisInst(m, remoto) };
   });
@@ -170,27 +229,34 @@ async function rodar(nuvem: typeof import('./nuvem'), usuario: Usuario): Promise
   // O usuário pode ter editado durante a sincronização: refaz a mesclagem com o que há agora.
   const final = mesclar3(local0, instantaneoDe(getEscala()), mesclado);
   const recebeu = substituirDaNuvem(final);
-  salvarBase(usuario.uid, mesclado);
+  salvarBase(usuario.uid, mesclado, carimbo);
+  // A consulta foi recusada e a transação não: é a consulta que não serve aqui (índice, regras).
+  if (recusada) definirSync({ consultaOff: true });
+  concluir(usuario);
+  return { ok: true, enviou: gravou, recebeu };
+}
 
+function concluir(usuario: Usuario): void {
+  const agora = Date.now();
   definirSync({
     uid: usuario.uid,
     email: usuario.email,
     nome: usuario.nome,
-    ultima: Date.now(),
+    ultima: agora,
+    checado: agora,
     tentativa: undefined,
     falhas: undefined,
     permanente: undefined,
     erro: undefined,
     ...SESSAO_OK,
   });
-  return { ok: true, enviou: gravou, recebeu };
 }
 
 /**
  * Confere de novo uma sessão marcada como perdida. O SDK só lê a sessão guardada no navegador ao
  * iniciar; se ela aparece (outra aba entrou, uma leitura que falhou uma vez), limpa o aviso em vez
  * de exigir um login à toa — sem isso o aviso ficava gravado para sempre e desligava o automático.
- * Não é uma sincronização: não lê a nuvem e não gasta a janela de 12 h. Devolve true se a sessão voltou.
+ * Não é uma sincronização: não lê a nuvem. Devolve true se a sessão voltou.
  */
 export async function revalidarSessao(): Promise<boolean> {
   const s = getSync();
@@ -226,6 +292,8 @@ export async function conectar(): Promise<Resultado> {
       email: u.email,
       nome: u.nome,
       ultima: undefined,
+      checado: undefined,
+      consultaOff: undefined,
       tentativa: undefined,
       falhas: undefined,
       permanente: undefined,
@@ -258,6 +326,7 @@ export async function desconectar(): Promise<void> {
     email: undefined,
     nome: undefined,
     ultima: undefined,
+    checado: undefined,
     erro: undefined,
     ...SESSAO_OK,
     tentativa: undefined,
@@ -276,7 +345,7 @@ export async function apagarNuvem(): Promise<Resultado> {
     await (await carregarNuvem()).apagar(uid);
     limparBase();
     // Sem cópia na nuvem, o automático fica desligado para não recriá-la sem você pedir.
-    definirSync({ auto: false, ultima: undefined, erro: undefined });
+    definirSync({ auto: false, ultima: undefined, checado: undefined, erro: undefined });
     return { ok: true, enviou: false, recebeu: false };
   } catch (e) {
     const mensagem = mensagemDeErro(e) ?? 'Não foi possível apagar agora.';

@@ -236,6 +236,12 @@ function subscribe(cb: () => void) {
   return () => ouvintes.delete(cb);
 }
 
+/** Avisa a cada mudança na escala (lançamento, desfazer, sincronização, outra aba). */
+export function assinarEscala(cb: () => void): () => void {
+  ouvintes.add(cb);
+  return () => void ouvintes.delete(cb);
+}
+
 export function useEscala(): EscalaDB {
   return useSyncExternalStore(subscribe, getEscala, getEscala);
 }
