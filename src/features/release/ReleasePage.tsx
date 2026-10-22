@@ -1,5 +1,5 @@
 import { useId, useRef } from 'react';
-import { FileText, Plus, Trash2, UserRound, Mic } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText, Plus, Trash2, UserRound, Mic } from 'lucide-react';
 import { Card, Expansivel, Field, PageHead, Seg, AutoTextarea, gap } from '../../components/ui';
 import { DateTimeFields, RecentInput } from '../../components/fields';
 import { MessagePreview, ShareActions } from '../../components/MessageComposer';
@@ -7,6 +7,7 @@ import { confirmDialog } from '../../components/dialogs';
 import { usePersistentState, pushRecent, readRecent } from '../../lib/storage';
 import { nowHM, todayISO } from '../../lib/date';
 import { uid } from '../../lib/id';
+import { moverItem } from '../../lib/lista';
 import { CampoOpcoes } from '../../components/opcoes';
 import {
   FATOS_GRUPOS,
@@ -52,6 +53,20 @@ function novoRascunho(): Draft {
     ba: '',
     dp: '',
   };
+}
+
+/** Par de setas para subir/descer um item da lista; a seta sem destino fica desativada. */
+function Mover({ i, total, rotulo, onMover }: { i: number; total: number; rotulo: string; onMover: (delta: 1 | -1) => void }) {
+  return (
+    <div className="mover">
+      <button type="button" className="icon-btn" aria-label={`Subir ${rotulo}`} disabled={i === 0} onClick={() => onMover(-1)}>
+        <ChevronUp />
+      </button>
+      <button type="button" className="icon-btn" aria-label={`Descer ${rotulo}`} disabled={i === total - 1} onClick={() => onMover(1)}>
+        <ChevronDown />
+      </button>
+    </div>
+  );
 }
 
 export default function ReleasePage() {
@@ -200,6 +215,7 @@ export default function ReleasePage() {
                       }
                     }}
                   />
+                  <Mover i={i} total={draft.apreensoes.length} rotulo={`item ${i + 1}`} onMover={(d) => set('apreensoes', moverItem(draft.apreensoes, i, d))} />
                   <button
                     type="button"
                     className="btn icon ghost"
@@ -235,6 +251,7 @@ export default function ReleasePage() {
                   <div className="subcard-head">
                     <span className="tag">{i + 1}</span>
                     <span className="title">Indivíduo</span>
+                    <Mover i={i} total={draft.detidos.length} rotulo={`indivíduo ${i + 1}`} onMover={(d) => set('detidos', moverItem(draft.detidos, i, d))} />
                     <button
                       type="button"
                       className="icon-btn"
