@@ -121,15 +121,18 @@ export function useRoute(): Resolved {
   );
 }
 
-/** Props para <a> que navegam sem recarregar a página. */
-export function linkProps(id: RouteId, onNavigate?: () => void) {
+/**
+ * Props para <a> que navegam sem recarregar a página. `navegar` troca o jeito de navegar (ex.: com a
+ * transição de deslize da barra inferior); o padrão é `navigate`.
+ */
+export function linkProps(id: RouteId, onNavigate?: () => void, navegar: (id: RouteId) => void = navigate) {
   return {
     href: hrefFor(id),
     onClick: (e: ReactMouseEvent<HTMLAnchorElement>) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       e.preventDefault();
       onNavigate?.();
-      navigate(id);
+      navegar(id);
     },
   };
 }
