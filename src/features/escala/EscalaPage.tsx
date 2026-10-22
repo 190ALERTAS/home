@@ -10,7 +10,7 @@ import {
   FileUp,
   ListChecks,
   MessageCircle,
-  Palmtree,
+  CalendarOff,
   Settings,
   Share2,
   Trash2,
@@ -301,13 +301,13 @@ export default function EscalaPage() {
 
             <div className="quick" role="toolbar" aria-label="Ações rápidas">
               <button type="button" onClick={() => setDia(mes === monthKeyOf(hoje) ? hoje : `${mes}-01`)}>
-                <CalendarPlus /> Lançar turno
+                <CalendarPlus /> Lançar escala
               </button>
               <button type="button" onClick={() => setSheet('gerador')}>
                 <Wand2 /> Gerar escala
               </button>
               <button type="button" onClick={() => setSheet('periodo')}>
-                <Palmtree /> Férias / afast.
+                <CalendarOff /> Indisponi&shy;bilidade
               </button>
               <button
                 type="button"
@@ -358,7 +358,8 @@ export default function EscalaPage() {
             <p className="base-calculo">
               Carga horária: {formatMinutes(db.config.metas['31'])} em meses de 31 dias, {formatMinutes(db.config.metas['30'])} em
               meses de 30 dias e {formatMinutes(db.config.metas['28'])}/{formatMinutes(db.config.metas['29'])} em fevereiro. Férias e
-              afastamentos descontam a carga proporcionalmente; cada EDT/RSP desconta {formatMinutes(db.config.edtMinutos)}. O turno
+              afastamentos descontam a carga proporcionalmente (cerca de 5h42 por dia, o fator 5,7 da NI ADM 033.2); cada EDT/RSP desconta{' '}
+              {formatMinutes(db.config.edtMinutos)}. Serviço extraordinário (GSE) é contado à parte e sobreaviso conta 1/3. O turno
               conta no mês em que começa.{' '}
               {sincronizando
                 ? 'Dados salvos neste aparelho e sincronizados com a sua conta Google — continue fazendo backups.'

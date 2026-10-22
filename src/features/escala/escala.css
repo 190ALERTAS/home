@@ -160,8 +160,9 @@
   .ring .pct {
     font-size: 25px;
   }
+  /* "−121h35" (7 caracteres) cabe na coluna até em 320 px */
   .kpi .v {
-    font-size: 22px;
+    font-size: min(22px, 5.5vw);
   }
 }
 

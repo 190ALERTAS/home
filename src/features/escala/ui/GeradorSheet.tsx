@@ -174,6 +174,9 @@ export function GeradorSheet({ open, onClose, mes, inicioSugerido }: { open: boo
         />
 
         <div className="stack" style={gap(4)}>
+          <p className="subtle" style={{ fontSize: 13 }}>
+            Dias com indisponibilidade (férias, afastamento, convalescença, EDT/RSP) são sempre pulados.
+          </p>
           <Switch
             checked={substituir}
             onChange={setSubstituir}

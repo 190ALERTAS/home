@@ -2,7 +2,7 @@ import { DIAS_SEMANA_CURTOS, MESES, formatDateBR, formatMinutes, parseMonthKey, 
 import { downloadBlob } from '../../lib/share';
 import { emblemaPNG } from '../../components/Emblema';
 import { calcularResumo, entriesDoMes } from './calc';
-import { ROTULO_MARCACAO, type EscalaDB } from './model';
+import { ROTULO_INDISP, ROTULO_SERVICO, indisponibilidadeDe, servicoDe, type EscalaDB } from './model';
 
 const MAIUSC = (s: string) => s.toLocaleUpperCase('pt-BR');
 
@@ -20,9 +20,12 @@ export function textoResumo(db: EscalaDB, mes: string): string {
     `Meta do mês: ${formatMinutes(r.meta)}${r.meta !== r.metaBase ? ` (base ${formatMinutes(r.metaBase)})` : ''}`,
     r.saldo >= 0 ? `Extras: *${formatMinutes(r.extras)}*` : `Faltam: *${formatMinutes(r.faltam)}*`,
   ];
+  if (r.gse) linhas.push(`Extraordinário (GSE): *${formatMinutes(r.gse)}* em ${r.turnosGse} turno(s)`);
+  if (r.sobreaviso) linhas.push(`Sobreaviso: ${formatMinutes(r.sobreaviso)} (conta ${formatMinutes(r.sobreavisoComputado)})`);
   const extras: string[] = [];
   if (r.diasFerias) extras.push(`Férias: ${r.diasFerias} dia(s)`);
-  if (r.diasAfastamento) extras.push(`Afastamento: ${r.diasAfastamento} dia(s)`);
+  if (r.diasAfastamento)
+    extras.push(`Afastamento: ${r.diasAfastamento} dia(s)${r.diasConvalescenca ? ` (${r.diasConvalescenca} de convalescença)` : ''}`);
   if (r.diasEdt) extras.push(`EDT/RSP: ${r.diasEdt}`);
   if (extras.length) linhas.push(extras.join(' · '));
   linhas.push('_Gerado pelo 190 ALERTAS_');
@@ -107,6 +110,8 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
     r.diasAfastamento ? `Afastamento: ${r.diasAfastamento} dia(s)` : '',
     r.diasEdt ? `EDT/RSP: ${r.diasEdt} (-${formatMinutes(r.descontoEdt)})` : '',
     r.extras > 0 ? `Horas normais: ${formatMinutes(r.normais)}` : '',
+    r.gse ? `GSE: ${formatMinutes(r.gse)} em ${r.turnosGse} turno(s)` : '',
+    r.sobreaviso ? `Sobreaviso: ${formatMinutes(r.sobreaviso)} (conta ${formatMinutes(r.sobreavisoComputado)})` : '',
   ].filter(Boolean);
   doc.text(pdfTxt(detalhes.join('   ·   ')), margem, y);
   y += 14;
@@ -116,21 +121,26 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
     const data = formatDateBR(e.date);
     const dia = DIAS_SEMANA_CURTOS[weekdayOf(e.date)];
     if (e.kind === 'turno') {
-      return [data, dia, e.start, e.end, formatMinutes(e.minutes), e.note ?? ''];
+      return [data, dia, e.start, e.end, formatMinutes(e.minutes), ROTULO_SERVICO[servicoDe(e)].curto, e.note ?? ''];
     }
-    return [data, dia, { content: MAIUSC(ROTULO_MARCACAO[e.kind].longo), colSpan: 3, styles: { fontStyle: 'bold' as const, textColor: [150, 90, 0] as [number, number, number] } }, e.note ?? ''];
+    return [
+      data,
+      dia,
+      { content: MAIUSC(ROTULO_INDISP[indisponibilidadeDe(e)].longo), colSpan: 4, styles: { fontStyle: 'bold' as const, textColor: [150, 90, 0] as [number, number, number] } },
+      e.note ?? '',
+    ];
   });
 
   autoTable(doc, {
     startY: y,
     margin: { left: margem, right: margem, bottom: 50 },
-    head: [['Data', 'Dia', 'Início', 'Fim', 'Horas', 'Observação']],
-    body: corpo.length ? corpo : [[{ content: 'Nenhum lançamento neste mês.', colSpan: 6, styles: { halign: 'center' } }]],
+    head: [['Data', 'Dia', 'Início', 'Fim', 'Horas', 'Tipo', 'Observação']],
+    body: corpo.length ? corpo : [[{ content: 'Nenhum lançamento neste mês.', colSpan: 7, styles: { halign: 'center' } }]],
     theme: 'grid',
     styles: { font: 'helvetica', fontSize: 9.5, cellPadding: 5, lineColor: [221, 226, 232], lineWidth: 0.5, textColor: [18, 24, 32] },
     headStyles: { fillColor: [14, 19, 26], textColor: [255, 255, 255], fontStyle: 'bold' },
     alternateRowStyles: { fillColor: [246, 247, 249] },
-    columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 38 }, 2: { cellWidth: 48 }, 3: { cellWidth: 48 }, 4: { cellWidth: 52, fontStyle: 'bold' } },
+    columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 38 }, 2: { cellWidth: 48 }, 3: { cellWidth: 48 }, 4: { cellWidth: 52, fontStyle: 'bold' }, 5: { cellWidth: 40 } },
   });
 
   // Rodapé em todas as páginas
@@ -145,7 +155,8 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
       pdfTxt(
         `Gerado pelo 190 ALERTAS em ${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}. ` +
           `Carga: ${formatMinutes(db.config.metas['31'])} (31 dias), ${formatMinutes(db.config.metas['30'])} (30 dias); ` +
-          `férias/afastamentos proporcionais; EDT/RSP -${formatMinutes(db.config.edtMinutos)}/dia.`,
+          `férias/afastamentos proporcionais; EDT/RSP -${formatMinutes(db.config.edtMinutos)}/dia; ` +
+          `GSE à parte; sobreaviso conta 1/3 (NI ADM 033.2).`,
       ),
       W - margem * 2 - 50,
     );

@@ -124,12 +124,6 @@ export const MODELOS_PADRAO: ModeloTurno[] = [
   { id: '24h', nome: '24 horas', start: '07:00', end: '07:00' },
 ];
 
-export const ROTULO_MARCACAO: Record<TipoMarcacao, { curto: string; longo: string }> = {
-  ferias: { curto: 'FÉR', longo: 'Férias' },
-  afastamento: { curto: 'AFT', longo: 'Afastamento' },
-  edt: { curto: 'EDT', longo: 'EDT/RSP' },
-};
-
 export const ROTULO_SERVICO: Record<'ordinario' | TipoServico, { curto: string; longo: string }> = {
   ordinario: { curto: 'ORD', longo: 'Ordinário' },
   gse: { curto: 'GSE', longo: 'Extra (GSE)' },
