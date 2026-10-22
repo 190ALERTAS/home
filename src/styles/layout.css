@@ -589,23 +589,97 @@
 }
 
 ::view-transition-group(tela) {
-  animation-duration: 280ms;
+  animation-duration: var(--deslize-ms, 280ms);
+}
+
+/* Telas deslizam por baixo da barra superior e da navegação (a ordem padrão nem sempre garante isso) */
+::view-transition-group(tela),
+::view-transition-group(trilho) {
+  z-index: 1;
+}
+
+::view-transition-group(topo),
+::view-transition-group(dock) {
+  z-index: 2;
+}
+
+/*
+ * O trilho anda `--deslize-passos` telas: a atual sai inteira, as do meio atravessam e a nova chega.
+ * Todas com a mesma curva, para parecer um único trilho rolando (como o scroll suave do carrossel).
+ */
+html[data-deslize]::view-transition-old(tela),
+html[data-deslize]::view-transition-new(tela),
+html[data-deslize]::view-transition-new(trilho) {
+  animation-duration: var(--deslize-ms, 280ms);
+  animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  animation-fill-mode: both;
 }
 
 html[data-deslize='direita']::view-transition-old(tela) {
-  animation: 280ms var(--ease-out) both sai-para-esquerda;
+  animation-name: sai-para-esquerda;
 }
 
 html[data-deslize='direita']::view-transition-new(tela) {
-  animation: 280ms var(--ease-out) both entra-pela-direita;
+  animation-name: entra-pela-direita;
 }
 
 html[data-deslize='esquerda']::view-transition-old(tela) {
-  animation: 280ms var(--ease-out) both sai-para-direita;
+  animation-name: sai-para-direita;
 }
 
 html[data-deslize='esquerda']::view-transition-new(tela) {
-  animation: 280ms var(--ease-out) both entra-pela-esquerda;
+  animation-name: entra-pela-esquerda;
+}
+
+html[data-deslize='direita']::view-transition-new(trilho) {
+  animation-name: trilho-para-esquerda;
+}
+
+html[data-deslize='esquerda']::view-transition-new(trilho) {
+  animation-name: trilho-para-direita;
+}
+
+::view-transition-group(trilho) {
+  animation: none;
+}
+
+/* Fora da tela, logo além da borda de onde as telas vêm; só aparece pela transição */
+.trilho-telas {
+  position: fixed;
+  z-index: 1;
+  top: calc(var(--topbar-h) + var(--safe-top));
+  bottom: 0;
+  display: flex;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--bg);
+  view-transition-name: trilho;
+}
+
+.trilho-telas.direita {
+  left: 100vw;
+}
+
+.trilho-telas.esquerda {
+  right: 100vw;
+  flex-direction: row-reverse;
+}
+
+.trilho-tela {
+  flex: none;
+  width: 100vw;
+}
+
+.trilho-bloco {
+  height: 120px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.trilho-bloco.curto {
+  height: 64px;
 }
 
 /*
@@ -618,35 +692,59 @@ html[data-deslize='esquerda']::view-transition-new(tela) {
   }
 
   html[data-deslize-simples][data-deslize='direita'] .main {
-    animation: 280ms var(--ease-out) both entra-pela-direita;
+    animation: 280ms var(--ease-out) both entra-simples-direita;
   }
 
   html[data-deslize-simples][data-deslize='esquerda'] .main {
-    animation: 280ms var(--ease-out) both entra-pela-esquerda;
+    animation: 280ms var(--ease-out) both entra-simples-esquerda;
   }
 }
 
 @keyframes sai-para-esquerda {
   to {
-    transform: translateX(-100%);
+    transform: translateX(calc(var(--deslize-passos, 1) * -100vw));
   }
 }
 
 @keyframes sai-para-direita {
   to {
-    transform: translateX(100%);
+    transform: translateX(calc(var(--deslize-passos, 1) * 100vw));
   }
 }
 
 @keyframes entra-pela-direita {
   from {
-    transform: translateX(100%);
+    transform: translateX(calc(var(--deslize-passos, 1) * 100vw));
   }
 }
 
 @keyframes entra-pela-esquerda {
   from {
+    transform: translateX(calc(var(--deslize-passos, 1) * -100vw));
+  }
+}
+
+@keyframes entra-simples-direita {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes entra-simples-esquerda {
+  from {
     transform: translateX(-100%);
+  }
+}
+
+@keyframes trilho-para-esquerda {
+  to {
+    transform: translateX(calc(var(--deslize-passos, 1) * -100vw));
+  }
+}
+
+@keyframes trilho-para-direita {
+  to {
+    transform: translateX(calc(var(--deslize-passos, 1) * 100vw));
   }
 }
 

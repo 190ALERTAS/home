@@ -83,4 +83,16 @@ export function direcaoNav(de: RouteId | 'notfound', para: RouteId): 'direita' |
   return j > i ? 'direita' : 'esquerda';
 }
 
+/**
+ * Telas que passam rapidamente no caminho até o item tocado (como no carrossel, que rola por todos
+ * os slides do meio), na ordem em que aparecem. Item vizinho: nenhuma.
+ */
+export function telasNoCaminho(de: RouteId | 'notfound', para: RouteId): RouteId[] {
+  const ordem: RouteId[] = [...BOTTOM, ...MORE];
+  const i = de === 'notfound' ? -1 : ordem.indexOf(de);
+  const j = ordem.indexOf(para);
+  if (i < 0 || j < 0) return [];
+  return i < j ? ordem.slice(i + 1, j) : ordem.slice(j + 1, i).reverse();
+}
+
 export const APP_VERSION = '5.2.1';

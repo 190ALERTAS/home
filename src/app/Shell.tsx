@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Download, Ellipsis, History, Moon, Share, SquarePlus, Sun, WifiOff } from 'lucide-react';
-import { linkProps, type RouteId } from '../lib/router';
+import { linkProps, navigate, type RouteId } from '../lib/router';
 import { toggleTheme, useTheme } from '../lib/theme';
 import { useInstall, useOnline } from '../lib/pwa';
 import { Sheet } from '../components/Sheet';
@@ -9,7 +9,8 @@ import { gap } from '../components/ui';
 import { Emblema } from '../components/Emblema';
 import { DockContext } from '../components/dock';
 import { navegarDeslizando } from '../lib/transicao';
-import { APP_VERSION, BOTTOM, DESTAQUE, MORE, NAV, SIDE_EXTRA, SIDE_MAIN, direcaoNav } from './nav';
+import { quandoPronta, telas } from './telas';
+import { APP_VERSION, BOTTOM, DESTAQUE, MORE, NAV, SIDE_EXTRA, SIDE_MAIN, direcaoNav, telasNoCaminho } from './nav';
 
 // As notas de atualização só são baixadas quando alguém abre a folha (o chunk fica no cache offline do PWA).
 const NotasSheet = lazy(() => import('../features/atualizacoes/NotasSheet'));
@@ -83,6 +84,39 @@ export function IOSInstallHelp({ open, onClose }: { open: boolean; onClose: () =
   );
 }
 
+/**
+ * Telas que passam no caminho do deslize até um item distante da barra. Só existe durante a transição:
+ * fica fora da tela (logo depois da borda do lado de onde as telas vêm) e o CSS a faz atravessar junto
+ * com a tela atual e a nova. É só aparência (cabeçalho de cada tela e blocos vazios).
+ */
+function TrilhoTelas({ ids, direcao }: { ids: RouteId[]; direcao: 'direita' | 'esquerda' }) {
+  return (
+    <div className={`trilho-telas ${direcao}`} aria-hidden>
+      {ids.map((id) => {
+        const Icon = NAV[id].icon;
+        return (
+          <div key={id} className="trilho-tela">
+            <div className="page">
+              <header className="page-head">
+                <span className="ph-icon">
+                  <Icon />
+                </span>
+                <div className="ph-text">
+                  <h1>{NAV[id].long}</h1>
+                  <p>{NAV[id].desc}</p>
+                </div>
+              </header>
+              <div className="trilho-bloco" />
+              <div className="trilho-bloco curto" />
+              <div className="trilho-bloco" />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function Shell({ route, children }: { route: RouteId | 'notfound'; children: ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const [iosHelp, setIosHelp] = useState(false);
@@ -93,8 +127,24 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
   const moreActive = MORE.includes(route as RouteId);
   const [slotAcoes, setSlotAcoes] = useState<HTMLDivElement | null>(null);
   const dockRef = useRef<HTMLDivElement>(null);
-  // Itens da barra inferior (e do "Mais") trocam de tela deslizando para o lado do item tocado.
-  const deslizar = (id: RouteId) => navegarDeslizando(id, direcaoNav(route, id));
+  // Itens da barra inferior (e do "Mais") trocam de tela deslizando para o lado do item tocado; indo
+  // para um item distante, as telas do meio passam rapidamente no caminho.
+  const [trilho, setTrilho] = useState<{ ids: RouteId[]; direcao: 'direita' | 'esquerda' } | null>(null);
+  // A tela nova precisa estar baixada antes de deslizar: senão o que entraria seria o "carregando".
+  const deslizar = (id: RouteId) => {
+    const direcao = direcaoNav(route, id);
+    const meio = telasNoCaminho(route, id);
+    quandoPronta(id, () =>
+      navegarDeslizando(id, direcao, {
+        passos: meio.length + 1,
+        durante: direcao && meio.length ? () => setTrilho({ ids: meio, direcao }) : undefined,
+        depois: () => setTrilho(null),
+      }),
+    );
+  };
+  const irQuandoPronta = (id: RouteId) => quandoPronta(id, () => navigate(id));
+  // Começa a baixar já no toque (antes do clique completar), se ainda não estiver pronta.
+  const preparar = (id: RouteId) => () => void telas.carregar(id).catch(() => undefined);
 
   // Altura da parte inferior fixa (navegação + barra flutuante da tela) → espaço no fim da página e posição dos avisos.
   useEffect(() => {
@@ -130,7 +180,7 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
         {SIDE_MAIN.map((id) => {
           const Icon = NAV[id].icon;
           return (
-            <a key={id} className="side-item" {...linkProps(id)} aria-current={route === id ? 'page' : undefined}>
+            <a key={id} className="side-item" {...linkProps(id, undefined, irQuandoPronta)} aria-current={route === id ? 'page' : undefined}>
               <Icon /> {NAV[id].long}
             </a>
           );
@@ -139,7 +189,7 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
         {SIDE_EXTRA.map((id) => {
           const Icon = NAV[id].icon;
           return (
-            <a key={id} className="side-item" {...linkProps(id)} aria-current={route === id ? 'page' : undefined}>
+            <a key={id} className="side-item" {...linkProps(id, undefined, irQuandoPronta)} aria-current={route === id ? 'page' : undefined}>
               <Icon /> {NAV[id].long}
             </a>
           );
@@ -166,6 +216,8 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
         </main>
       </DockContext.Provider>
 
+      {trilho && <TrilhoTelas ids={trilho.ids} direcao={trilho.direcao} />}
+
       <div className="dock" ref={dockRef}>
         <div className="dock-acoes" ref={setSlotAcoes} />
         <nav className="bottom-nav" aria-label="Navegação">
@@ -176,6 +228,7 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
                 key={id}
                 className={`nav-item${id === DESTAQUE ? ' nav-destaque' : ''}`}
                 {...linkProps(id, undefined, deslizar)}
+                onPointerDown={preparar(id)}
                 aria-current={route === id ? 'page' : undefined}
                 aria-label={NAV[id].long}
               >

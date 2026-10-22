@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, type ComponentType } from 'react';
+import { Suspense, useEffect, useMemo, type ComponentType } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useRoute, type RouteId } from '../lib/router';
 import { Shell } from './Shell';
@@ -9,24 +9,17 @@ import ReleasePage from '../features/release/ReleasePage';
 import VeiculoPage from '../features/veiculo/VeiculoPage';
 import { NotFoundPage } from '../features/inicio/NotFoundPage';
 import { iniciarSyncAutomatico } from '../features/escala/sync/auto';
-
-const loaders = {
-  escala: () => import('../features/escala/EscalaPage'),
-  croqui: () => import('../features/croqui/CroquiPage'),
-  taf: () => import('../features/taf/TafPage'),
-  sugestoes: () => import('../features/institucional/SugestoesPage'),
-  termos: () => import('../features/institucional/TermosPage'),
-} satisfies Partial<Record<RouteId, () => Promise<{ default: ComponentType }>>>;
+import { telas } from './telas';
 
 const PAGES: Record<RouteId, ComponentType> = {
   inicio: InicioPage,
   release: ReleasePage,
   veiculos: VeiculoPage,
-  escala: lazy(loaders.escala),
-  croqui: lazy(loaders.croqui),
-  taf: lazy(loaders.taf),
-  sugestoes: lazy(loaders.sugestoes),
-  termos: lazy(loaders.termos),
+  escala: telas.preguicosa('escala'),
+  croqui: telas.preguicosa('croqui'),
+  taf: telas.preguicosa('taf'),
+  sugestoes: telas.preguicosa('sugestoes'),
+  termos: telas.preguicosa('termos'),
 };
 
 function PageFallback() {
@@ -79,10 +72,13 @@ function UpdatePrompt() {
 export function App() {
   const { id } = useRoute();
 
-  // Baixa as telas restantes em segundo plano para navegação instantânea.
+  // Baixa as telas restantes logo depois de abrir, para navegação instantânea (no app instalado elas
+  // já estão no cache offline, então é rápido).
   useEffect(() => {
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
-    const h = idle(() => Object.values(loaders).forEach((load) => void load().catch(() => undefined)));
+    const idle = window.requestIdleCallback
+      ? (cb: () => void) => window.requestIdleCallback(cb, { timeout: 800 })
+      : (cb: () => void) => window.setTimeout(cb, 300);
+    const h = idle(() => void telas.carregarTodas());
     return () => {
       if (window.cancelIdleCallback && typeof h === 'number') window.cancelIdleCallback(h);
     };
@@ -91,7 +87,8 @@ export function App() {
   // Sincronização automática da escala (só age com a conta conectada e o automático ligado).
   useEffect(() => iniciarSyncAutomatico(), []);
 
-  const Page = id === 'notfound' ? NotFoundPage : PAGES[id];
+  // Tela já baixada é usada direto (o `lazy` suspenderia e mostraria o "carregando" por um instante).
+  const Page = useMemo(() => (id === 'notfound' ? NotFoundPage : (telas.pronta(id) ?? PAGES[id])), [id]);
 
   return (
     <>
