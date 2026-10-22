@@ -14,7 +14,16 @@ import {
   type Entry,
   type Turno,
 } from './model';
-import { adicionarTurno, aplicarTurno, editarTurno, limparDias, marcar, removerMes } from './ops';
+import {
+  adicionarTurno,
+  aplicarTurno,
+  editarTurno,
+  impactoLancamento,
+  limparDias,
+  marcar,
+  marcarIndisponibilidade,
+  removerMes,
+} from './ops';
 import { PRESETS, aplicarGerador, preverGerador } from './gerador';
 import { K_BACKUP_V1, K_ESPELHO, K_V1, K_V2, assinatura, carregar, salvar, type KV } from './store';
 
@@ -207,6 +216,49 @@ describe('operações', () => {
     expect(db.entries.map((e) => `${e.date}:${e.kind}`)).toEqual(['2026-09-10:ferias', '2026-09-11:edt']);
   });
 
+  it('lançar turno remove a indisponibilidade do dia (e só dele)', () => {
+    let db = marcar(dbVazio(), ['2026-09-10', '2026-09-11'], 'edt');
+    db = adicionarTurno(db, '2026-09-10', '07:00', '19:00');
+    expect(db.entries.map((e) => `${e.date}:${e.kind}`)).toEqual(['2026-09-10:turno', '2026-09-11:edt']);
+    db = aplicarTurno(db, ['2026-09-11'], '19:00', '07:00', false, { servico: 'gse', note: 'Reforço' });
+    expect(db.entries.map((e) => `${e.date}:${e.kind}`)).toEqual(['2026-09-10:turno', '2026-09-11:turno']);
+    expect(turnos(db.entries)[1]).toMatchObject({ servico: 'gse', note: 'Reforço' });
+  });
+
+  it('lançar indisponibilidade remove os turnos do dia', () => {
+    let db = aplicarTurno(dbVazio(), ['2026-09-10', '2026-09-11'], '07:00', '19:00', false);
+    db = marcarIndisponibilidade(db, ['2026-09-10'], 'convalescenca', 'Atestado');
+    expect(db.entries.map((e) => `${e.date}:${e.kind}`)).toEqual(['2026-09-10:afastamento', '2026-09-11:turno']);
+    expect(db.entries[0]).toMatchObject({ motivo: 'convalescenca', note: 'Atestado' });
+  });
+
+  it('trocar férias por EDT mantém uma marcação só', () => {
+    let db = marcarIndisponibilidade(dbVazio(), ['2026-09-10'], 'ferias');
+    db = marcarIndisponibilidade(db, ['2026-09-10'], 'edt');
+    expect(db.entries.map((e) => e.kind)).toEqual(['edt']);
+    db = marcarIndisponibilidade(db, ['2026-09-10'], 'convalescenca');
+    db = marcarIndisponibilidade(db, ['2026-09-10'], 'afastamento');
+    expect(db.entries).toHaveLength(1);
+    expect(db.entries[0]).toMatchObject({ kind: 'afastamento' });
+    expect('motivo' in db.entries[0]).toBe(false);
+  });
+
+  it('mesma indisponibilidade de novo não troca o id', () => {
+    const db = marcarIndisponibilidade(dbVazio(), ['2026-09-10'], 'convalescenca');
+    const id = db.entries[0].id;
+    expect(marcarIndisponibilidade(db, ['2026-09-10'], 'convalescenca').entries[0].id).toBe(id);
+  });
+
+  it('impactoLancamento conta o que será removido', () => {
+    let db = aplicarTurno(dbVazio(), ['2026-09-10'], '07:00', '19:00', false);
+    db = adicionarTurno(db, '2026-09-10', '19:00', '23:00');
+    db = marcar(db, ['2026-09-11'], 'edt');
+    const datas = ['2026-09-10', '2026-09-11', '2026-09-12'];
+    expect(impactoLancamento(db.entries, datas, 'escala')).toEqual({ turnos: 0, marcacoes: 1 });
+    expect(impactoLancamento(db.entries, datas, 'indisponibilidade')).toEqual({ turnos: 2, marcacoes: 0 });
+    expect(impactoLancamento(db.entries, ['2026-09-11'], 'indisponibilidade')).toEqual({ turnos: 0, marcacoes: 0 });
+  });
+
   it('aplica turno em lote, limpa dias e remove mês', () => {
     let db = aplicarTurno(dbVazio(), ['2026-09-01', '2026-09-03'], '07:00', '19:00', false);
     db = aplicarTurno(db, ['2026-09-03'], '19:00', '07:00', true);
@@ -228,7 +280,7 @@ describe('operações', () => {
 });
 
 describe('gerador de escala', () => {
-  const opc = { inicio: '2026-10-01', fim: '2026-10-31', pularAusencias: true, substituir: false };
+  const opc = { inicio: '2026-10-01', fim: '2026-10-31', substituir: false };
   const preset = (id: string) => PRESETS.find((p) => p.id === id)!.padrao;
 
   it('12x36 em outubro/2026: 16 turnos, 192h', () => {
@@ -249,6 +301,20 @@ describe('gerador de escala', () => {
 
   it('dias da semana (seg a sex) em outubro/2026: 22 dias', () => {
     expect(preverGerador([], preset('semana'), opc).novos).toHaveLength(22);
+  });
+
+  it('6x18 em outubro/2026: 31 turnos, 186h', () => {
+    const p = preverGerador([], preset('6x18'), opc);
+    expect(p.novos).toHaveLength(31);
+    expect(p.minutos).toBe(186 * 60);
+    expect(p.novos[0]).toMatchObject({ start: '06:00', end: '12:00' });
+  });
+
+  it('pula qualquer indisponibilidade, inclusive EDT/RSP', () => {
+    const db = marcar(dbVazio(), ['2026-10-01', '2026-10-03'], 'edt');
+    const p = preverGerador(db.entries, preset('12x36'), opc);
+    expect(p.novos).toHaveLength(14);
+    expect(p.pulados).toBe(2);
   });
 
   it('pula férias e dias já lançados; substitui quando pedido', () => {
