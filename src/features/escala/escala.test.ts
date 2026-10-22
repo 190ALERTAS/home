@@ -216,6 +216,17 @@ describe('operações', () => {
     expect(db.entries.map((e) => `${e.date}:${e.kind}`)).toEqual(['2026-09-10:ferias', '2026-09-11:edt']);
   });
 
+  it('editar troca o tipo de serviço (e volta a ordinário)', () => {
+    let db = adicionarTurno(dbVazio(), '2026-09-10', '07:00', '19:00');
+    const id = db.entries[0].id;
+    db = editarTurno(db, id, { servico: 'gse' });
+    expect(turnos(db.entries)[0].servico).toBe('gse');
+    db = editarTurno(db, id, { note: 'x' });
+    expect(turnos(db.entries)[0].servico).toBe('gse');
+    db = editarTurno(db, id, { servico: 'ordinario' });
+    expect('servico' in turnos(db.entries)[0]).toBe(false);
+  });
+
   it('lançar turno remove a indisponibilidade do dia (e só dele)', () => {
     let db = marcar(dbVazio(), ['2026-09-10', '2026-09-11'], 'edt');
     db = adicionarTurno(db, '2026-09-10', '07:00', '19:00');

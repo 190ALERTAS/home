@@ -53,7 +53,7 @@ export function adicionarTurno(
 export function editarTurno(
   db: EscalaDB,
   id: string,
-  patch: { date?: string; start?: string; end?: string; note?: string },
+  patch: { date?: string; start?: string; end?: string; note?: string; servico?: 'ordinario' | TipoServico },
 ): EscalaDB {
   return com(
     db,
@@ -73,6 +73,8 @@ export function editarTurno(
       };
       if (note) next.note = note;
       else delete next.note;
+      if (patch.servico === 'ordinario') delete next.servico;
+      else if (patch.servico) next.servico = patch.servico;
       return next;
     }),
   );

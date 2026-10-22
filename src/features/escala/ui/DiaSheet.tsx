@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Moon, Palmtree, Pencil, Plus, Stethoscope, Trash2, CalendarX, TriangleAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Moon, Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
 import { Sheet } from '../../../components/Sheet';
 import { toast } from '../../../components/toast';
-import { gap } from '../../../components/ui';
+import { confirmDialog } from '../../../components/dialogs';
+import { Seg, gap } from '../../../components/ui';
 import {
   DIAS_SEMANA,
   MESES,
@@ -14,10 +15,19 @@ import {
 } from '../../../lib/date';
 import { track } from '../../../lib/analytics';
 import { duplicados } from '../calc';
-import { ROTULO_MARCACAO, type TipoMarcacao, type Turno } from '../model';
-import { adicionarTurno, editarTurno, limparDias, marcar, remover } from '../ops';
+import {
+  ROTULO_INDISP,
+  ROTULO_SERVICO,
+  indisponibilidadeDe,
+  servicoDe,
+  type Marcacao,
+  type TipoIndisponibilidade,
+  type Turno,
+} from '../model';
+import { adicionarTurno, editarTurno, impactoLancamento, limparDias, marcarIndisponibilidade, remover } from '../ops';
 import { atualizar, desfazer, useEscala } from '../store';
-import { CamposHorario, SlotGrid, useOpcoesHorario } from './Horarios';
+import { CamposHorario, ServicoSeg, SlotGrid, servicoParaGravar, useOpcoesHorario, type ServicoEscolha } from './Horarios';
+import { EscolhaIndisp, ICONE_INDISP } from './Indisponibilidade';
 
 export function tituloDia(data: string): string {
   const d = parseISODate(data);
@@ -39,18 +49,20 @@ export function avisarDesfazer(titulo: string) {
   });
 }
 
-const ICONE_MARCA: Record<TipoMarcacao, typeof Palmtree> = {
-  ferias: Palmtree,
-  afastamento: Stethoscope,
-  edt: CalendarX,
-};
+/** Rótulo do tipo de serviço para listas ("Extra (GSE)"), vazio no ordinário. */
+export function rotuloServico(t: Turno): string {
+  const s = servicoDe(t);
+  return s === 'ordinario' ? '' : ROTULO_SERVICO[s].longo;
+}
 
 function EditorTurno({ turno, onFim }: { turno: Turno; onFim: () => void }) {
   const [h, setH] = useState({ start: turno.start, end: turno.end });
   const [nota, setNota] = useState(turno.note ?? '');
+  const [servico, setServico] = useState<ServicoEscolha>(servicoDe(turno));
   return (
     <div className="subcard">
       <CamposHorario start={h.start} end={h.end} onChange={setH} />
+      <ServicoSeg value={servico} onChange={setServico} />
       <input className="input" value={nota} placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
       <div className="row">
         <button
@@ -73,7 +85,12 @@ function EditorTurno({ turno, onFim }: { turno: Turno; onFim: () => void }) {
           className="btn primary"
           disabled={!h.start || !h.end}
           onClick={() => {
-            atualizar((db) => editarTurno(db, turno.id, { start: h.start, end: h.end, note: nota }), 'Turno editado');
+            // Turno com tipo desconhecido (versão futura) só muda de tipo se o usuário escolher outro.
+            const mudouServico = servico !== servicoDe(turno);
+            atualizar(
+              (db) => editarTurno(db, turno.id, { start: h.start, end: h.end, note: nota, ...(mudouServico ? { servico } : {}) }),
+              'Turno editado',
+            );
             toast({ title: 'Turno atualizado', kind: 'success' });
             onFim();
           }}
@@ -85,43 +102,87 @@ function EditorTurno({ turno, onFim }: { turno: Turno; onFim: () => void }) {
   );
 }
 
+type Aba = 'escala' | 'indisp';
+
+/**
+ * Folha do dia. Duas seções que não se misturam num lançamento: **Escala** (horários de serviço) e
+ * **Indisponibilidade** (férias, afastamento, convalescença, EDT/RSP). Escolher um atalho ou um tipo
+ * só seleciona; nada é gravado antes de tocar em "Lançar".
+ */
 export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; onClose: () => void; onNavigate: (d: string) => void }) {
   const db = useEscala();
   const opcoes = useOpcoesHorario(db.entries, db.modelos);
   const [editando, setEditando] = useState<string | null>(null);
-  const [custom, setCustom] = useState({ start: '', end: '' });
+  const [aba, setAba] = useState<Aba>('escala');
+  const [h, setH] = useState({ start: '', end: '' });
+  const [servico, setServico] = useState<ServicoEscolha>('ordinario');
   const [nota, setNota] = useState('');
+  const [indisp, setIndisp] = useState<TipoIndisponibilidade | null>(null);
+  const [notaIndisp, setNotaIndisp] = useState('');
 
   useEffect(() => {
     setEditando(null);
+    setH({ start: '', end: '' });
+    setServico('ordinario');
     setNota('');
+    setIndisp(null);
+    setNotaIndisp('');
+    // Abre na seção do que o dia já tem (só ao trocar de dia, não a cada lançamento).
+    if (data) setAba(db.entries.some((e) => e.date === data && e.kind !== 'turno') ? 'indisp' : 'escala');
   }, [data]);
 
   if (!data) return <Sheet open={false} onClose={onClose} title="">{null}</Sheet>;
 
   const doDia = db.entries.filter((e) => e.date === data);
   const turnos = doDia.filter((e): e is Turno => e.kind === 'turno');
-  const marcas = doDia.filter((e) => e.kind !== 'turno');
+  const marcas = doDia.filter((e): e is Marcacao => e.kind !== 'turno');
   const dups = duplicados(doDia);
   const total = turnos.reduce((s, t) => s + t.minutes, 0);
+  const nomeMarcas = [...new Set(marcas.map((m) => ROTULO_INDISP[indisponibilidadeDe(m)].longo))].join(' e ');
 
-  const adicionar = (start: string, end: string) => {
-    atualizar((d) => adicionarTurno(d, data, start, end, nota), 'Turno adicionado');
-    track('escala_turno');
+  const lancarEscala = async () => {
+    if (!h.start || !h.end) return;
+    if (impactoLancamento(db.entries, [data], 'escala').marcacoes > 0) {
+      const ok = await confirmDialog({
+        title: `Lançar escala em dia de ${nomeMarcas}?`,
+        message: 'A indisponibilidade deste dia será removida. Um dia é escala ou indisponibilidade, nunca os dois.',
+        confirmLabel: 'Lançar escala',
+      });
+      if (!ok) return;
+    }
+    const s = servicoParaGravar(servico);
+    atualizar((d) => adicionarTurno(d, data, h.start, h.end, nota, s), 'Turno lançado');
+    track('escala_turno', { servico });
     if (navigator.vibrate) navigator.vibrate(12);
-    avisarDesfazer(`Turno ${start}–${end} adicionado`);
+    avisarDesfazer(`Turno ${h.start}–${h.end}${s ? ` (${ROTULO_SERVICO[s].curto})` : ''} lançado`);
+    setH({ start: '', end: '' });
+    setServico('ordinario');
     setNota('');
   };
 
-  const alternarMarca = (kind: TipoMarcacao) => {
-    const existe = marcas.find((m) => m.kind === kind);
-    if (existe) {
-      atualizar((d) => remover(d, [existe.id]), `${ROTULO_MARCACAO[kind].longo} removido`);
-      avisarDesfazer(`${ROTULO_MARCACAO[kind].longo} removido`);
-    } else {
-      atualizar((d) => marcar(d, [data], kind), `${ROTULO_MARCACAO[kind].longo} marcado`);
-      avisarDesfazer(`${ROTULO_MARCACAO[kind].longo} marcado`);
+  const lancarIndisp = async () => {
+    if (!indisp) return;
+    const n = impactoLancamento(db.entries, [data], 'indisponibilidade').turnos;
+    if (n > 0) {
+      const ok = await confirmDialog({
+        title: `Lançar ${ROTULO_INDISP[indisp].longo} neste dia?`,
+        message: `${n} turno(s) deste dia serão removidos. Um dia é escala ou indisponibilidade, nunca os dois.`,
+        confirmLabel: `Lançar ${ROTULO_INDISP[indisp].longo}`,
+        danger: true,
+      });
+      if (!ok) return;
     }
+    atualizar((d) => marcarIndisponibilidade(d, [data], indisp, notaIndisp), `${ROTULO_INDISP[indisp].longo} lançado`);
+    track('escala_indisponibilidade', { tipo: indisp });
+    avisarDesfazer(`${ROTULO_INDISP[indisp].longo} lançado`);
+    setIndisp(null);
+    setNotaIndisp('');
+  };
+
+  const removerMarca = (m: Marcacao) => {
+    const rotulo = ROTULO_INDISP[indisponibilidadeDe(m)].longo;
+    atualizar((d) => remover(d, [m.id]), `${rotulo} removido`);
+    avisarDesfazer(`${rotulo} removido`);
   };
 
   return (
@@ -142,29 +203,35 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
         </span>
       }
       subtitle={
-        turnos.length ? `${turnos.length} turno(s) · ${formatMinutes(total)} no dia` : marcas.length ? undefined : 'Sem lançamentos'
+        turnos.length ? `${turnos.length} turno(s) · ${formatMinutes(total)} no dia` : marcas.length ? nomeMarcas : 'Sem lançamentos'
       }
     >
       <div className="stack" style={gap(18)}>
+        {turnos.length > 0 && marcas.length > 0 && (
+          <div className="callout amber" role="note">
+            <TriangleAlert />
+            <div>
+              Este dia tem escala e indisponibilidade ao mesmo tempo (lançamento antigo). Nada foi alterado; remova o que não
+              vale.
+            </div>
+          </div>
+        )}
+
         {(turnos.length > 0 || marcas.length > 0) && (
           <div className="list">
             {marcas.map((m) => {
-              const Icon = ICONE_MARCA[m.kind as TipoMarcacao];
+              const tipo = indisponibilidadeDe(m);
+              const Icon = ICONE_INDISP[tipo];
               return (
                 <div key={m.id} className="list-item">
                   <span className="ico">
                     <Icon />
                   </span>
                   <span className="txt">
-                    <strong>{ROTULO_MARCACAO[m.kind as TipoMarcacao].longo}</strong>
-                    <small>Desconta da carga horária do mês</small>
+                    <strong>{ROTULO_INDISP[tipo].longo}</strong>
+                    <small>{m.note || 'Indisponibilidade · desconta da carga horária do mês'}</small>
                   </span>
-                  <button
-                    type="button"
-                    className="icon-btn"
-                    aria-label="Remover marcação"
-                    onClick={() => alternarMarca(m.kind as TipoMarcacao)}
-                  >
+                  <button type="button" className="icon-btn" aria-label={`Remover ${ROTULO_INDISP[tipo].longo}`} onClick={() => removerMarca(m)}>
                     <Trash2 />
                   </button>
                 </div>
@@ -186,10 +253,13 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
                       {crossesMidnight(t.start, t.end) ? ' (+1 dia)' : ''}
                     </strong>
                     <small>
-                      {t.note || 'Toque para editar'}
+                      {[rotuloServico(t), t.note || 'Toque para editar'].filter(Boolean).join(' · ')}
                       {t.minutes !== shiftMinutes(t.start, t.end) ? ' · duração registrada na versão anterior' : ''}
                     </small>
                   </span>
+                  {servicoDe(t) !== 'ordinario' && (
+                    <span className={`badge ${servicoDe(t) === 'gse' ? 'green' : 'blue'}`}>{ROTULO_SERVICO[servicoDe(t)].curto}</span>
+                  )}
                   {dups.has(t.id) && (
                     <span className="badge amber" title="Turno repetido no mesmo dia">
                       <TriangleAlert /> Repetido
@@ -205,51 +275,51 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
           </div>
         )}
 
-        <div className="stack" style={gap(10)}>
-          <div className="eyebrow">Adicionar turno — um toque</div>
-          <SlotGrid opcoes={opcoes} onPick={(o) => adicionar(o.start, o.end)} />
-          <div className="subcard" style={{ gap: 10 }}>
-            <CamposHorario start={custom.start} end={custom.end} onChange={setCustom} />
-            <div className="item-row">
-              <input
-                className="input"
-                value={nota}
-                placeholder="Observação (opcional)"
-                onChange={(e) => setNota(e.target.value)}
-              />
-              <button
-                type="button"
-                className="btn primary"
-                disabled={!custom.start || !custom.end}
-                onClick={() => adicionar(custom.start, custom.end)}
-              >
-                <Plus /> Lançar
-              </button>
-            </div>
-          </div>
-        </div>
+        <Seg<Aba>
+          value={aba}
+          onChange={setAba}
+          ariaLabel="O que lançar"
+          options={[
+            { value: 'escala', label: 'Escala' },
+            { value: 'indisp', label: 'Indisponibilidade' },
+          ]}
+        />
 
-        <div className="stack" style={gap(10)}>
-          <div className="eyebrow">Marcar o dia</div>
-          <div className="grid-3">
-            {(['ferias', 'afastamento', 'edt'] as TipoMarcacao[]).map((k) => {
-              const Icon = ICONE_MARCA[k];
-              const on = marcas.some((m) => m.kind === k);
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  className="chip"
-                  aria-pressed={on}
-                  style={{ justifyContent: 'center', minHeight: 46, borderRadius: 12 }}
-                  onClick={() => alternarMarca(k)}
-                >
-                  <Icon /> {ROTULO_MARCACAO[k].longo}
-                </button>
-              );
-            })}
+        {aba === 'escala' ? (
+          <div className="stack" style={gap(12)}>
+            {marcas.length > 0 && (
+              <p className="subtle" style={{ fontSize: 13.5 }}>
+                Dia marcado como {nomeMarcas}. Lançar um turno remove a indisponibilidade.
+              </p>
+            )}
+            <div className="eyebrow">Horário</div>
+            <SlotGrid opcoes={opcoes} selecionado={h} onPick={(o) => setH({ start: o.start, end: o.end })} />
+            <CamposHorario start={h.start} end={h.end} onChange={setH} />
+            <ServicoSeg value={servico} onChange={setServico} />
+            <input className="input" value={nota} placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
+            <button type="button" className="btn primary lg block" disabled={!h.start || !h.end} onClick={lancarEscala}>
+              <Plus /> Lançar {h.start && h.end ? `${h.start}–${h.end}` : 'escala'}
+            </button>
           </div>
-        </div>
+        ) : (
+          <div className="stack" style={gap(12)}>
+            {turnos.length > 0 && (
+              <p className="subtle" style={{ fontSize: 13.5 }}>
+                Este dia tem {turnos.length} turno(s). Lançar uma indisponibilidade remove os turnos.
+              </p>
+            )}
+            <EscolhaIndisp valor={indisp} onEscolher={setIndisp} edtMinutos={db.config.edtMinutos} />
+            <input
+              className="input"
+              value={notaIndisp}
+              placeholder="Observação (opcional, ex.: nº do atestado)"
+              onChange={(e) => setNotaIndisp(e.target.value)}
+            />
+            <button type="button" className="btn primary lg block" disabled={!indisp} onClick={lancarIndisp}>
+              <Plus /> Lançar {indisp ? ROTULO_INDISP[indisp].longo : 'indisponibilidade'}
+            </button>
+          </div>
+        )}
 
         {doDia.length > 0 && (
           <button

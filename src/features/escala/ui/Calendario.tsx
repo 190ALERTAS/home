@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Moon, Sun, SunMoon } from 'lucide-react';
 import { DIAS_SEMANA_CURTOS, crossesMidnight, daysInMonth, formatMinutes, pad2, parseMonthKey } from '../../../lib/date';
-import type { Entry, Turno } from '../model';
+import { servicoDe, type Entry, type Turno } from '../model';
 
 interface Props {
   mes: string;
@@ -57,8 +57,11 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
           const turnos = itens.filter((e): e is Turno => e.kind === 'turno');
           const minutos = turnos.reduce((s, t) => s + t.minutes, 0);
           const noturnos = turnos.filter((t) => crossesMidnight(t.start, t.end)).length;
+          const gse = turnos.some((t) => servicoDe(t) === 'gse');
+          const sbv = turnos.some((t) => servicoDe(t) === 'sobreaviso');
           const ferias = itens.some((e) => e.kind === 'ferias');
           const afast = itens.some((e) => e.kind === 'afastamento');
+          const cnv = itens.some((e) => e.kind === 'afastamento' && e.motivo === 'convalescenca');
           const edt = itens.some((e) => e.kind === 'edt');
           const dup = itens.some((e) => duplicados.has(e.id));
           const dia = Number(data.slice(8));
@@ -77,8 +80,10 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
             .join(' ');
           const descricao = [
             turnos.length ? `${turnos.length} turno(s), ${formatMinutes(minutos)}` : '',
+            gse ? 'serviço extraordinário (GSE)' : '',
+            sbv ? 'sobreaviso' : '',
             ferias ? 'férias' : '',
-            afast ? 'afastamento' : '',
+            cnv ? 'convalescença' : afast ? 'afastamento' : '',
             edt ? 'EDT/RSP' : '',
             dup ? 'possível lançamento em dobro' : '',
           ]
@@ -108,14 +113,14 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
                 <span>
                   <span className="h">{horasCurtas(minutos)}</span>
                   <span
-                    className={`bar${noturnos === turnos.length ? ' noite' : noturnos > 0 ? ' misto' : ''}`}
+                    className={`bar${gse ? ' gse' : sbv ? ' sbv' : noturnos === turnos.length ? ' noite' : noturnos > 0 ? ' misto' : ''}`}
                     style={{ width: `${Math.min(100, (minutos / 720) * 100)}%` }}
                   />
                 </span>
               ) : ferias ? (
                 <span className="tag">FÉR</span>
               ) : afast ? (
-                <span className="tag">AFT</span>
+                <span className="tag">{cnv ? 'CNV' : 'AFT'}</span>
               ) : edt ? (
                 <span className="tag edt">EDT</span>
               ) : null}
@@ -133,12 +138,20 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
           Noturno
         </span>
         <span>
+          <i style={{ background: 'var(--green)' }} />
+          Extra (GSE)
+        </span>
+        <span>
+          <i className="leg-sbv" />
+          Sobreaviso
+        </span>
+        <span>
           <i style={{ background: 'var(--amber)' }} />
           Férias
         </span>
         <span>
           <i style={{ background: 'var(--violet)' }} />
-          Afastamento
+          Afastamento / CNV
         </span>
         <span>
           <i style={{ background: 'var(--blue-soft)', boxShadow: 'inset 0 0 0 1px var(--blue)' }} />
