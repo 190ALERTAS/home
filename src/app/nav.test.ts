@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DESTAQUE, direcaoNav } from './nav';
+import { DESTAQUE, direcaoNav, telasNoCaminho } from './nav';
 
 describe('barra inferior', () => {
   it('o destaque (ícone vermelho) é o Início', () => {
@@ -20,5 +20,17 @@ describe('barra inferior', () => {
   it('mesmo item ou tela fora da barra: sem transição', () => {
     expect(direcaoNav('escala', 'escala')).toBeNull();
     expect(direcaoNav('notfound', 'inicio')).toBeNull();
+  });
+
+  it('item distante: as telas do meio passam no caminho, na ordem em que aparecem', () => {
+    expect(telasNoCaminho('inicio', 'veiculos')).toEqual(['release', 'escala', 'taf', 'croqui']);
+    expect(telasNoCaminho('veiculos', 'inicio')).toEqual(['croqui', 'taf', 'escala', 'release']);
+    expect(telasNoCaminho('release', 'termos')).toEqual(['escala', 'taf', 'croqui', 'veiculos', 'sugestoes']);
+  });
+
+  it('item vizinho, o mesmo item ou tela fora da barra: nada no caminho', () => {
+    expect(telasNoCaminho('inicio', 'release')).toEqual([]);
+    expect(telasNoCaminho('taf', 'taf')).toEqual([]);
+    expect(telasNoCaminho('notfound', 'taf')).toEqual([]);
   });
 });

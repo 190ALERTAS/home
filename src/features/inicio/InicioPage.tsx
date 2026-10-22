@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { ArrowRight, Download, Lock, Share, SquarePlus, X } from 'lucide-react';
-import { linkProps, type RouteId } from '../../lib/router';
+import { linkProps, navigate, type RouteId } from '../../lib/router';
+import { quandoPronta } from '../../app/telas';
 import { DIAS_SEMANA_CURTOS, formatDateBR, formatMinutes, monthKeyOf, monthLabel, nowHM, todayISO, weekdayOf } from '../../lib/date';
 import { readString, writeString } from '../../lib/storage';
 import { useInstall, useOnline } from '../../lib/pwa';
@@ -81,7 +82,7 @@ function Tile({ id, destaque, extra }: { id: RouteId; destaque?: boolean; extra?
   const n = NAV[id];
   const Icon = n.icon;
   return (
-    <a className={`tile${destaque ? ' destaque' : ''}`} {...linkProps(id)}>
+    <a className={`tile${destaque ? ' destaque' : ''}`} {...linkProps(id, undefined, (r) => quandoPronta(r, () => navigate(r)))}>
       <span className="tile-ico">
         <Icon />
       </span>
