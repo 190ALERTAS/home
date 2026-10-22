@@ -36,7 +36,7 @@ const K_BASE = '190a:escala:sync-base';
 export interface SyncPersistido {
   /** Conta Google conectada. */
   ativo: boolean;
-  /** Sincroniza sozinho ao abrir o app, quando a janela de 12 h libera. */
+  /** Sincroniza sozinho: confere a nuvem ao abrir/voltar ao app e envia logo depois de cada lançamento. */
   auto: boolean;
   uid?: string;
   email?: string;

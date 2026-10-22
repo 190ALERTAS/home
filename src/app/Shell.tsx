@@ -8,7 +8,7 @@ import { toast } from '../components/toast';
 import { gap } from '../components/ui';
 import { Emblema } from '../components/Emblema';
 import { DockContext } from '../components/dock';
-import { APP_VERSION, BOTTOM, MORE, NAV, SIDE_EXTRA, SIDE_MAIN } from './nav';
+import { APP_VERSION, BOTTOM, DESTAQUE, MORE, NAV, SIDE_EXTRA, SIDE_MAIN } from './nav';
 
 // As notas de atualização só são baixadas quando alguém abre a folha (o chunk fica no cache offline do PWA).
 const NotasSheet = lazy(() => import('../features/atualizacoes/NotasSheet'));
@@ -171,14 +171,17 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
             return (
               <a
                 key={id}
-                className={`nav-item${id === 'veiculos' ? ' nav-destaque' : ''}`}
+                className={`nav-item${id === DESTAQUE ? ' nav-destaque' : ''}`}
                 {...linkProps(id)}
                 aria-current={route === id ? 'page' : undefined}
+                aria-label={NAV[id].long}
               >
                 <span className="pill">
                   <Icon />
                 </span>
-                {NAV[id].label}
+                <span className="nav-rotulo" aria-hidden>
+                  {NAV[id].label}
+                </span>
               </a>
             );
           })}
@@ -192,7 +195,7 @@ export function Shell({ route, children }: { route: RouteId | 'notfound'; childr
             <span className="pill">
               <Ellipsis />
             </span>
-            Mais
+            <span className="nav-rotulo">Mais</span>
           </button>
         </nav>
       </div>
