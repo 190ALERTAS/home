@@ -95,4 +95,4 @@ export function telasNoCaminho(de: RouteId | 'notfound', para: RouteId): RouteId
   return i < j ? ordem.slice(i + 1, j) : ordem.slice(j + 1, i).reverse();
 }
 
-export const APP_VERSION = '5.2.2';
+export const APP_VERSION = '5.2.3';
