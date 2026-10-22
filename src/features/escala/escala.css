@@ -499,18 +499,21 @@
 }
 
 .sel-bar .acts {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: flex;
   gap: 6px;
 }
 
 .sel-bar .acts .btn {
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 3px;
   min-width: 0;
   min-height: 54px;
   padding: 4px;
   font-size: 12px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.15;
 }
 
 /* ---------- Lista do mês ---------- */

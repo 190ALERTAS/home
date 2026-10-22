@@ -194,7 +194,7 @@ export default function InicioPage() {
         <Lock size={16} />
         <p>
           Nada do que você digita nas ferramentas é enviado para servidores: rascunhos, escala e croquis ficam salvos só neste
-          aparelho.{' '}
+          aparelho. A escala só vai para a nuvem se você ativar a sincronização com a sua conta Google.{' '}
           <a {...linkProps('termos')}>Termos e privacidade</a>
         </p>
       </section>
