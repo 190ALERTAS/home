@@ -4,12 +4,10 @@ import { Sheet } from '../../../components/Sheet';
 import { Switch, gap } from '../../../components/ui';
 import { confirmDialog } from '../../../components/dialogs';
 import { useOnline } from '../../../lib/pwa';
-import { definirSync, formatarQuando, formatarRestante, notaSessao, INTERVALO_MS } from '../sync/estado';
+import { definirSync, formatarQuando, notaSessao } from '../sync/estado';
 import { apagarNuvem, conectar, desconectar, revalidarSessao, sincronizar, type Resultado } from '../sync/motor';
 import { useStatusSync, type StatusSync } from '../sync/useStatus';
-import { BarraJanela, descrever } from './SyncStatus';
-
-const HORAS = INTERVALO_MS / 3_600_000;
+import { descrever } from './SyncStatus';
 
 interface Retorno {
   tipo: 'ok' | 'info';
@@ -29,12 +27,12 @@ function retornoDe(r: Resultado, okTexto: string): Retorno | null {
             : 'Tudo já estava igual na nuvem.';
     return { tipo: 'ok', texto: `${okTexto} ${texto}` };
   }
-  if (r.motivo === 'janela' || r.motivo === 'ocupado') return { tipo: 'info', texto: r.mensagem };
+  if (r.motivo === 'ocupado') return { tipo: 'info', texto: r.mensagem };
   return null; // erros aparecem pelo aviso persistente (estado.erro)
 }
 
 function Estado({ st }: { st: StatusSync }) {
-  const { s, agora, janela: j } = st;
+  const { s, agora } = st;
   const d = descrever(st);
   const { Icone } = d;
   return (
@@ -46,15 +44,14 @@ function Estado({ st }: { st: StatusSync }) {
           <div className="subtle" style={{ fontSize: 13.5 }}>{d.detalhe}</div>
         </div>
       </div>
-      <BarraJanela progresso={j.progresso} aberta={j.aberta} />
       <div className="grid-2">
         <div className="kpi">
           <span className="v" style={{ fontSize: 17 }}>{s.ultima != null ? formatarQuando(s.ultima, agora) : '—'}</span>
           <span className="l">Última sincronização</span>
         </div>
         <div className="kpi">
-          <span className={`v ${j.aberta ? 'green' : ''}`} style={{ fontSize: 17 }}>{j.aberta ? 'Agora' : `em ${formatarRestante(j.restanteMs)}`}</span>
-          <span className="l">Próxima disponível</span>
+          <span className="v" style={{ fontSize: 17 }}>{s.checado != null ? formatarQuando(s.checado, agora) : '—'}</span>
+          <span className="l">Última conferência</span>
         </div>
       </div>
     </div>
@@ -63,7 +60,7 @@ function Estado({ st }: { st: StatusSync }) {
 
 export function SyncSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const st = useStatusSync();
-  const { s, janela: j, pendente } = st;
+  const { s } = st;
   const nota = notaSessao(s, st.agora);
   const online = useOnline();
   const [retorno, setRetorno] = useState<Retorno | null>(null);
@@ -131,8 +128,8 @@ export function SyncSheet({ open, onClose }: { open: boolean; onClose: () => voi
             <div className="list-item">
               <span className="ico"><RefreshCw /></span>
               <span className="txt">
-                <strong>Uma sincronização a cada {HORAS} h</strong>
-                <small>Manual ou automática, para gastar pouco</small>
+                <strong>Automática e econômica</strong>
+                <small>Confere a nuvem ao abrir o app e envia logo depois de cada lançamento</small>
               </span>
             </div>
             <div className="list-item">
@@ -205,23 +202,14 @@ export function SyncSheet({ open, onClose }: { open: boolean; onClose: () => voi
                 {ocupado ? <span className="spinner" /> : <LogIn />} Entrar novamente
               </button>
             ) : (
-              <button
-                type="button"
-                className="btn primary lg block"
-                disabled={ocupado || !j.aberta || !online}
-                onClick={sincronizarAgora}
-              >
+              <button type="button" className="btn primary lg block" disabled={ocupado || !online} onClick={sincronizarAgora}>
                 {ocupado ? <span className="spinner" /> : <RefreshCw />} Sincronizar agora
               </button>
             )}
-            {!s.precisaEntrar && !j.aberta && (
+            {!online && (
               <p className="subtle" style={{ fontSize: 13, textAlign: 'center' }}>
-                A sincronização de {HORAS} h já foi usada. Libera em {formatarRestante(j.restanteMs)}
-                {pendente ? ' — suas alterações seguem nela.' : '.'}
+                Sem internet no momento. O que você lançar fica guardado aqui e sobe quando a rede voltar.
               </p>
-            )}
-            {!online && j.aberta && (
-              <p className="subtle" style={{ fontSize: 13, textAlign: 'center' }}>Sem internet no momento.</p>
             )}
           </div>
 
@@ -229,7 +217,7 @@ export function SyncSheet({ open, onClose }: { open: boolean; onClose: () => voi
             checked={s.auto}
             onChange={(auto) => definirSync({ auto })}
             label="Sincronização automática"
-            description={`Ao abrir o app, no máximo uma vez a cada ${HORAS} h. Desligada, você sincroniza só pelo botão.`}
+            description="Ao abrir o app e logo depois de cada lançamento. Desligada, você sincroniza só pelo botão."
           />
 
           <div className="list">

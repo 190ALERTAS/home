@@ -161,11 +161,11 @@ export default function InicioPage() {
 
       <div className="eyebrow secao-titulo">Ferramentas</div>
       <div className="tiles">
-        <Tile id="veiculos" destaque />
+        <Tile id="escala" destaque extra={<ResumoEscala />} />
         <Tile id="release" />
-        <Tile id="escala" extra={<ResumoEscala />} />
-        <Tile id="croqui" />
         <Tile id="taf" />
+        <Tile id="croqui" />
+        <Tile id="veiculos" />
         <Tile id="sugestoes" />
       </div>
 

@@ -25,7 +25,6 @@ export function GeradorSheet({ open, onClose, mes, inicioSugerido }: { open: boo
   const [inicio, setInicio] = useState(inicioSugerido);
   const [ate, setAte] = useState<Ate>('mes');
   const [fimData, setFimData] = useState(lastDayOfMonth(mes));
-  const [pularAusencias, setPular] = useState(true);
   const [substituir, setSubstituir] = useState(false);
 
   useEffect(() => {
@@ -37,8 +36,8 @@ export function GeradorSheet({ open, onClose, mes, inicioSugerido }: { open: boo
 
   const fim = ate === 'mes' ? lastDayOfMonth(inicio.slice(0, 7)) : ate === 'proximo' ? lastDayOfMonth(shiftMonth(inicio.slice(0, 7), 1)) : fimData;
   const previa = useMemo(
-    () => preverGerador(db.entries, padrao, { inicio, fim, pularAusencias, substituir }),
-    [db.entries, padrao, inicio, fim, pularAusencias, substituir],
+    () => preverGerador(db.entries, padrao, { inicio, fim, substituir }),
+    [db.entries, padrao, inicio, fim, substituir],
   );
 
   const escolher = (id: string) => {
@@ -175,7 +174,9 @@ export function GeradorSheet({ open, onClose, mes, inicioSugerido }: { open: boo
         />
 
         <div className="stack" style={gap(4)}>
-          <Switch checked={pularAusencias} onChange={setPular} label="Pular férias e afastamentos" />
+          <p className="subtle" style={{ fontSize: 13 }}>
+            Dias com indisponibilidade (férias, afastamento, convalescença, EDT/RSP) são sempre pulados.
+          </p>
           <Switch
             checked={substituir}
             onChange={setSubstituir}

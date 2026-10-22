@@ -59,8 +59,9 @@ export default function TermosPage() {
             <strong>Sincronização opcional da escala:</strong> se você escolher entrar com a sua conta Google em Minha escala →
             Configurações → Conexão e sincronização, uma cópia da escala (lançamentos, turnos salvos, carga horária e a identificação
             do relatório) passa a ser guardada no Firebase (Google), em uma área ligada à sua conta e acessada pelo app somente com o
-            seu login. O app lê o nome e o e-mail da conta apenas para exibi-los a você. A sincronização acontece no máximo uma vez a
-            cada 12 horas, manual ou automática. Você pode sair da conta ou apagar a cópia na nuvem a qualquer momento nas mesmas
+            seu login. O app lê o nome e o e-mail da conta apenas para exibi-los a você. Com a sincronização automática ligada, o app
+            confere a cópia na nuvem ao ser aberto e envia as alterações logo depois de cada lançamento; desligada, só pelo botão
+            "Sincronizar agora". Você pode sair da conta ou apagar a cópia na nuvem a qualquer momento nas mesmas
             configurações. Quem administra o projeto no Firebase tem acesso técnico ao banco de dados; por isso, não registre
             informações sigilosas nas observações dos lançamentos.
           </li>

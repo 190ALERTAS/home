@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { formatMinutes, shiftMinutes } from '../../../lib/date';
 import { CampoHora } from '../../../components/pickers';
+import { Seg, gap } from '../../../components/ui';
 import { turnosFrequentes } from '../calc';
-import type { Entry, ModeloTurno } from '../model';
+import { ROTULO_SERVICO, type Entry, type ModeloTurno, type TipoServico } from '../model';
 
 export interface OpcaoHorario {
   start: string;
@@ -93,6 +94,35 @@ export function CamposHorario({
         </span>
         <CampoHora rotulo="Fim do turno" titulo="Fim do turno" value={end} onChange={(v) => onChange({ start, end: v })} />
       </div>
+    </div>
+  );
+}
+
+export type ServicoEscolha = 'ordinario' | TipoServico;
+
+/** O que gravar no turno: ordinário não leva o campo (igual aos turnos lançados até a versão 5.1). */
+export const servicoParaGravar = (v: ServicoEscolha): TipoServico | undefined => (v === 'ordinario' ? undefined : v);
+
+const DICA_SERVICO: Record<ServicoEscolha, string> = {
+  ordinario: 'Conta na carga horária do mês.',
+  gse: 'Serviço extraordinário: soma à parte da carga do mês (limite de 40h no mês).',
+  sobreaviso: 'Conta 1/3 das horas na carga do mês (NI ADM 033.2).',
+};
+
+/** Tipo de serviço do turno (NI ADM 033.2): ordinário, extraordinário (GSE) ou sobreaviso. */
+export function ServicoSeg({ value, onChange }: { value: ServicoEscolha; onChange: (v: ServicoEscolha) => void }) {
+  return (
+    <div className="stack" style={gap(6)}>
+      <span className="field-label">Tipo de serviço</span>
+      <Seg<ServicoEscolha>
+        value={value}
+        onChange={onChange}
+        ariaLabel="Tipo de serviço"
+        options={(['ordinario', 'gse', 'sobreaviso'] as ServicoEscolha[]).map((v) => ({ value: v, label: ROTULO_SERVICO[v].longo }))}
+      />
+      <small className="subtle" style={{ fontSize: 13 }}>
+        {DICA_SERVICO[value]}
+      </small>
     </div>
   );
 }

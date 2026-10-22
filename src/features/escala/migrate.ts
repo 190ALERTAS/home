@@ -213,15 +213,31 @@ export function interpretarBackup(texto: string): Importado {
 
 /** Chave de igualdade para evitar duplicar lançamentos ao mesclar. */
 export function chaveEntrada(e: Entry): string {
-  return e.kind === 'turno' ? `t|${e.date}|${e.start}|${e.end}|${e.minutes}` : `${e.kind}|${e.date}`;
+  // Os campos novos só entram na chave quando existem: as chaves dos lançamentos antigos não mudam.
+  if (e.kind === 'turno') return `t|${e.date}|${e.start}|${e.end}|${e.minutes}${e.servico ? `|${e.servico}` : ''}`;
+  return `${e.kind}|${e.date}${e.motivo ? `|${e.motivo}` : ''}`;
+}
+
+/**
+ * Chave como o lançamento aparece no formato da versão 4 ("registros"): sem o tipo de serviço e com
+ * férias, afastamento e convalescença juntos (todos viram "FER"). Usada ao reler o espelho, para que
+ * um turno GSE ou uma convalescença não voltem como lançamentos novos.
+ */
+export function chaveV1(e: Entry): string {
+  if (e.kind === 'turno') return `t|${e.date}|${e.start}|${e.end}|${e.minutes}`;
+  return `${e.kind === 'edt' ? 'edt' : 'ferias'}|${e.date}`;
 }
 
 /** Junta entradas novas às existentes, sem repetir as que já existem. */
-export function mesclar(existentes: Entry[], novas: Entry[]): { entries: Entry[]; adicionadas: number } {
-  const chaves = new Set(existentes.map(chaveEntrada));
+export function mesclar(
+  existentes: Entry[],
+  novas: Entry[],
+  chave: (e: Entry) => string = chaveEntrada,
+): { entries: Entry[]; adicionadas: number } {
+  const chaves = new Set(existentes.map(chave));
   const add: Entry[] = [];
   for (const e of novas) {
-    const k = chaveEntrada(e);
+    const k = chave(e);
     if (chaves.has(k)) continue;
     chaves.add(k);
     add.push({ ...e, id: uid() });

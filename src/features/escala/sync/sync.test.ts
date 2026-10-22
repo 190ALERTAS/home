@@ -1,13 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { configPadrao, MODELOS_PADRAO, type Entry, type Turno } from '../model';
 import { canonico, iguaisInst, mesclar3, type Instantaneo } from './merge';
 import {
   formatarHa,
   formatarQuando,
-  formatarRestante,
-  INTERVALO_MS,
-  janela,
+  lerBase,
   notaSessao,
+  salvarBase,
   situacao,
   type SyncEstado,
 } from './estado';
@@ -197,34 +196,42 @@ describe('mesclagem entre aparelhos', () => {
   });
 });
 
-describe('janela de 12 horas', () => {
+describe('base da sincronização (carimbo da nuvem)', () => {
+  const mem = new Map<string, string>();
+  const stub = () =>
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => mem.get(k) ?? null,
+      setItem: (k: string, v: string) => void mem.set(k, v),
+      removeItem: (k: string) => void mem.delete(k),
+    });
+  afterEach(() => {
+    mem.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it('base antiga (5.1.x, sem carimbo) ainda é lida', () => {
+    stub();
+    const i = inst([turno('a', '2026-09-01')]);
+    mem.set('190a:escala:sync-base', JSON.stringify({ uid: 'u1', ...i }));
+    const b = lerBase('u1');
+    expect(b?.entries.map((e) => e.id)).toEqual(['a']);
+    expect(b?.carimbo).toBeUndefined();
+    expect(lerBase('u2')).toBeNull();
+  });
+
+  it('base guarda e devolve o carimbo', () => {
+    stub();
+    salvarBase('u1', inst([turno('a', '2026-09-01')]), '2026-10-22T03:00:00.000Z');
+    expect(lerBase('u1')?.carimbo).toBe('2026-10-22T03:00:00.000Z');
+    salvarBase('u1', inst([]));
+    expect(lerBase('u1')?.carimbo).toBeUndefined();
+  });
+});
+
+describe('textos de tempo', () => {
   const H = 60 * 60 * 1000;
 
-  it('sem sincronização anterior está aberta', () => {
-    expect(janela(undefined, 1000)).toEqual({ aberta: true, restanteMs: 0, progresso: 1 });
-  });
-
-  it('gasta a janela ao sincronizar e libera após 12 h', () => {
-    const t0 = 1_000_000;
-    expect(janela(t0, t0).aberta).toBe(false);
-    expect(janela(t0, t0).progresso).toBe(0);
-    const meio = janela(t0, t0 + 3 * H);
-    expect(meio.aberta).toBe(false);
-    expect(meio.restanteMs).toBe(9 * H);
-    expect(meio.progresso).toBeCloseTo(0.25);
-    expect(janela(t0, t0 + INTERVALO_MS).aberta).toBe(true);
-  });
-
-  it('relógio que voltou no tempo espera no máximo uma janela', () => {
-    expect(janela(10 * H, 0).restanteMs).toBe(INTERVALO_MS);
-  });
-
   it('formata tempos em português', () => {
-    expect(formatarRestante(9 * H + 20 * 60_000)).toBe('9h 20min');
-    expect(formatarRestante(2 * H)).toBe('2h');
-    expect(formatarRestante(35 * 60_000)).toBe('35 min');
-    expect(formatarRestante(1)).toBe('1 min');
-    expect(formatarRestante(0)).toBe('agora');
     expect(formatarHa(20_000)).toBe('agora há pouco');
     expect(formatarHa(35 * 60_000)).toBe('há 35 min');
     expect(formatarHa(3 * H)).toBe('há 3 h');

@@ -160,8 +160,9 @@
   .ring .pct {
     font-size: 25px;
   }
+  /* "−121h35" (7 caracteres) cabe na coluna até em 320 px */
   .kpi .v {
-    font-size: 22px;
+    font-size: min(22px, 5.5vw);
   }
 }
 
@@ -378,6 +379,20 @@
 
 .day .bar.misto {
   background: linear-gradient(90deg, var(--primary) 50%, var(--blue) 50%);
+}
+
+/* Serviço extraordinário (GSE) e sobreaviso (NI ADM 033.2) */
+.day .bar.gse {
+  background: var(--green);
+}
+
+.day .bar.sbv,
+.cal-legend i.leg-sbv {
+  background: repeating-linear-gradient(90deg, var(--blue) 0 4px, transparent 4px 7px);
+}
+
+.cal-legend i.leg-sbv {
+  box-shadow: inset 0 0 0 1px var(--blue);
 }
 
 .day.trabalho {
@@ -972,26 +987,6 @@ button.entry:hover {
   .esc-resumo .sync-topo small::before {
     content: '· ';
   }
-}
-
-/* Avanço da janela de 12 h: enche até liberar a próxima sincronização */
-.sync-bar {
-  height: 6px;
-  border-radius: 999px;
-  background: var(--surface-3);
-  overflow: hidden;
-}
-
-.sync-bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--blue);
-  transition: width 600ms var(--ease-out);
-}
-
-.sync-bar.pronta i {
-  background: var(--green);
 }
 
 /* Ícone de estado (painel e linha das configurações) */

@@ -60,12 +60,14 @@ export const NAV: Record<RouteId, NavEntry> = {
   termos: { id: 'termos', label: 'Termos', long: 'Termos de uso', desc: 'Termos e privacidade', icon: ScrollText },
 };
 
-/** Itens fixos da barra inferior (o 5º botão é "Mais"). */
-export const BOTTOM: RouteId[] = ['inicio', 'release', 'veiculos', 'escala'];
+/** Itens fixos da barra inferior (o 7º botão é "Mais"). A Minha escala é o produto principal. */
+export const BOTTOM: RouteId[] = ['inicio', 'release', 'escala', 'taf', 'croqui', 'veiculos'];
+/** Rota em destaque na barra inferior (ícone sempre vermelho). */
+export const DESTAQUE: RouteId = 'escala';
 /** Itens do menu "Mais". */
-export const MORE: RouteId[] = ['croqui', 'taf', 'sugestoes', 'termos'];
+export const MORE: RouteId[] = ['sugestoes', 'termos'];
 /** Ordem da barra lateral (desktop). */
-export const SIDE_MAIN: RouteId[] = ['inicio', 'release', 'veiculos', 'escala', 'croqui', 'taf'];
+export const SIDE_MAIN: RouteId[] = ['inicio', 'release', 'escala', 'taf', 'croqui', 'veiculos'];
 export const SIDE_EXTRA: RouteId[] = ['sugestoes', 'termos'];
 
-export const APP_VERSION = '5.1.2';
+export const APP_VERSION = '5.2.0';

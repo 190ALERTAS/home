@@ -24,6 +24,12 @@ export const PRESETS: Preset[] = [
     padrao: { tipo: 'ciclo', dias: [{ start: '07:00', end: '19:00' }, null] },
   },
   {
+    id: '6x18',
+    nome: '6x18 (1:3)',
+    desc: '6h de serviço por dia, 18h de folga',
+    padrao: { tipo: 'ciclo', dias: [{ start: '06:00', end: '12:00' }] },
+  },
+  {
     id: '12x24-12x48',
     nome: '12x24 · 12x48',
     desc: 'Um dia, uma noite e duas folgas',
@@ -55,10 +61,8 @@ export const PRESETS: Preset[] = [
 export interface OpcoesGerador {
   /** Primeiro dia do ciclo (deve ser um dia de serviço no início do ciclo). */
   inicio: string;
-  /** Último dia (inclusive). */
+  /** Último dia (inclusive). Dias com indisponibilidade (férias, afastamento, EDT/RSP) sempre são pulados. */
   fim: string;
-  /** Não lança turnos em dias de férias/afastamento. */
-  pularAusencias: boolean;
   /** Apaga turnos já lançados nos dias gerados (senão, mantém e pula esses dias). */
   substituir: boolean;
 }
@@ -99,7 +103,7 @@ export function preverGerador(entries: Entry[], padrao: Padrao, o: OpcoesGerador
     const slot = slotDoDia(padrao, o.inicio, data);
     if (!slot) continue;
     const doDia = porData.get(data) ?? [];
-    if (o.pularAusencias && doDia.some((e) => e.kind === 'ferias' || e.kind === 'afastamento')) {
+    if (doDia.some((e) => e.kind !== 'turno')) {
       pulados++;
       continue;
     }

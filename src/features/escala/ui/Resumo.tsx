@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { TriangleAlert } from 'lucide-react';
 import { formatMinutes } from '../../../lib/date';
+import { GSE_LIMITE } from '../model';
 import type { ResumoMes } from '../calc';
 
 /** Anima números entre valores (efeito de contagem). */
@@ -112,10 +114,39 @@ export function Resumo({ r }: { r: ResumoMes }) {
         </span>
         {r.diasFerias > 0 && <span className="badge amber">{r.diasFerias} dia(s) de férias</span>}
         {r.diasAfastamento > 0 && <span className="badge violet">{r.diasAfastamento} dia(s) de afastamento</span>}
+        {r.diasConvalescenca > 0 && <span className="badge violet">{r.diasConvalescenca} de convalescença</span>}
         {r.diasEdt > 0 && <span className="badge blue">{r.diasEdt} EDT/RSP</span>}
         {r.extras > 0 && <span className="badge green">Normais {formatMinutes(r.normais)}</span>}
+        {r.gse > 0 && (
+          <span className={`badge ${r.gseExcedido ? 'red' : 'green'}`} title="Serviço extraordinário: soma à parte da carga do mês">
+            GSE {formatMinutes(r.gse)} / {formatMinutes(GSE_LIMITE)}
+          </span>
+        )}
+        {r.sobreaviso > 0 && (
+          <span className="badge blue" title="Sobreaviso conta 1/3 das horas na carga do mês">
+            Sobreaviso {formatMinutes(r.sobreaviso)} → {formatMinutes(r.sobreavisoComputado)}
+          </span>
+        )}
         {semMeta && <span className="badge">Mês sem carga horária</span>}
       </div>
+      {r.gseExcedido && (
+        <div className="callout amber" role="note" style={{ marginTop: 12 }}>
+          <TriangleAlert />
+          <div>
+            Serviço extraordinário acima de {formatMinutes(GSE_LIMITE)} no mês. A NI ADM 033.2 (3.f.1) só admite passar do
+            limite em ocorrência já iniciada, situação imprevista ou quando todos da localidade já cumpriram as 40h.
+          </div>
+        </div>
+      )}
+      {r.alertaConvalescencaGse && (
+        <div className="callout amber" role="note" style={{ marginTop: 12 }}>
+          <TriangleAlert />
+          <div>
+            Convalescença de mais de 1 dia neste mês: pela NI ADM 033.2 (3.e.2.c), não se deve concorrer a escala
+            extraordinária no mesmo mês, salvo situação excepcionalíssima justificada.
+          </div>
+        </div>
+      )}
     </div>
   );
 }
