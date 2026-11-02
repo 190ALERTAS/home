@@ -2,12 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { idbSet } from './idb';
 
 /** IndexedDB mínimo: o request da gravação dá certo e depois a transação termina como pedido. */
-function stubIndexedDB(fim: 'completa' | 'aborta') {
+function stubIndexedDB(fim: 'completa' | 'aborta' | 'lanca') {
   const close = vi.fn();
   const db = {
     objectStoreNames: { contains: () => true },
     close,
     transaction: () => {
+      if (fim === 'lanca') throw new DOMException('mudança de versão', 'InvalidStateError');
       const t: Record<string, unknown> = { error: new DOMException('cota', 'QuotaExceededError') };
       t.objectStore = () => ({
         put: () => {
@@ -60,5 +61,11 @@ describe('gravação no IndexedDB', () => {
     const b = stubIndexedDB('completa');
     await idbSet('k', 1);
     expect(b.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('erro ao abrir a transação devolve false e fecha o db', async () => {
+    const { close } = stubIndexedDB('lanca');
+    expect(await idbSet('k', 1)).toBe(false);
+    expect(close).toHaveBeenCalledTimes(1);
   });
 });
