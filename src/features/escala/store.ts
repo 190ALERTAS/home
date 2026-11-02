@@ -117,24 +117,46 @@ export function carregar(kv: KV, agora = new Date()): { db: EscalaDB; aviso?: Av
 
 const memoria = new Map<string, string>();
 const kvNavegador: KV = {
+  // O que caiu na memória é mais novo que o que ficou no localStorage (que parou de aceitar gravação).
   getItem: (k) => {
+    if (memoria.has(k)) return memoria.get(k)!;
     try {
       return localStorage.getItem(k);
     } catch {
-      return memoria.get(k) ?? null;
+      return null;
     }
   },
   setItem: (k, v) => {
-    localStorage.setItem(k, v);
+    try {
+      localStorage.setItem(k, v);
+    } catch {
+      // Armazenamento cheio ou bloqueado: segue na memória até fechar o app.
+      memoria.set(k, v);
+      modoTemporario = true;
+    }
   },
   removeItem: (k) => {
+    memoria.delete(k);
     try {
       localStorage.removeItem(k);
     } catch {
-      memoria.delete(k);
+      /* ignora */
     }
   },
 };
+
+let modoTemporario = false;
+let avisouTemporario = false;
+
+/** A escala está só na memória (o aparelho não aceitou gravar): vale até fechar o app. */
+export function emModoTemporario(): boolean {
+  return modoTemporario;
+}
+
+/** Só para testes. */
+export function lerChave(k: string): string | null {
+  return kvNavegador.getItem(k);
+}
 
 let estado: EscalaDB | null = null;
 /**
@@ -194,6 +216,14 @@ function persistir(db: EscalaDB): boolean {
   if (!ok) {
     toast({
       title: 'Não foi possível salvar a escala',
+      desc: 'O armazenamento do aparelho está cheio ou bloqueado. Faça um backup pelo menu da escala.',
+      kind: 'error',
+      duration: 8000,
+    });
+  } else if (modoTemporario && !avisouTemporario) {
+    avisouTemporario = true;
+    toast({
+      title: 'Escala salva só até fechar o app',
       desc: 'O armazenamento do aparelho está cheio ou bloqueado. Faça um backup pelo menu da escala.',
       kind: 'error',
       duration: 8000,

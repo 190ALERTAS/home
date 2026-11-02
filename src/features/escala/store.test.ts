@@ -26,3 +26,42 @@ describe('outra aba alterou a escala', () => {
     expect(s.podeDesfazer()).toBe(true);
   });
 });
+
+describe('sem armazenamento no aparelho', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.unstubAllGlobals();
+  });
+
+  it('sem localStorage, a alteração vale na sessão e o aviso aparece uma vez', async () => {
+    const { toast } = await import('../../components/toast');
+    vi.mocked(toast).mockClear();
+    const s = await import('./store');
+    expect(s.atualizar((db) => ({ ...db, entries: [...db.entries] }), 'lançar')).toBe(true);
+    expect(s.atualizar((db) => ({ ...db, entries: [...db.entries] }), 'lançar de novo')).toBe(true);
+    expect(s.emModoTemporario()).toBe(true);
+    expect(toast).toHaveBeenCalledTimes(1);
+    const aviso = vi.mocked(toast).mock.calls[0][0];
+    expect(aviso.kind).toBe('error');
+    expect(aviso.title).toContain('até fechar o app');
+  });
+
+  it('cota cheia no meio da sessão: a leitura usa o valor da memória', async () => {
+    const { K_V2 } = await import('./store');
+    const { dbVazio } = await import('./model');
+    const antigo = JSON.stringify(dbVazio('2020-01-01T00:00:00.000Z'));
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => (k === K_V2 ? antigo : null),
+      setItem: () => {
+        throw new DOMException('quota', 'QuotaExceededError');
+      },
+      removeItem: () => undefined,
+    });
+    vi.resetModules();
+    const s = await import('./store');
+    s.atualizar((db) => ({ ...db, entries: [...db.entries] }), 'lançar');
+    const lido = s.lerChave(s.K_V2);
+    expect(lido).not.toBe(antigo);
+    expect(JSON.parse(lido!).meta.atualizadoEm).toBe(s.getEscala().meta.atualizadoEm);
+  });
+});
