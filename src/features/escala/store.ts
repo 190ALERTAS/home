@@ -257,15 +257,25 @@ export function useEscala(): EscalaDB {
   return useSyncExternalStore(subscribe, getEscala, getEscala);
 }
 
+/**
+ * Outra aba/janela gravou a escala: passa a usar o que ela gravou. O histórico de desfazer é
+ * descartado: voltar a um estado desta aba apagaria o que a outra lançou.
+ * Retorna true se a escala mudou (valor ilegível é ignorado).
+ */
+export function aplicarDeOutraAba(raw: string): boolean {
+  const db = normalizarV2(parse(raw));
+  if (!db) return false;
+  estado = db;
+  revisao++;
+  pilhaDesfazer.length = 0;
+  emitir();
+  return true;
+}
+
 // Outra aba/janela alterou a escala: acompanha.
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
     if (e.key !== K_V2 || !e.newValue) return;
-    const db = normalizarV2(parse(e.newValue));
-    if (db) {
-      estado = db;
-      revisao++;
-      emitir();
-    }
+    aplicarDeOutraAba(e.newValue);
   });
 }
