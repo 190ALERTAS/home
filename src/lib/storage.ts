@@ -54,6 +54,22 @@ interface Envelope<T> {
 }
 
 /**
+ * O que gravar para `valor`, ou null se não precisa gravar. Sem mudança no conteúdo, a hora antiga
+ * fica: abrir a tela não renova o prazo do rascunho (senão uma ocorrência antiga nunca expira).
+ */
+export function envelopeParaGravar<T>(anterior: unknown, valor: T, agora: number): Envelope<T> | null {
+  if (
+    anterior &&
+    typeof anterior === 'object' &&
+    'v' in anterior &&
+    JSON.stringify((anterior as Envelope<unknown>).v) === JSON.stringify(valor)
+  ) {
+    return null;
+  }
+  return { v: valor, t: agora };
+}
+
+/**
  * Estado React persistido no localStorage.
  * Com `ttlMs`, o valor expira (usado para rascunhos de formulários).
  */
@@ -80,7 +96,8 @@ export function usePersistentState<T>(
   const [value, setValue] = useState<T>(load);
 
   useEffect(() => {
-    writeJSON(key, { v: value, t: Date.now() } satisfies Envelope<T>);
+    const env = envelopeParaGravar(readJSON<unknown>(key, null), value, Date.now());
+    if (env) writeJSON(key, env);
   }, [key, value]);
 
   const reset = useCallback(() => {
