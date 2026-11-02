@@ -41,7 +41,10 @@ export function criarTelas<K extends RouteId>(carregadores: Partial<Record<K, Ca
     pronta: (id: RouteId): ComponentType | undefined => prontas.get(id),
     /** Pode mostrar sem esperar: vem no pacote principal ou já foi baixada. */
     estaPronta: (id: RouteId): boolean => !sobDemanda(id) || prontas.has(id),
-    carregarTodas: () => Promise.all((Object.keys(carregadores) as K[]).map((id) => carregar(id).catch(() => undefined))).then(() => undefined),
+    /** Baixa as telas uma por vez, na ordem dada (para não disputar a rede com a tela aberta). Falhas são ignoradas. */
+    carregarTodas: async (ordem: K[] = Object.keys(carregadores) as K[]) => {
+      for (const id of ordem) await carregar(id).catch(() => undefined);
+    },
     /** Versão `lazy` da tela, para a primeira vez (antes de baixar). */
     preguicosa: (id: K): LazyExoticComponent<ComponentType> =>
       lazy(() => carregar(id).then(() => ({ default: prontas.get(id)! }))),

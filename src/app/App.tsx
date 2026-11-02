@@ -91,9 +91,18 @@ export function App() {
     const idle = window.requestIdleCallback
       ? (cb: () => void) => window.requestIdleCallback(cb, { timeout: 800 })
       : (cb: () => void) => window.setTimeout(cb, 300);
-    const h = idle(() => void telas.carregarTodas());
+    // Só depois do `load`: a tela aberta e as fontes vêm primeiro; a Escala é a primeira da fila.
+    let h: number | undefined;
+    const iniciar = () => {
+      h = idle(() => void telas.carregarTodas(['escala', 'taf', 'croqui', 'sugestoes', 'termos'])) as number;
+    };
+    if (document.readyState === 'complete') iniciar();
+    else window.addEventListener('load', iniciar, { once: true });
     return () => {
-      if (window.cancelIdleCallback && typeof h === 'number') window.cancelIdleCallback(h);
+      window.removeEventListener('load', iniciar);
+      if (h === undefined) return;
+      if (window.cancelIdleCallback) window.cancelIdleCallback(h);
+      else window.clearTimeout(h);
     };
   }, []);
 

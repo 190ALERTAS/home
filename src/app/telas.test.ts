@@ -53,6 +53,28 @@ describe('telas carregadas sob demanda', () => {
     expect(t.estaPronta('escala')).toBe(true);
   });
 
+  it('carregarTodas baixa uma por vez, na ordem pedida', async () => {
+    const log: string[] = [];
+    let soltarTaf!: () => void;
+    const t = criarTelas({
+      escala: async () => {
+        log.push('escala');
+        return { default: Escala };
+      },
+      taf: () => {
+        log.push('taf');
+        return new Promise<{ default: typeof Taf }>((r) => (soltarTaf = () => r({ default: Taf })));
+      },
+    });
+    const todas = t.carregarTodas(['taf', 'escala']);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(log).toEqual(['taf']);
+    soltarTaf();
+    await todas;
+    expect(log).toEqual(['taf', 'escala']);
+  });
+
   it('carregarTodas baixa todas e ignora falhas', async () => {
     const t = criarTelas({ escala: async () => ({ default: Escala }), taf: () => Promise.reject(new Error('x')) });
     await t.carregarTodas();
