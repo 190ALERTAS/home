@@ -13,15 +13,11 @@ import { telas } from './telas';
 import { ErroTela } from './ErroTela';
 import { deveReavisar } from '../lib/reaviso';
 
-const PAGES: Record<RouteId, ComponentType> = {
+/** Telas do pacote principal; as demais vêm de `telas` (baixadas sob demanda). */
+const PAGES: Partial<Record<RouteId, ComponentType>> = {
   inicio: InicioPage,
   release: ReleasePage,
   veiculos: VeiculoPage,
-  escala: telas.preguicosa('escala'),
-  croqui: telas.preguicosa('croqui'),
-  taf: telas.preguicosa('taf'),
-  sugestoes: telas.preguicosa('sugestoes'),
-  termos: telas.preguicosa('termos'),
 };
 
 function PageFallback() {
@@ -114,13 +110,13 @@ export function App() {
   const [tentativa, setTentativa] = useState(0);
 
   // Tela já baixada é usada direto (o `lazy` suspenderia e mostraria o "carregando" por um instante).
-  const Page = useMemo(() => {
-    if (id === 'notfound') return NotFoundPage;
-    const pronta = telas.pronta(id);
-    if (pronta) return pronta;
-    if (tentativa > 0 && !telas.estaPronta(id)) return telas.preguicosa(id as Parameters<typeof telas.preguicosa>[0]);
-    return PAGES[id];
-  }, [id, tentativa]);
+  // Tela sob demanda que ainda não baixou ganha um `lazy` novo a cada entrada: uma falha anterior
+  // (sem internet) não fica guardada.
+  const Page = useMemo(
+    () => (id === 'notfound' ? NotFoundPage : (telas.paraMostrar(id) ?? PAGES[id] ?? NotFoundPage)),
+    // `tentativa` força uma instância nova no "Tentar de novo".
+    [id, tentativa],
+  );
 
   return (
     <>

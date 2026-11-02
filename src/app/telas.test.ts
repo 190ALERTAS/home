@@ -43,6 +43,20 @@ describe('telas carregadas sob demanda', () => {
     expect(t.pronta('taf')).toBe(Taf);
   });
 
+  it('tela que falhou e foi deixada ganha uma instância nova ao voltar (sem o erro guardado)', async () => {
+    let falhar = true;
+    const t = criarTelas({ taf: async () => (falhar ? Promise.reject(new Error('offline')) : { default: Taf }) });
+    const primeira = t.paraMostrar('taf');
+    await expect(t.carregar('taf')).rejects.toThrow('offline');
+    const segunda = t.paraMostrar('taf');
+    expect(segunda).toBeDefined();
+    expect(segunda).not.toBe(primeira);
+    falhar = false;
+    await t.carregar('taf');
+    expect(t.paraMostrar('taf')).toBe(Taf);
+    expect(t.paraMostrar('release')).toBeUndefined();
+  });
+
   it('tela que já vem no pacote principal está sempre pronta', async () => {
     const t = criarTelas({ escala: async () => ({ default: Escala }) });
     await expect(t.carregar('release')).resolves.toBeUndefined();

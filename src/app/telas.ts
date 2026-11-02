@@ -35,6 +35,10 @@ export function criarTelas<K extends RouteId>(carregadores: Partial<Record<K, Ca
     return p;
   }
 
+  /** Versão `lazy` da tela, para a primeira vez (antes de baixar). */
+  const preguicosa = (id: K): LazyExoticComponent<ComponentType> =>
+    lazy(() => carregar(id).then(() => ({ default: prontas.get(id)! })));
+
   return {
     carregar,
     /** A tela já baixada, para usar sem `lazy`; undefined se ainda não baixou ou se vem no pacote principal. */
@@ -45,9 +49,14 @@ export function criarTelas<K extends RouteId>(carregadores: Partial<Record<K, Ca
     carregarTodas: async (ordem: K[] = Object.keys(carregadores) as K[]) => {
       for (const id of ordem) await carregar(id).catch(() => undefined);
     },
-    /** Versão `lazy` da tela, para a primeira vez (antes de baixar). */
-    preguicosa: (id: K): LazyExoticComponent<ComponentType> =>
-      lazy(() => carregar(id).then(() => ({ default: prontas.get(id)! }))),
+    preguicosa,
+    /**
+     * O que mostrar para a tela sob demanda: a já baixada ou uma versão `lazy` nova (o `lazy` guarda
+     * o erro de uma falha anterior; uma instância nova tenta baixar de novo). Undefined se a tela vem
+     * no pacote principal.
+     */
+    paraMostrar: (id: RouteId): ComponentType | undefined =>
+      sobDemanda(id) ? (prontas.get(id) ?? preguicosa(id)) : undefined,
   };
 }
 
