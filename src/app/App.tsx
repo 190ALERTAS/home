@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, type ComponentType } from 'react';
+import { Suspense, useEffect, useMemo, useState, type ComponentType } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useRoute, type RouteId } from '../lib/router';
 import { Shell } from './Shell';
@@ -10,6 +10,7 @@ import VeiculoPage from '../features/veiculo/VeiculoPage';
 import { NotFoundPage } from '../features/inicio/NotFoundPage';
 import { iniciarSyncAutomatico } from '../features/escala/sync/auto';
 import { telas } from './telas';
+import { ErroTela } from './ErroTela';
 
 const PAGES: Record<RouteId, ComponentType> = {
   inicio: InicioPage,
@@ -87,15 +88,27 @@ export function App() {
   // Sincronização automática da escala (só age com a conta conectada e o automático ligado).
   useEffect(() => iniciarSyncAutomatico(), []);
 
+  // "Tentar de novo" depois de uma falha ao abrir a tela: o `lazy` guarda o erro, então cada tentativa
+  // usa uma instância nova.
+  const [tentativa, setTentativa] = useState(0);
+
   // Tela já baixada é usada direto (o `lazy` suspenderia e mostraria o "carregando" por um instante).
-  const Page = useMemo(() => (id === 'notfound' ? NotFoundPage : (telas.pronta(id) ?? PAGES[id])), [id]);
+  const Page = useMemo(() => {
+    if (id === 'notfound') return NotFoundPage;
+    const pronta = telas.pronta(id);
+    if (pronta) return pronta;
+    if (tentativa > 0 && !telas.estaPronta(id)) return telas.preguicosa(id as Parameters<typeof telas.preguicosa>[0]);
+    return PAGES[id];
+  }, [id, tentativa]);
 
   return (
     <>
       <Shell route={id}>
-        <Suspense fallback={<PageFallback />}>
-          <Page key={id} />
-        </Suspense>
+        <ErroTela key={`${id}:${tentativa}`} onTentar={() => setTentativa((n) => n + 1)}>
+          <Suspense fallback={<PageFallback />}>
+            <Page key={id} />
+          </Suspense>
+        </ErroTela>
       </Shell>
       <Toaster />
       <DialogHost />

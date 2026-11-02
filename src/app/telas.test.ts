@@ -29,6 +29,20 @@ describe('telas carregadas sob demanda', () => {
     expect(t.pronta('taf')).toBe(Taf);
   });
 
+  it('cada tentativa depois de falhar pede o download de novo', async () => {
+    let falhas = 2;
+    const load = vi.fn(async () => {
+      if (falhas-- > 0) throw new Error('offline');
+      return { default: Taf };
+    });
+    const t = criarTelas({ taf: load });
+    await expect(t.carregar('taf')).rejects.toThrow('offline');
+    await expect(t.carregar('taf')).rejects.toThrow('offline');
+    await expect(t.carregar('taf')).resolves.toBeUndefined();
+    expect(load).toHaveBeenCalledTimes(3);
+    expect(t.pronta('taf')).toBe(Taf);
+  });
+
   it('tela que já vem no pacote principal está sempre pronta', async () => {
     const t = criarTelas({ escala: async () => ({ default: Escala }) });
     await expect(t.carregar('release')).resolves.toBeUndefined();
