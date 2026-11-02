@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useState, type ComponentType } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useRoute, type RouteId } from '../lib/router';
 import { Shell } from './Shell';
@@ -11,6 +11,7 @@ import { NotFoundPage } from '../features/inicio/NotFoundPage';
 import { iniciarSyncAutomatico } from '../features/escala/sync/auto';
 import { telas } from './telas';
 import { ErroTela } from './ErroTela';
+import { deveReavisar } from '../lib/reaviso';
 
 const PAGES: Record<RouteId, ComponentType> = {
   inicio: InicioPage,
@@ -50,21 +51,32 @@ function UpdatePrompt() {
     }
   }, [offlineReady, setOfflineReady]);
 
+  // O aviso some depois de 60 s; enquanto a versão nova esperar, ele volta quando o app reabre.
+  const ultimoAviso = useRef<number | null>(null);
   useEffect(() => {
     if (!needRefresh) return;
-    toast({
-      title: 'Nova versão disponível',
-      desc: 'Toque em atualizar para carregar as melhorias.',
-      kind: 'info',
-      duration: 60_000,
-      action: {
-        label: 'Atualizar',
-        onClick: () => {
-          setNeedRefresh(false);
-          void updateServiceWorker(true);
+    const avisar = () => {
+      ultimoAviso.current = Date.now();
+      toast({
+        title: 'Nova versão disponível',
+        desc: 'Toque em atualizar para carregar as melhorias.',
+        kind: 'info',
+        duration: 60_000,
+        action: {
+          label: 'Atualizar',
+          onClick: () => {
+            setNeedRefresh(false);
+            void updateServiceWorker(true);
+          },
         },
-      },
-    });
+      });
+    };
+    avisar();
+    const aoVoltar = () => {
+      if (document.visibilityState === 'visible' && deveReavisar(Date.now(), ultimoAviso.current)) avisar();
+    };
+    document.addEventListener('visibilitychange', aoVoltar);
+    return () => document.removeEventListener('visibilitychange', aoVoltar);
   }, [needRefresh, setNeedRefresh, updateServiceWorker]);
 
   return null;
