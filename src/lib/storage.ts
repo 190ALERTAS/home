@@ -69,6 +69,12 @@ export function envelopeParaGravar<T>(anterior: unknown, valor: T, agora: number
   return { v: valor, t: agora };
 }
 
+/** O valor guardado ainda vale? Precisa ser um envelope e, com `ttlMs`, estar dentro do prazo. */
+export function envelopeValido<T = unknown>(env: unknown, agora: number, ttlMs?: number): env is Envelope<T> {
+  if (!env || typeof env !== 'object' || !('v' in env)) return false;
+  return !ttlMs || agora - ((env as Envelope<T>).t ?? 0) <= ttlMs;
+}
+
 /**
  * Estado React persistido no localStorage.
  * Com `ttlMs`, o valor expira (usado para rascunhos de formulários).
@@ -84,10 +90,9 @@ export function usePersistentState<T>(
   const load = (): T => {
     const make = () =>
       typeof initialRef.current === 'function' ? (initialRef.current as () => T)() : initialRef.current;
-    const env = readJSON<Envelope<T> | null>(key, null);
-    if (!env || typeof env !== 'object' || !('v' in env)) return make();
-    if (ttlMs && Date.now() - (env.t ?? 0) > ttlMs) {
-      removeKey(key);
+    const env = readJSON<unknown>(key, null);
+    if (!envelopeValido<T>(env, Date.now(), ttlMs)) {
+      if (env != null) removeKey(key);
       return make();
     }
     return env.v;
