@@ -270,7 +270,7 @@ export function desfazer(): string | null {
   const atual = getEscala();
   estado = { ...atual, entries: item.entries, meta: { ...atual.meta, atualizadoEm: new Date().toISOString() } };
   revisao++;
-  salvar(kvNavegador, estado);
+  persistir(estado);
   emitir();
   return item.rotulo;
 }

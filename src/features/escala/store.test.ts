@@ -73,6 +73,28 @@ describe('sem armazenamento no aparelho', () => {
     expect(s.getEscala().entries).toHaveLength(0);
   });
 
+  it('primeira falha de gravação num desfazer já mostra o aviso', async () => {
+    const { toast } = await import('../../components/toast');
+    vi.mocked(toast).mockClear();
+    let cheio = false;
+    const dados = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => dados.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        if (cheio) throw new DOMException('quota', 'QuotaExceededError');
+        dados.set(k, v);
+      },
+      removeItem: (k: string) => void dados.delete(k),
+    });
+    vi.resetModules();
+    const s = await import('./store');
+    s.atualizar((db) => ({ ...db, entries: [...db.entries] }), 'lançar');
+    cheio = true;
+    expect(s.desfazer()).toBe('lançar');
+    expect(s.emModoTemporario()).toBe(true);
+    expect(toast).toHaveBeenCalledTimes(1);
+  });
+
   it('cota cheia no meio da sessão: a leitura usa o valor da memória', async () => {
     const { K_V2 } = await import('./store');
     const { dbVazio } = await import('./model');
