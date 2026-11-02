@@ -73,7 +73,7 @@ export function PeriodoSheet({ open, onClose, inicioSugerido }: { open: boolean;
             <CampoData rotulo="Até" titulo="Fim do período" atalhos={false} value={ate} min={de} onChange={setAte} />
           </Field>
         </div>
-        <input className="input" value={nota} placeholder="Observação (opcional, ex.: nº do boletim)" onChange={(e) => setNota(e.target.value)} />
+        <input className="input" value={nota} aria-label="Observação" placeholder="Observação (opcional, ex.: nº do boletim)" onChange={(e) => setNota(e.target.value)} />
         {valido && (
           <p className="subtle" style={{ fontSize: 14 }}>
             {formatDateBR(de)} a {formatDateBR(ate)} · {dias} dia(s).

@@ -165,7 +165,7 @@ function LoteIndispSheet({ open, datas, onClose, onFeito }: { open: boolean; dat
     >
       <div className="stack" style={gap(16)}>
         <EscolhaIndisp valor={tipo} onEscolher={setTipo} edtMinutos={db.config.edtMinutos} />
-        <input className="input" value={nota} placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
+        <input className="input" value={nota} aria-label="Observação" placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
       </div>
     </Sheet>
   );

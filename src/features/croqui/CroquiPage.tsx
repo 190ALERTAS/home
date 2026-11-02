@@ -568,6 +568,7 @@ export default function CroquiPage() {
                       <input
                         className="input"
                         value={v.descricao}
+                        aria-label={`Descrição do veículo ${v.rotulo}`}
                         placeholder="Ex.: VW Gol branco, placa IXX1D23"
                         onChange={(e) => {
                           aplicar(
