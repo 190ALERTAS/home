@@ -23,9 +23,19 @@ async function tx<T>(modo: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBReq
   return new Promise<T>((resolve, reject) => {
     const t = db.transaction(STORE, modo);
     const req = fn(t.objectStore(STORE));
-    req.onsuccess = () => resolve(req.result);
+    // Na leitura basta o request. Na gravação, só vale depois do commit: a transação ainda pode
+    // abortar (cota cheia) depois do sucesso do request.
+    if (modo === 'readonly') req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
-    t.oncomplete = () => db.close();
+    t.oncomplete = () => {
+      db.close();
+      resolve(req.result);
+    };
+    t.onabort = () => {
+      db.close();
+      reject(t.error ?? new Error('transação abortada'));
+    };
+    t.onerror = () => reject(t.error ?? req.error);
   });
 }
 
