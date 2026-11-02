@@ -46,6 +46,33 @@ describe('sem armazenamento no aparelho', () => {
     expect(aviso.title).toContain('até fechar o app');
   });
 
+  it('cota cheia só para "registros": turno apagado não volta ao reabrir o app', async () => {
+    const dados = new Map<string, string>();
+    let cheioV1 = false;
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => dados.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        if (cheioV1 && k === 'registros') throw new DOMException('quota', 'QuotaExceededError');
+        dados.set(k, v);
+      },
+      removeItem: (k: string) => void dados.delete(k),
+    });
+    // 1ª sessão: lança um turno com o armazenamento funcionando.
+    let s = await import('./store');
+    const turno = { id: 't1', kind: 'turno' as const, date: '2026-10-01', start: '07:00', end: '19:00', minutes: 720 };
+    s.atualizar((db) => ({ ...db, entries: [turno] }), 'lançar');
+    // 2ª sessão: "registros" não cabe mais; o turno é apagado.
+    vi.resetModules();
+    cheioV1 = true;
+    s = await import('./store');
+    expect(s.getEscala().entries).toHaveLength(1);
+    s.atualizar((db) => ({ ...db, entries: [] }), 'apagar');
+    // 3ª sessão: reabre o app.
+    vi.resetModules();
+    s = await import('./store');
+    expect(s.getEscala().entries).toHaveLength(0);
+  });
+
   it('cota cheia no meio da sessão: a leitura usa o valor da memória', async () => {
     const { K_V2 } = await import('./store');
     const { dbVazio } = await import('./model');

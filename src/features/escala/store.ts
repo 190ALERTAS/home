@@ -127,8 +127,15 @@ const kvNavegador: KV = {
     }
   },
   setItem: (k, v) => {
+    // Depois da primeira falha, tudo vai para a memória: gravar só parte das chaves (ex.: a assinatura
+    // do espelho sem o "registros") deixaria o aparelho inconsistente e traria de volta turnos apagados.
+    if (modoTemporario) {
+      memoria.set(k, v);
+      return;
+    }
     try {
       localStorage.setItem(k, v);
+      memoria.delete(k);
     } catch {
       // Armazenamento cheio ou bloqueado: segue na memória até fechar o app.
       memoria.set(k, v);
