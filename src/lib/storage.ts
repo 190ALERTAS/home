@@ -54,6 +54,28 @@ interface Envelope<T> {
 }
 
 /**
+ * O que gravar para `valor`, ou null se não precisa gravar. Sem mudança no conteúdo, a hora antiga
+ * fica: abrir a tela não renova o prazo do rascunho (senão uma ocorrência antiga nunca expira).
+ */
+export function envelopeParaGravar<T>(anterior: unknown, valor: T, agora: number): Envelope<T> | null {
+  if (
+    anterior &&
+    typeof anterior === 'object' &&
+    'v' in anterior &&
+    JSON.stringify((anterior as Envelope<unknown>).v) === JSON.stringify(valor)
+  ) {
+    return null;
+  }
+  return { v: valor, t: agora };
+}
+
+/** O valor guardado ainda vale? Precisa ser um envelope e, com `ttlMs`, estar dentro do prazo. */
+export function envelopeValido<T = unknown>(env: unknown, agora: number, ttlMs?: number): env is Envelope<T> {
+  if (!env || typeof env !== 'object' || !('v' in env)) return false;
+  return !ttlMs || agora - ((env as Envelope<T>).t ?? 0) <= ttlMs;
+}
+
+/**
  * Estado React persistido no localStorage.
  * Com `ttlMs`, o valor expira (usado para rascunhos de formulários).
  */
@@ -68,10 +90,9 @@ export function usePersistentState<T>(
   const load = (): T => {
     const make = () =>
       typeof initialRef.current === 'function' ? (initialRef.current as () => T)() : initialRef.current;
-    const env = readJSON<Envelope<T> | null>(key, null);
-    if (!env || typeof env !== 'object' || !('v' in env)) return make();
-    if (ttlMs && Date.now() - (env.t ?? 0) > ttlMs) {
-      removeKey(key);
+    const env = readJSON<unknown>(key, null);
+    if (!envelopeValido<T>(env, Date.now(), ttlMs)) {
+      if (env != null) removeKey(key);
       return make();
     }
     return env.v;
@@ -80,7 +101,8 @@ export function usePersistentState<T>(
   const [value, setValue] = useState<T>(load);
 
   useEffect(() => {
-    writeJSON(key, { v: value, t: Date.now() } satisfies Envelope<T>);
+    const env = envelopeParaGravar(readJSON<unknown>(key, null), value, Date.now());
+    if (env) writeJSON(key, env);
   }, [key, value]);
 
   const reset = useCallback(() => {

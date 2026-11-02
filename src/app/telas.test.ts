@@ -29,6 +29,34 @@ describe('telas carregadas sob demanda', () => {
     expect(t.pronta('taf')).toBe(Taf);
   });
 
+  it('cada tentativa depois de falhar pede o download de novo', async () => {
+    let falhas = 2;
+    const load = vi.fn(async () => {
+      if (falhas-- > 0) throw new Error('offline');
+      return { default: Taf };
+    });
+    const t = criarTelas({ taf: load });
+    await expect(t.carregar('taf')).rejects.toThrow('offline');
+    await expect(t.carregar('taf')).rejects.toThrow('offline');
+    await expect(t.carregar('taf')).resolves.toBeUndefined();
+    expect(load).toHaveBeenCalledTimes(3);
+    expect(t.pronta('taf')).toBe(Taf);
+  });
+
+  it('tela que falhou e foi deixada ganha uma instância nova ao voltar (sem o erro guardado)', async () => {
+    let falhar = true;
+    const t = criarTelas({ taf: async () => (falhar ? Promise.reject(new Error('offline')) : { default: Taf }) });
+    const primeira = t.paraMostrar('taf');
+    await expect(t.carregar('taf')).rejects.toThrow('offline');
+    const segunda = t.paraMostrar('taf');
+    expect(segunda).toBeDefined();
+    expect(segunda).not.toBe(primeira);
+    falhar = false;
+    await t.carregar('taf');
+    expect(t.paraMostrar('taf')).toBe(Taf);
+    expect(t.paraMostrar('release')).toBeUndefined();
+  });
+
   it('tela que já vem no pacote principal está sempre pronta', async () => {
     const t = criarTelas({ escala: async () => ({ default: Escala }) });
     await expect(t.carregar('release')).resolves.toBeUndefined();
@@ -37,6 +65,28 @@ describe('telas carregadas sob demanda', () => {
     expect(t.estaPronta('escala')).toBe(false);
     await t.carregar('escala');
     expect(t.estaPronta('escala')).toBe(true);
+  });
+
+  it('carregarTodas baixa uma por vez, na ordem pedida', async () => {
+    const log: string[] = [];
+    let soltarTaf!: () => void;
+    const t = criarTelas({
+      escala: async () => {
+        log.push('escala');
+        return { default: Escala };
+      },
+      taf: () => {
+        log.push('taf');
+        return new Promise<{ default: typeof Taf }>((r) => (soltarTaf = () => r({ default: Taf })));
+      },
+    });
+    const todas = t.carregarTodas(['taf', 'escala']);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(log).toEqual(['taf']);
+    soltarTaf();
+    await todas;
+    expect(log).toEqual(['taf', 'escala']);
   });
 
   it('carregarTodas baixa todas e ignora falhas', async () => {

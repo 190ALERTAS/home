@@ -1,4 +1,6 @@
 import {
+  cloneElement,
+  isValidElement,
   useId,
   useLayoutEffect,
   useRef,
@@ -63,9 +65,17 @@ export function Field({
   /** Id da dica, para o campo apontar para ela com aria-describedby. */
   hintId?: string;
 }) {
+  // Sem `htmlFor`, liga o rótulo sozinho quando o filho é um único campo (para o leitor de tela).
+  const gerado = useId();
+  let para = htmlFor;
+  let campo = children;
+  if (!para && isValidElement<{ id?: string }>(children) && CAMPOS.has(children.type)) {
+    para = children.props.id ?? gerado;
+    if (!children.props.id) campo = cloneElement(children, { id: para });
+  }
   return (
     <div className={`field${invalid ? ' invalid' : ''}${className ? ` ${className}` : ''}`}>
-      <label htmlFor={htmlFor}>
+      <label htmlFor={para}>
         {label}
         {required && (
           <span className="req" aria-label="obrigatório">
@@ -74,7 +84,7 @@ export function Field({
         )}
         {aside && <span style={{ marginLeft: 'auto', textTransform: 'none', letterSpacing: 0 }}>{aside}</span>}
       </label>
-      {children}
+      {campo}
       {hint && (
         <div className="hint" id={hintId}>
           {hint}
@@ -99,6 +109,9 @@ export function AutoTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement> 
   }, [props.value, minRows]);
   return <textarea ref={ref} className={`textarea${className ? ` ${className}` : ''}`} {...rest} />;
 }
+
+/** Campos que o `Field` liga ao rótulo sozinho (todos repassam o `id` ao elemento nativo). */
+const CAMPOS = new Set<unknown>(['input', 'select', 'textarea', AutoTextarea]);
 
 /* ---------- Interruptor ---------- */
 

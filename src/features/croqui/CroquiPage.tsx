@@ -39,6 +39,8 @@ import './croqui.css';
 
 type Etapa = 'local' | 'desenho' | 'exportar';
 const K_IDB = 'croqui:atual';
+/** O aviso de falha no salvamento automático aparece uma vez por sessão. */
+let avisouFalhaSalvar = false;
 
 interface Salvo {
   doc: CroquiDoc;
@@ -117,7 +119,11 @@ export default function CroquiPage() {
   const pendente = useRef<Salvo | null>(null);
   const gravar = useCallback(() => {
     if (!pendente.current) return;
-    void idbSet(K_IDB, pendente.current);
+    void idbSet(K_IDB, pendente.current).then((ok) => {
+      if (ok || avisouFalhaSalvar) return;
+      avisouFalhaSalvar = true;
+      toast({ title: 'Não deu para salvar o croqui neste aparelho', desc: 'Exporte a imagem antes de fechar.', kind: 'error' });
+    });
     pendente.current = null;
   }, []);
   useEffect(() => {
@@ -562,6 +568,7 @@ export default function CroquiPage() {
                       <input
                         className="input"
                         value={v.descricao}
+                        aria-label={`Descrição do veículo ${v.rotulo}`}
                         placeholder="Ex.: VW Gol branco, placa IXX1D23"
                         onChange={(e) => {
                           aplicar(

@@ -63,7 +63,7 @@ function EditorTurno({ turno, onFim }: { turno: Turno; onFim: () => void }) {
     <div className="subcard">
       <CamposHorario start={h.start} end={h.end} onChange={setH} />
       <ServicoSeg value={servico} onChange={setServico} />
-      <input className="input" value={nota} placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
+      <input className="input" value={nota} aria-label="Observação" placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
       <div className="row">
         <button
           type="button"
@@ -296,7 +296,7 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
             <SlotGrid opcoes={opcoes} selecionado={h} onPick={(o) => setH({ start: o.start, end: o.end })} />
             <CamposHorario start={h.start} end={h.end} onChange={setH} />
             <ServicoSeg value={servico} onChange={setServico} />
-            <input className="input" value={nota} placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
+            <input className="input" value={nota} aria-label="Observação" placeholder="Observação (opcional)" onChange={(e) => setNota(e.target.value)} />
             <button type="button" className="btn primary lg block" disabled={!h.start || !h.end} onClick={lancarEscala}>
               <Plus /> Lançar {h.start && h.end ? `${h.start}–${h.end}` : 'escala'}
             </button>
@@ -312,7 +312,7 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
             <input
               className="input"
               value={notaIndisp}
-              placeholder="Observação (opcional, ex.: nº do atestado)"
+              aria-label="Observação" placeholder="Observação (opcional, ex.: nº do atestado)"
               onChange={(e) => setNotaIndisp(e.target.value)}
             />
             <button type="button" className="btn primary lg block" disabled={!indisp} onClick={lancarIndisp}>

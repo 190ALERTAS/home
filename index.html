@@ -38,7 +38,6 @@
       })();
     </script>
     <!-- Google Analytics (estatísticas anônimas de uso; nenhum conteúdo digitado é enviado) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
@@ -46,6 +45,25 @@
       }
       gtag('js', new Date());
       gtag('config', 'G-3Q72PBZVYP', { send_page_view: false });
+      // O script do Google só é baixado depois que o app abriu (ele pesava na abertura). Os eventos
+      // ficam na fila (dataLayer) e são enviados quando ele chega.
+      (function () {
+        var feito = false;
+        function carregar() {
+          if (feito) return;
+          feito = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-3Q72PBZVYP';
+          document.head.appendChild(s);
+        }
+        function depoisDeAbrir() {
+          if (window.requestIdleCallback) window.requestIdleCallback(carregar, { timeout: 4000 });
+          setTimeout(carregar, 2000);
+        }
+        if (document.readyState === 'complete') depoisDeAbrir();
+        else window.addEventListener('load', depoisDeAbrir, { once: true });
+      })();
     </script>
   </head>
   <body>

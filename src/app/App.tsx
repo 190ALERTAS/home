@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, type ComponentType } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useRoute, type RouteId } from '../lib/router';
 import { Shell } from './Shell';
@@ -10,16 +10,14 @@ import VeiculoPage from '../features/veiculo/VeiculoPage';
 import { NotFoundPage } from '../features/inicio/NotFoundPage';
 import { iniciarSyncAutomatico } from '../features/escala/sync/auto';
 import { telas } from './telas';
+import { ErroTela } from './ErroTela';
+import { deveReavisar } from '../lib/reaviso';
 
-const PAGES: Record<RouteId, ComponentType> = {
+/** Telas do pacote principal; as demais vêm de `telas` (baixadas sob demanda). */
+const PAGES: Partial<Record<RouteId, ComponentType>> = {
   inicio: InicioPage,
   release: ReleasePage,
   veiculos: VeiculoPage,
-  escala: telas.preguicosa('escala'),
-  croqui: telas.preguicosa('croqui'),
-  taf: telas.preguicosa('taf'),
-  sugestoes: telas.preguicosa('sugestoes'),
-  termos: telas.preguicosa('termos'),
 };
 
 function PageFallback() {
@@ -49,21 +47,32 @@ function UpdatePrompt() {
     }
   }, [offlineReady, setOfflineReady]);
 
+  // O aviso some depois de 60 s; enquanto a versão nova esperar, ele volta quando o app reabre.
+  const ultimoAviso = useRef<number | null>(null);
   useEffect(() => {
     if (!needRefresh) return;
-    toast({
-      title: 'Nova versão disponível',
-      desc: 'Toque em atualizar para carregar as melhorias.',
-      kind: 'info',
-      duration: 60_000,
-      action: {
-        label: 'Atualizar',
-        onClick: () => {
-          setNeedRefresh(false);
-          void updateServiceWorker(true);
+    const avisar = () => {
+      ultimoAviso.current = Date.now();
+      toast({
+        title: 'Nova versão disponível',
+        desc: 'Toque em atualizar para carregar as melhorias.',
+        kind: 'info',
+        duration: 60_000,
+        action: {
+          label: 'Atualizar',
+          onClick: () => {
+            setNeedRefresh(false);
+            void updateServiceWorker(true);
+          },
         },
-      },
-    });
+      });
+    };
+    avisar();
+    const aoVoltar = () => {
+      if (document.visibilityState === 'visible' && deveReavisar(Date.now(), ultimoAviso.current)) avisar();
+    };
+    document.addEventListener('visibilitychange', aoVoltar);
+    return () => document.removeEventListener('visibilitychange', aoVoltar);
   }, [needRefresh, setNeedRefresh, updateServiceWorker]);
 
   return null;
@@ -78,24 +87,45 @@ export function App() {
     const idle = window.requestIdleCallback
       ? (cb: () => void) => window.requestIdleCallback(cb, { timeout: 800 })
       : (cb: () => void) => window.setTimeout(cb, 300);
-    const h = idle(() => void telas.carregarTodas());
+    // Só depois do `load`: a tela aberta e as fontes vêm primeiro; a Escala é a primeira da fila.
+    let h: number | undefined;
+    const iniciar = () => {
+      h = idle(() => void telas.carregarTodas(['escala', 'taf', 'croqui', 'sugestoes', 'termos'])) as number;
+    };
+    if (document.readyState === 'complete') iniciar();
+    else window.addEventListener('load', iniciar, { once: true });
     return () => {
-      if (window.cancelIdleCallback && typeof h === 'number') window.cancelIdleCallback(h);
+      window.removeEventListener('load', iniciar);
+      if (h === undefined) return;
+      if (window.cancelIdleCallback) window.cancelIdleCallback(h);
+      else window.clearTimeout(h);
     };
   }, []);
 
   // Sincronização automática da escala (só age com a conta conectada e o automático ligado).
   useEffect(() => iniciarSyncAutomatico(), []);
 
+  // "Tentar de novo" depois de uma falha ao abrir a tela: o `lazy` guarda o erro, então cada tentativa
+  // usa uma instância nova.
+  const [tentativa, setTentativa] = useState(0);
+
   // Tela já baixada é usada direto (o `lazy` suspenderia e mostraria o "carregando" por um instante).
-  const Page = useMemo(() => (id === 'notfound' ? NotFoundPage : (telas.pronta(id) ?? PAGES[id])), [id]);
+  // Tela sob demanda que ainda não baixou ganha um `lazy` novo a cada entrada: uma falha anterior
+  // (sem internet) não fica guardada.
+  const Page = useMemo(
+    () => (id === 'notfound' ? NotFoundPage : (telas.paraMostrar(id) ?? PAGES[id] ?? NotFoundPage)),
+    // `tentativa` força uma instância nova no "Tentar de novo".
+    [id, tentativa],
+  );
 
   return (
     <>
       <Shell route={id}>
-        <Suspense fallback={<PageFallback />}>
-          <Page key={id} />
-        </Suspense>
+        <ErroTela key={`${id}:${tentativa}`} onTentar={() => setTentativa((n) => n + 1)}>
+          <Suspense fallback={<PageFallback />}>
+            <Page key={id} />
+          </Suspense>
+        </ErroTela>
       </Shell>
       <Toaster />
       <DialogHost />

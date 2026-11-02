@@ -200,10 +200,10 @@ export function ConfigSheet({ open, onClose }: { open: boolean; onClose: () => v
 
         <section className="stack" style={gap(10)}>
           <div className="eyebrow">Identificação no relatório PDF (opcional)</div>
-          <input className="input" placeholder="Nome / posto ou graduação" value={perfil.nome} onChange={(e) => setPerfil({ ...perfil, nome: e.target.value })} />
+          <input className="input" aria-label="Nome / posto ou graduação" placeholder="Nome / posto ou graduação" value={perfil.nome} onChange={(e) => setPerfil({ ...perfil, nome: e.target.value })} />
           <div className="grid-2">
-            <input className="input" placeholder="Matrícula / ID" value={perfil.matricula} onChange={(e) => setPerfil({ ...perfil, matricula: e.target.value })} />
-            <input className="input" placeholder="Unidade" value={perfil.unidade} onChange={(e) => setPerfil({ ...perfil, unidade: e.target.value })} />
+            <input className="input" aria-label="Matrícula / ID" placeholder="Matrícula / ID" value={perfil.matricula} onChange={(e) => setPerfil({ ...perfil, matricula: e.target.value })} />
+            <input className="input" aria-label="Unidade" placeholder="Unidade" value={perfil.unidade} onChange={(e) => setPerfil({ ...perfil, unidade: e.target.value })} />
           </div>
         </section>
 

@@ -35,16 +35,28 @@ export function criarTelas<K extends RouteId>(carregadores: Partial<Record<K, Ca
     return p;
   }
 
+  /** Versão `lazy` da tela, para a primeira vez (antes de baixar). */
+  const preguicosa = (id: K): LazyExoticComponent<ComponentType> =>
+    lazy(() => carregar(id).then(() => ({ default: prontas.get(id)! })));
+
   return {
     carregar,
     /** A tela já baixada, para usar sem `lazy`; undefined se ainda não baixou ou se vem no pacote principal. */
     pronta: (id: RouteId): ComponentType | undefined => prontas.get(id),
     /** Pode mostrar sem esperar: vem no pacote principal ou já foi baixada. */
     estaPronta: (id: RouteId): boolean => !sobDemanda(id) || prontas.has(id),
-    carregarTodas: () => Promise.all((Object.keys(carregadores) as K[]).map((id) => carregar(id).catch(() => undefined))).then(() => undefined),
-    /** Versão `lazy` da tela, para a primeira vez (antes de baixar). */
-    preguicosa: (id: K): LazyExoticComponent<ComponentType> =>
-      lazy(() => carregar(id).then(() => ({ default: prontas.get(id)! }))),
+    /** Baixa as telas uma por vez, na ordem dada (para não disputar a rede com a tela aberta). Falhas são ignoradas. */
+    carregarTodas: async (ordem: K[] = Object.keys(carregadores) as K[]) => {
+      for (const id of ordem) await carregar(id).catch(() => undefined);
+    },
+    preguicosa,
+    /**
+     * O que mostrar para a tela sob demanda: a já baixada ou uma versão `lazy` nova (o `lazy` guarda
+     * o erro de uma falha anterior; uma instância nova tenta baixar de novo). Undefined se a tela vem
+     * no pacote principal.
+     */
+    paraMostrar: (id: RouteId): ComponentType | undefined =>
+      sobDemanda(id) ? (prontas.get(id) ?? preguicosa(id)) : undefined,
   };
 }
 

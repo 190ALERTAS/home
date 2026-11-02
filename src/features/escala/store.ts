@@ -117,24 +117,53 @@ export function carregar(kv: KV, agora = new Date()): { db: EscalaDB; aviso?: Av
 
 const memoria = new Map<string, string>();
 const kvNavegador: KV = {
+  // O que caiu na memória é mais novo que o que ficou no localStorage (que parou de aceitar gravação).
   getItem: (k) => {
+    if (memoria.has(k)) return memoria.get(k)!;
     try {
       return localStorage.getItem(k);
     } catch {
-      return memoria.get(k) ?? null;
+      return null;
     }
   },
   setItem: (k, v) => {
-    localStorage.setItem(k, v);
+    // Depois da primeira falha, tudo vai para a memória: gravar só parte das chaves (ex.: a assinatura
+    // do espelho sem o "registros") deixaria o aparelho inconsistente e traria de volta turnos apagados.
+    if (modoTemporario) {
+      memoria.set(k, v);
+      return;
+    }
+    try {
+      localStorage.setItem(k, v);
+      memoria.delete(k);
+    } catch {
+      // Armazenamento cheio ou bloqueado: segue na memória até fechar o app.
+      memoria.set(k, v);
+      modoTemporario = true;
+    }
   },
   removeItem: (k) => {
+    memoria.delete(k);
     try {
       localStorage.removeItem(k);
     } catch {
-      memoria.delete(k);
+      /* ignora */
     }
   },
 };
+
+let modoTemporario = false;
+let avisouTemporario = false;
+
+/** A escala está só na memória (o aparelho não aceitou gravar): vale até fechar o app. */
+export function emModoTemporario(): boolean {
+  return modoTemporario;
+}
+
+/** Só para testes. */
+export function lerChave(k: string): string | null {
+  return kvNavegador.getItem(k);
+}
 
 let estado: EscalaDB | null = null;
 /**
@@ -198,6 +227,14 @@ function persistir(db: EscalaDB): boolean {
       kind: 'error',
       duration: 8000,
     });
+  } else if (modoTemporario && !avisouTemporario) {
+    avisouTemporario = true;
+    toast({
+      title: 'Escala salva só até fechar o app',
+      desc: 'O armazenamento do aparelho está cheio ou bloqueado. Faça um backup pelo menu da escala.',
+      kind: 'error',
+      duration: 8000,
+    });
   }
   return ok;
 }
@@ -233,7 +270,7 @@ export function desfazer(): string | null {
   const atual = getEscala();
   estado = { ...atual, entries: item.entries, meta: { ...atual.meta, atualizadoEm: new Date().toISOString() } };
   revisao++;
-  salvar(kvNavegador, estado);
+  persistir(estado);
   emitir();
   return item.rotulo;
 }
@@ -257,15 +294,25 @@ export function useEscala(): EscalaDB {
   return useSyncExternalStore(subscribe, getEscala, getEscala);
 }
 
+/**
+ * Outra aba/janela gravou a escala: passa a usar o que ela gravou. O histórico de desfazer é
+ * descartado: voltar a um estado desta aba apagaria o que a outra lançou.
+ * Retorna true se a escala mudou (valor ilegível é ignorado).
+ */
+export function aplicarDeOutraAba(raw: string): boolean {
+  const db = normalizarV2(parse(raw));
+  if (!db) return false;
+  estado = db;
+  revisao++;
+  pilhaDesfazer.length = 0;
+  emitir();
+  return true;
+}
+
 // Outra aba/janela alterou a escala: acompanha.
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
     if (e.key !== K_V2 || !e.newValue) return;
-    const db = normalizarV2(parse(e.newValue));
-    if (db) {
-      estado = db;
-      revisao++;
-      emitir();
-    }
+    aplicarDeOutraAba(e.newValue);
   });
 }

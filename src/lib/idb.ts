@@ -21,11 +21,29 @@ function abrir(): Promise<IDBDatabase> {
 async function tx<T>(modo: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
   const db = await abrir();
   return new Promise<T>((resolve, reject) => {
-    const t = db.transaction(STORE, modo);
-    const req = fn(t.objectStore(STORE));
-    req.onsuccess = () => resolve(req.result);
+    let t: IDBTransaction;
+    let req: IDBRequest<T>;
+    try {
+      t = db.transaction(STORE, modo);
+      req = fn(t.objectStore(STORE));
+    } catch (e) {
+      // Ex.: valor que não dá para guardar ou banco em troca de versão.
+      db.close();
+      return reject(e);
+    }
+    // Na leitura basta o request. Na gravação, só vale depois do commit: a transação ainda pode
+    // abortar (cota cheia) depois do sucesso do request.
+    if (modo === 'readonly') req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
-    t.oncomplete = () => db.close();
+    t.oncomplete = () => {
+      db.close();
+      resolve(req.result);
+    };
+    t.onabort = () => {
+      db.close();
+      reject(t.error ?? new Error('transação abortada'));
+    };
+    t.onerror = () => reject(t.error ?? req.error);
   });
 }
 
