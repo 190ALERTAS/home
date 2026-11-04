@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Sheet } from '../../../components/Sheet';
 import { MESES_CURTOS, formatMinutes, monthKey, parseMonthKey } from '../../../lib/date';
+import { minutosPorDia } from '../calc';
 import type { Entry } from '../model';
 
 export function MesPicker({
@@ -25,8 +26,10 @@ export function MesPicker({
   const horas = new Map<string, number>();
   for (const e of entries) {
     if (e.kind !== 'turno') continue;
-    const k = e.date.slice(0, 7);
-    horas.set(k, (horas.get(k) ?? 0) + e.minutes);
+    for (const p of minutosPorDia(e)) {
+      const k = p.date.slice(0, 7);
+      horas.set(k, (horas.get(k) ?? 0) + p.minutes);
+    }
   }
 
   return (

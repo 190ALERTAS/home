@@ -598,3 +598,40 @@ describe('NI ADM 033.2: tipos de serviço e convalescença', () => {
     expect(mesclar(base, [t('y', '2026-10-01', '07:00', '19:00', 720, { servico: 'gse' })]).adicionadas).toBe(1);
   });
 });
+
+describe('turno na virada do mês', () => {
+  const cfg = configPadrao();
+  const turno = (date: string, start: string, end: string, minutes: number, servico?: Turno['servico']): Turno => ({
+    id: `${date}-${start}`,
+    kind: 'turno',
+    date,
+    start,
+    end,
+    minutes,
+    ...(servico ? { servico } : {}),
+  });
+
+  it('divide 18h→06h entre outubro e novembro', () => {
+    const e = [turno('2026-10-31', '18:00', '06:00', 720)];
+    const out = calcularResumo(e, '2026-10', cfg);
+    const nov = calcularResumo(e, '2026-11', cfg);
+    expect(out.trabalhado).toBe(360);
+    expect(nov.trabalhado).toBe(360);
+    expect(out.turnos).toBe(1);
+    expect(nov.turnos).toBe(0);
+  });
+
+  it('divide GSE e sobreaviso entre os meses', () => {
+    const gse = [turno('2026-10-31', '18:00', '06:00', 720, 'gse')];
+    expect(calcularResumo(gse, '2026-10', cfg).gse).toBe(360);
+    expect(calcularResumo(gse, '2026-11', cfg).gse).toBe(360);
+    const sob = [turno('2026-10-31', '18:00', '06:00', 720, 'sobreaviso')];
+    expect(calcularResumo(sob, '2026-11', cfg).trabalhado).toBe(120);
+  });
+
+  it('turno que não vira o mês continua inteiro', () => {
+    const e = [turno('2026-10-30', '19:00', '07:00', 720)];
+    expect(calcularResumo(e, '2026-10', cfg).trabalhado).toBe(720);
+    expect(calcularResumo(e, '2026-11', cfg).trabalhado).toBe(0);
+  });
+});

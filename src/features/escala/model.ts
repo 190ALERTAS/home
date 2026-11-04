@@ -24,7 +24,7 @@ export type TipoIndisponibilidade = 'ferias' | 'afastamento' | 'convalescenca' |
 export interface Turno {
   id: string;
   kind: 'turno';
-  /** Data de início do turno (AAAA-MM-DD). O turno conta no mês em que começa. */
+  /** Data de início do turno (AAAA-MM-DD). Se atravessa a virada do mês, as horas são divididas entre os dois meses. */
   date: string;
   start: string; // HH:MM
   end: string; // HH:MM
