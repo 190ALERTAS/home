@@ -55,17 +55,24 @@ export function minutosComputados(t: Turno): number {
  * Ex.: 12h de 31/10 às 18h até 01/11 às 06h = 6h em 31/10 e 6h em 01/11.
  */
 export function minutosPorDia(t: Turno): { date: string; minutes: number }[] {
-  const noPrimeiro = Math.min(t.minutes, 1440 - hmToMinutes(t.start));
-  const resto = t.minutes - noPrimeiro;
-  const partes = [{ date: t.date, minutes: noPrimeiro }];
-  if (resto > 0) partes.push({ date: addDays(t.date, 1), minutes: resto });
-  return partes;
+  const partes: { date: string; minutes: number }[] = [];
+  let restante = t.minutes;
+  let data = t.date;
+  let disponivel = 1440 - hmToMinutes(t.start);
+  // Turno normal tem no máximo 24h (2 dias); o laço cobre também duração antiga maior que isso.
+  while (restante > 0 && partes.length < 32) {
+    const m = Math.min(restante, disponivel);
+    partes.push({ date: data, minutes: m });
+    restante -= m;
+    data = addDays(data, 1);
+    disponivel = 1440;
+  }
+  return partes.length ? partes : [{ date: t.date, minutes: 0 }];
 }
 
 /** O turno atravessa a virada do mês (termina em outro mês). */
 export function viraMes(t: Turno): boolean {
-  const p = minutosPorDia(t);
-  return p.length > 1 && p[1].date.slice(0, 7) !== t.date.slice(0, 7);
+  return minutosPorDia(t).some((p) => p.date.slice(0, 7) !== t.date.slice(0, 7));
 }
 
 /**
@@ -74,7 +81,7 @@ export function viraMes(t: Turno): boolean {
  */
 export function minutosNoDia(t: Turno, data: string): number {
   if (!viraMes(t)) return t.date === data ? t.minutes : 0;
-  return minutosPorDia(t).find((p) => p.date === data)?.minutes ?? 0;
+  return minutosPorDia(t).filter((p) => p.date === data).reduce((s, p) => s + p.minutes, 0);
 }
 
 /** Turnos que viram o mês, indexados pelo dia que recebe a continuação (1º dia do mês seguinte). */
@@ -82,12 +89,17 @@ export function continuacoesPorDia(entries: Entry[]): Map<string, Turno[]> {
   const map = new Map<string, Turno[]>();
   for (const e of entries) {
     if (!isTurno(e) || !viraMes(e)) continue;
-    const dia = minutosPorDia(e)[1].date;
+    const dia = minutosPorDia(e).find((p) => p.date.slice(0, 7) !== e.date.slice(0, 7))!.date;
     const list = map.get(dia);
     if (list) list.push(e);
     else map.set(dia, [e]);
   }
   return map;
+}
+
+/** Turnos de meses anteriores que continuam dentro de `mes` (aparecem na lista e no PDF do mês). */
+export function continuacoesDoMes(entries: Entry[], mes: string): Turno[] {
+  return entries.filter((e): e is Turno => isTurno(e) && !e.date.startsWith(mes) && minutosNoMes(e, mes) > 0);
 }
 
 /** Minutos do turno que caem dentro do mês `mes` (AAAA-MM). Turno que vira o mês é dividido. */

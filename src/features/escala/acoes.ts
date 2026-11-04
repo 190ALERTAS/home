@@ -1,7 +1,7 @@
 import { DIAS_SEMANA_CURTOS, MESES, formatDateBR, formatMinutes, parseMonthKey, todayISO, weekdayOf } from '../../lib/date';
 import { downloadBlob } from '../../lib/share';
 import { emblemaPNG } from '../../components/Emblema';
-import { calcularResumo, entriesDoMes } from './calc';
+import { calcularResumo, continuacoesDoMes, entriesDoMes, minutosNoMes } from './calc';
 import { ROTULO_INDISP, ROTULO_SERVICO, indisponibilidadeDe, servicoDe, type EscalaDB } from './model';
 
 const MAIUSC = (s: string) => s.toLocaleUpperCase('pt-BR');
@@ -119,11 +119,20 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
   y += 14 + (linhasDetalhe.length - 1) * 11;
 
   // Tabela
-  const corpo = entriesDoMes(db.entries, mes).map((e) => {
+  const continuacoes = continuacoesDoMes(db.entries, mes).map((t) => [
+    formatDateBR(`${mes}-01`),
+    DIAS_SEMANA_CURTOS[weekdayOf(`${mes}-01`)],
+    '00:00',
+    t.end,
+    formatMinutes(minutosNoMes(t, mes)),
+    ROTULO_SERVICO[servicoDe(t)].curto,
+    `Continuação do turno de ${formatDateBR(t.date)}`,
+  ]);
+  const corpo = [...continuacoes, ...entriesDoMes(db.entries, mes).map((e) => {
     const data = formatDateBR(e.date);
     const dia = DIAS_SEMANA_CURTOS[weekdayOf(e.date)];
     if (e.kind === 'turno') {
-      return [data, dia, e.start, e.end, formatMinutes(e.minutes), ROTULO_SERVICO[servicoDe(e)].curto, e.note ?? ''];
+      return [data, dia, e.start, e.end, formatMinutes(minutosNoMes(e, mes)), ROTULO_SERVICO[servicoDe(e)].curto, e.note ?? ''];
     }
     return [
       data,
@@ -131,7 +140,7 @@ export async function gerarPdfMes(db: EscalaDB, mes: string): Promise<Blob> {
       { content: MAIUSC(ROTULO_INDISP[indisponibilidadeDe(e)].longo), colSpan: 4, styles: { fontStyle: 'bold' as const, textColor: [150, 90, 0] as [number, number, number] } },
       e.note ?? '',
     ];
-  });
+  })];
 
   autoTable(doc, {
     startY: y,

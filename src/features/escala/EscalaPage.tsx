@@ -27,7 +27,7 @@ import { formatMinutes, monthKeyOf, monthLabel, parseMonthKey, shiftMonth, today
 import { canShareFiles, downloadBlob, openWhatsApp, pickTextFile, shareFiles } from '../../lib/share';
 import { readString, writeString } from '../../lib/storage';
 import { track } from '../../lib/analytics';
-import { calcularResumo, continuacoesPorDia, duplicados, entriesDoMes, porDia } from './calc';
+import { calcularResumo, continuacoesDoMes, continuacoesPorDia, duplicados, entriesDoMes, porDia } from './calc';
 import { interpretarBackup, mesclar, normalizarV2 } from './migrate';
 import { removerMes } from './ops';
 import { dbVazio, type Entry, type EscalaDB } from './model';
@@ -355,7 +355,7 @@ export default function EscalaPage() {
                 ) : undefined
               }
             >
-              <ListaMes entries={doMes} duplicados={dups} onDia={setDia} />
+              <ListaMes entries={doMes} continuacoes={continuacoesDoMes(db.entries, mes)} mes={mes} duplicados={dups} onDia={setDia} />
             </Card>
             <p className="base-calculo">
               Carga horária: {formatMinutes(db.config.metas['31'])} em meses de 31 dias, {formatMinutes(db.config.metas['30'])} em
