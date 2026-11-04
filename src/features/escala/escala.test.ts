@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calcularResumo, conflitos, duplicados, minutosComputados, proximoTurno, turnosFrequentes } from './calc';
+import { calcularResumo, continuacoesDoMes, continuacoesPorDia, minutosNoMes, minutosPorDia, minutosNoDia, conflitos, duplicados, minutosComputados, proximoTurno, turnosFrequentes } from './calc';
 import { interpretarBackup, mesclar, migrarV1, normalizarV2, paraV1, parseHorasV1 } from './migrate';
 import {
   GSE_LIMITE,
@@ -633,5 +633,131 @@ describe('turno na virada do mês', () => {
     const e = [turno('2026-10-30', '19:00', '07:00', 720)];
     expect(calcularResumo(e, '2026-10', cfg).trabalhado).toBe(720);
     expect(calcularResumo(e, '2026-11', cfg).trabalhado).toBe(0);
+  });
+});
+
+describe('turno na virada do mês no calendário', () => {
+  const t: Turno = { id: 'a', kind: 'turno', date: '2026-11-30', start: '18:00', end: '06:00', minutes: 720 };
+  it('divide por dia só quando vira o mês', () => {
+    expect(minutosNoDia(t, '2026-11-30')).toBe(360);
+    expect(minutosNoDia(t, '2026-12-01')).toBe(360);
+    const meio: Turno = { ...t, id: 'b', date: '2026-11-15' };
+    expect(minutosNoDia(meio, '2026-11-15')).toBe(720);
+    expect(minutosNoDia(meio, '2026-11-16')).toBe(0);
+  });
+  it('indexa a continuação no 1º dia do mês seguinte', () => {
+    const m = continuacoesPorDia([t]);
+    expect(m.get('2026-12-01')).toEqual([t]);
+    expect(m.size).toBe(1);
+  });
+});
+
+describe('virada de mês: todos os casos', () => {
+  const cfg = configPadrao();
+  const mk = (date: string, start: string, end: string, minutes: number, servico?: Turno['servico']): Turno => ({
+    id: `${date}-${start}-${end}`,
+    kind: 'turno',
+    date,
+    start,
+    end,
+    minutes,
+    ...(servico ? { servico } : {}),
+  });
+  const mesesDe = (ano: number) => Array.from({ length: 12 }, (_, i) => `${ano}-${String(i + 1).padStart(2, '0')}`);
+
+  it('1h que passa para o mês seguinte conta lá', () => {
+    const t = mk('2026-10-31', '23:00', '01:00', 120);
+    expect(minutosNoMes(t, '2026-10')).toBe(60);
+    expect(minutosNoMes(t, '2026-11')).toBe(60);
+    expect(calcularResumo([t], '2026-11', cfg).trabalhado).toBe(60);
+    expect(continuacoesDoMes([t], '2026-11')).toEqual([t]);
+  });
+
+  it('termina exatamente à meia-noite: tudo no mês de início', () => {
+    const t = mk('2026-10-31', '18:00', '00:00', 360);
+    expect(minutosNoMes(t, '2026-10')).toBe(360);
+    expect(minutosNoMes(t, '2026-11')).toBe(0);
+    expect(continuacoesDoMes([t], '2026-11')).toEqual([]);
+  });
+
+  it('começa à meia-noite do dia 1: tudo no mês novo', () => {
+    const t = mk('2026-11-01', '00:00', '06:00', 360);
+    expect(minutosNoMes(t, '2026-10')).toBe(0);
+    expect(minutosNoMes(t, '2026-11')).toBe(360);
+  });
+
+  it('24h (início = fim) divide pela meia-noite', () => {
+    const t = mk('2026-10-31', '07:00', '07:00', 1440);
+    expect(minutosNoMes(t, '2026-10')).toBe(1020);
+    expect(minutosNoMes(t, '2026-11')).toBe(420);
+  });
+
+  it('virada de ano (31/12 → 01/01)', () => {
+    const t = mk('2026-12-31', '19:00', '07:00', 720);
+    expect(minutosNoMes(t, '2026-12')).toBe(300);
+    expect(minutosNoMes(t, '2027-01')).toBe(420);
+    expect(calcularResumo([t], '2027-01', cfg).trabalhado).toBe(420);
+  });
+
+  it('fevereiro comum e bissexto', () => {
+    const a = mk('2027-02-28', '22:00', '10:00', 720);
+    expect(minutosNoMes(a, '2027-02')).toBe(120);
+    expect(minutosNoMes(a, '2027-03')).toBe(600);
+    const b = mk('2028-02-29', '22:00', '10:00', 720);
+    expect(minutosNoMes(b, '2028-02')).toBe(120);
+    expect(minutosNoMes(b, '2028-03')).toBe(600);
+    const c = mk('2028-02-28', '22:00', '10:00', 720);
+    expect(minutosNoMes(c, '2028-02')).toBe(720);
+    expect(minutosNoMes(c, '2028-03')).toBe(0);
+  });
+
+  it('duração antiga maior que 24h não perde minutos', () => {
+    const t = mk('2026-10-31', '18:00', '18:00', 2880);
+    expect(minutosNoMes(t, '2026-10') + minutosNoMes(t, '2026-11')).toBe(2880);
+  });
+
+  it('turnos longos em todo último dia de todo mês: soma dos meses = duração, sem perder nem duplicar', () => {
+    const horarios: [string, string, number][] = [
+      ['18:00', '06:00', 720],
+      ['19:00', '07:00', 720],
+      ['23:30', '00:30', 60],
+      ['07:00', '07:00', 1440],
+      ['06:00', '06:00', 1440],
+      ['00:00', '00:00', 1440],
+      ['22:00', '22:00', 1440],
+      ['12:00', '23:59', 719],
+      ['23:59', '00:01', 2],
+    ];
+    for (const ano of [2026, 2027, 2028]) {
+      for (const mes of mesesDe(ano)) {
+        const [y, m] = mes.split('-').map(Number);
+        const ultimo = new Date(y, m, 0).getDate();
+        for (const [ini, fim, min] of horarios) {
+          for (const servico of [undefined, 'gse', 'sobreaviso'] as const) {
+            const t = mk(`${mes}-${String(ultimo).padStart(2, '0')}`, ini, fim, min, servico);
+            const todos = [...mesesDe(ano - 1), ...mesesDe(ano), ...mesesDe(ano + 1)];
+            const soma = todos.reduce((s, k) => s + minutosNoMes(t, k), 0);
+            expect(soma, `${t.date} ${ini}-${fim}`).toBe(min);
+            const res = todos.map((k) => calcularResumo([t], k, cfg));
+            const gse = res.reduce((s, r) => s + r.gse, 0);
+            const sob = res.reduce((s, r) => s + r.sobreaviso, 0);
+            expect(gse).toBe(servico === 'gse' ? min : 0);
+            expect(sob).toBe(servico === 'sobreaviso' ? min : 0);
+            expect(res.reduce((s, r) => s + r.turnos, 0)).toBe(1);
+            // dia a dia também fecha
+            const dias = new Map<string, number>();
+            for (const p of minutosPorDia(t)) dias.set(p.date, (dias.get(p.date) ?? 0) + p.minutes);
+            expect([...dias.values()].reduce((a, b) => a + b, 0)).toBe(min);
+          }
+        }
+      }
+    }
+  });
+
+  it('GSE: o limite de 40h é por mês, com a parte de cada mês', () => {
+    const e = [mk('2026-10-31', '18:00', '18:00', 1440, 'gse'), mk('2026-10-30', '08:00', '08:00', 1440, 'gse')];
+    const out = calcularResumo(e, '2026-10', cfg);
+    expect(out.gse).toBe(1440 + 360);
+    expect(out.gse + calcularResumo(e, '2026-11', cfg).gse).toBe(2880);
   });
 });

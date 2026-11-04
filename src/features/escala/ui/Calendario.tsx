@@ -1,11 +1,14 @@
 import { useRef } from 'react';
 import { Moon, Sun, SunMoon } from 'lucide-react';
 import { DIAS_SEMANA_CURTOS, crossesMidnight, daysInMonth, formatMinutes, pad2, parseMonthKey } from '../../../lib/date';
+import { minutosNoDia } from '../calc';
 import { servicoDe, type Entry, type Turno } from '../model';
 
 interface Props {
   mes: string;
   porData: Map<string, Entry[]>;
+  /** Turnos que viraram o mês e continuam neste dia (1º dia do mês). */
+  continuacoes: Map<string, Turno[]>;
   hoje: string;
   duplicados: Set<string>;
   selecao: Set<string> | null;
@@ -17,7 +20,7 @@ function horasCurtas(min: number): string {
   return formatMinutes(min);
 }
 
-export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onSwipe }: Props) {
+export function Calendario({ mes, porData, continuacoes, hoje, duplicados, selecao, onDia, onSwipe }: Props) {
   const { year, month } = parseMonthKey(mes);
   const total = daysInMonth(year, month);
   const offset = new Date(year, month - 1, 1).getDay();
@@ -54,8 +57,9 @@ export function Calendario({ mes, porData, hoje, duplicados, selecao, onDia, onS
         {celulas.map((data, i) => {
           if (!data) return <span key={`v${i}`} className="day vazio" aria-hidden />;
           const itens = porData.get(data) ?? [];
-          const turnos = itens.filter((e): e is Turno => e.kind === 'turno');
-          const minutos = turnos.reduce((s, t) => s + t.minutes, 0);
+          const iniciados = itens.filter((e): e is Turno => e.kind === 'turno');
+          const turnos = [...iniciados, ...(continuacoes.get(data) ?? [])];
+          const minutos = turnos.reduce((s, t) => s + minutosNoDia(t, data), 0);
           const noturnos = turnos.filter((t) => crossesMidnight(t.start, t.end)).length;
           const gse = turnos.some((t) => servicoDe(t) === 'gse');
           const sbv = turnos.some((t) => servicoDe(t) === 'sobreaviso');

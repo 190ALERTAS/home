@@ -1,14 +1,28 @@
 import { CalendarX, Moon, Sun, TriangleAlert } from 'lucide-react';
 import { DIAS_SEMANA_CURTOS, crossesMidnight, formatMinutes, weekdayOf } from '../../../lib/date';
-import { ROTULO_INDISP, ROTULO_SERVICO, indisponibilidadeDe, servicoDe, type Entry } from '../model';
+import { minutosNoMes } from '../calc';
+import { ROTULO_INDISP, ROTULO_SERVICO, indisponibilidadeDe, servicoDe, type Entry, type Turno } from '../model';
 import { ICONE_INDISP } from './Indisponibilidade';
 import { rotuloServico } from './DiaSheet';
 
 const COR_INDISP = { ferias: 'amber', afastamento: 'violet', convalescenca: 'violet', edt: 'blue' } as const;
 
 /** Lista cronológica dos lançamentos do mês. */
-export function ListaMes({ entries, duplicados, onDia }: { entries: Entry[]; duplicados: Set<string>; onDia: (d: string) => void }) {
-  if (entries.length === 0) {
+export function ListaMes({
+  entries,
+  continuacoes = [],
+  mes,
+  duplicados,
+  onDia,
+}: {
+  entries: Entry[];
+  /** Turnos do mês anterior que continuam neste mês. */
+  continuacoes?: Turno[];
+  mes: string;
+  duplicados: Set<string>;
+  onDia: (d: string) => void;
+}) {
+  if (entries.length === 0 && continuacoes.length === 0) {
     return (
       <div className="empty">
         <CalendarX />
@@ -18,6 +32,21 @@ export function ListaMes({ entries, duplicados, onDia }: { entries: Entry[]; dup
   }
   return (
     <div className="list">
+      {continuacoes.map((t) => (
+        <button key={`c${t.id}`} type="button" className="entry" onClick={() => onDia(`${mes}-01`)}>
+          <span className="d">
+            <b>1</b>
+            <small>{DIAS_SEMANA_CURTOS[weekdayOf(`${mes}-01`)]}</small>
+          </span>
+          <span className="info">
+            <strong>
+              <Moon size={14} style={{ display: 'inline', verticalAlign: '-2px', color: 'var(--blue)' }} /> até {t.end}
+            </strong>
+            <small>Continuação do turno de {t.date.slice(8)}/{t.date.slice(5, 7)}</small>
+          </span>
+          <span className="dur">{formatMinutes(minutosNoMes(t, mes))}</span>
+        </button>
+      ))}
       {entries.map((e) => {
         const dia = Number(e.date.slice(8));
         const sem = DIAS_SEMANA_CURTOS[weekdayOf(e.date)];
@@ -35,7 +64,7 @@ export function ListaMes({ entries, duplicados, onDia }: { entries: Entry[]; dup
                   {noite ? <Moon size={14} style={{ display: 'inline', verticalAlign: '-2px', color: 'var(--blue)' }} /> : <Sun size={14} style={{ display: 'inline', verticalAlign: '-2px', color: 'var(--primary-hi)' }} />}{' '}
                   {e.start} – {e.end}
                 </strong>
-                <small>{[rotuloServico(e), e.note || (noite ? 'Termina no dia seguinte' : 'Turno')].filter(Boolean).join(' · ')}</small>
+                <small>{[rotuloServico(e), e.note || (minutosNoMes(e, mes) !== e.minutes ? 'Continua no mês seguinte' : noite ? 'Termina no dia seguinte' : 'Turno')].filter(Boolean).join(' · ')}</small>
               </span>
               {servico !== 'ordinario' && (
                 <span className={`badge ${servico === 'gse' ? 'green' : 'blue'}`}>{ROTULO_SERVICO[servico].curto}</span>
@@ -45,7 +74,7 @@ export function ListaMes({ entries, duplicados, onDia }: { entries: Entry[]; dup
                   <TriangleAlert />
                 </span>
               )}
-              <span className="dur">{formatMinutes(e.minutes)}</span>
+              <span className="dur">{formatMinutes(minutosNoMes(e, mes))}</span>
             </button>
           );
         }

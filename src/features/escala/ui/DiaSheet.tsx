@@ -14,7 +14,7 @@ import {
   shiftMinutes,
 } from '../../../lib/date';
 import { track } from '../../../lib/analytics';
-import { duplicados } from '../calc';
+import { continuacoesPorDia, duplicados, minutosNoDia, viraMes } from '../calc';
 import {
   ROTULO_INDISP,
   ROTULO_SERVICO,
@@ -28,6 +28,11 @@ import { adicionarTurno, editarTurno, impactoLancamento, limparDias, marcarIndis
 import { atualizar, desfazer, useEscala } from '../store';
 import { CamposHorario, ServicoSeg, SlotGrid, servicoParaGravar, useOpcoesHorario, type ServicoEscolha } from './Horarios';
 import { EscolhaIndisp, ICONE_INDISP } from './Indisponibilidade';
+
+/** "30/11" a partir de AAAA-MM-DD. */
+function formatarDataCurta(iso: string): string {
+  return `${iso.slice(8)}/${iso.slice(5, 7)}`;
+}
 
 export function tituloDia(data: string): string {
   const d = parseISODate(data);
@@ -137,7 +142,9 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
   const turnos = doDia.filter((e): e is Turno => e.kind === 'turno');
   const marcas = doDia.filter((e): e is Marcacao => e.kind !== 'turno');
   const dups = duplicados(doDia);
-  const total = turnos.reduce((s, t) => s + t.minutes, 0);
+  // Turno do dia anterior que atravessa a virada do mês e continua neste dia.
+  const continuacoes = continuacoesPorDia(db.entries).get(data) ?? [];
+  const total = [...turnos, ...continuacoes].reduce((s, t) => s + minutosNoDia(t, data), 0);
   const nomeMarcas = [...new Set(marcas.map((m) => ROTULO_INDISP[indisponibilidadeDe(m)].longo))].join(' e ');
 
   const lancarEscala = async () => {
@@ -203,7 +210,7 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
         </span>
       }
       subtitle={
-        turnos.length ? `${turnos.length} turno(s) · ${formatMinutes(total)} no dia` : marcas.length ? nomeMarcas : 'Sem lançamentos'
+        turnos.length + continuacoes.length ? `${turnos.length + continuacoes.length} turno(s) · ${formatMinutes(total)} no dia` : marcas.length ? nomeMarcas : 'Sem lançamentos'
       }
     >
       <div className="stack" style={gap(18)}>
@@ -217,8 +224,22 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
           </div>
         )}
 
-        {(turnos.length > 0 || marcas.length > 0) && (
+        {(turnos.length > 0 || marcas.length > 0 || continuacoes.length > 0) && (
           <div className="list">
+            {continuacoes.map((t) => (
+              <div key={`c${t.id}`} className="list-item">
+                <span className="ico" style={{ color: 'var(--blue)' }}>
+                  <Moon />
+                </span>
+                <span className="txt">
+                  <strong className="tnum">até {t.end}</strong>
+                  <small>Continuação do turno de {formatarDataCurta(t.date)} ({t.start} – {t.end}). Para editar, abra o dia {formatarDataCurta(t.date)}.</small>
+                </span>
+                <span className="dur" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18 }}>
+                  {formatMinutes(minutosNoDia(t, data))}
+                </span>
+              </div>
+            ))}
             {marcas.map((m) => {
               const tipo = indisponibilidadeDe(m);
               const Icon = ICONE_INDISP[tipo];
@@ -254,6 +275,7 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
                     </strong>
                     <small>
                       {[rotuloServico(t), t.note || 'Toque para editar'].filter(Boolean).join(' · ')}
+                      {viraMes(t) ? ` · ${formatMinutes(t.minutes)} no total, o resto conta no mês seguinte` : ''}
                       {t.minutes !== shiftMinutes(t.start, t.end) ? ' · duração registrada na versão anterior' : ''}
                     </small>
                   </span>
@@ -266,7 +288,7 @@ export function DiaSheet({ data, onClose, onNavigate }: { data: string | null; o
                     </span>
                   )}
                   <span className="dur" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18 }}>
-                    {formatMinutes(t.minutes)}
+                    {formatMinutes(minutosNoDia(t, data))}
                   </span>
                   <Pencil size={16} className="subtle" />
                 </button>
