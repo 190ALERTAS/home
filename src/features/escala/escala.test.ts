@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calcularResumo, conflitos, duplicados, minutosComputados, proximoTurno, turnosFrequentes } from './calc';
+import { calcularResumo, continuacoesPorDia, minutosNoDia, conflitos, duplicados, minutosComputados, proximoTurno, turnosFrequentes } from './calc';
 import { interpretarBackup, mesclar, migrarV1, normalizarV2, paraV1, parseHorasV1 } from './migrate';
 import {
   GSE_LIMITE,
@@ -633,5 +633,21 @@ describe('turno na virada do mês', () => {
     const e = [turno('2026-10-30', '19:00', '07:00', 720)];
     expect(calcularResumo(e, '2026-10', cfg).trabalhado).toBe(720);
     expect(calcularResumo(e, '2026-11', cfg).trabalhado).toBe(0);
+  });
+});
+
+describe('turno na virada do mês no calendário', () => {
+  const t: Turno = { id: 'a', kind: 'turno', date: '2026-11-30', start: '18:00', end: '06:00', minutes: 720 };
+  it('divide por dia só quando vira o mês', () => {
+    expect(minutosNoDia(t, '2026-11-30')).toBe(360);
+    expect(minutosNoDia(t, '2026-12-01')).toBe(360);
+    const meio: Turno = { ...t, id: 'b', date: '2026-11-15' };
+    expect(minutosNoDia(meio, '2026-11-15')).toBe(720);
+    expect(minutosNoDia(meio, '2026-11-16')).toBe(0);
+  });
+  it('indexa a continuação no 1º dia do mês seguinte', () => {
+    const m = continuacoesPorDia([t]);
+    expect(m.get('2026-12-01')).toEqual([t]);
+    expect(m.size).toBe(1);
   });
 });

@@ -27,7 +27,7 @@ import { formatMinutes, monthKeyOf, monthLabel, parseMonthKey, shiftMonth, today
 import { canShareFiles, downloadBlob, openWhatsApp, pickTextFile, shareFiles } from '../../lib/share';
 import { readString, writeString } from '../../lib/storage';
 import { track } from '../../lib/analytics';
-import { calcularResumo, duplicados, entriesDoMes, porDia } from './calc';
+import { calcularResumo, continuacoesPorDia, duplicados, entriesDoMes, porDia } from './calc';
 import { interpretarBackup, mesclar, normalizarV2 } from './migrate';
 import { removerMes } from './ops';
 import { dbVazio, type Entry, type EscalaDB } from './model';
@@ -87,6 +87,7 @@ export default function EscalaPage() {
   const doMes = useMemo(() => entriesDoMes(db.entries, mes), [db.entries, mes]);
   const resumo = useMemo(() => calcularResumo(db.entries, mes, db.config), [db.entries, mes, db.config]);
   const mapa = useMemo(() => porDia(doMes), [doMes]);
+  const continuacoes = useMemo(() => continuacoesPorDia(db.entries), [db.entries]);
   const dups = useMemo(() => duplicados(doMes), [doMes]);
   const inicioSugerido = mes === monthKeyOf(hoje) ? hoje : `${mes}-01`;
 
@@ -322,6 +323,7 @@ export default function EscalaPage() {
               <Calendario
                 mes={mes}
                 porData={mapa}
+                continuacoes={continuacoes}
                 hoje={hoje}
                 duplicados={dups}
                 selecao={selecao}

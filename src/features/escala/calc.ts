@@ -62,6 +62,34 @@ export function minutosPorDia(t: Turno): { date: string; minutes: number }[] {
   return partes;
 }
 
+/** O turno atravessa a virada do mês (termina em outro mês). */
+export function viraMes(t: Turno): boolean {
+  const p = minutosPorDia(t);
+  return p.length > 1 && p[1].date.slice(0, 7) !== t.date.slice(0, 7);
+}
+
+/**
+ * Minutos do turno mostrados no dia `data` (calendário e folha do dia). Só o turno que vira o mês é
+ * dividido por dia; os demais aparecem inteiros no dia em que começam.
+ */
+export function minutosNoDia(t: Turno, data: string): number {
+  if (!viraMes(t)) return t.date === data ? t.minutes : 0;
+  return minutosPorDia(t).find((p) => p.date === data)?.minutes ?? 0;
+}
+
+/** Turnos que viram o mês, indexados pelo dia que recebe a continuação (1º dia do mês seguinte). */
+export function continuacoesPorDia(entries: Entry[]): Map<string, Turno[]> {
+  const map = new Map<string, Turno[]>();
+  for (const e of entries) {
+    if (!isTurno(e) || !viraMes(e)) continue;
+    const dia = minutosPorDia(e)[1].date;
+    const list = map.get(dia);
+    if (list) list.push(e);
+    else map.set(dia, [e]);
+  }
+  return map;
+}
+
 /** Minutos do turno que caem dentro do mês `mes` (AAAA-MM). Turno que vira o mês é dividido. */
 export function minutosNoMes(t: Turno, mes: string): number {
   return minutosPorDia(t).reduce((s, p) => (p.date.startsWith(mes) ? s + p.minutes : s), 0);
