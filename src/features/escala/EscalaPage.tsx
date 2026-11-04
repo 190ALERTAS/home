@@ -360,7 +360,7 @@ export default function EscalaPage() {
               meses de 30 dias e {formatMinutes(db.config.metas['28'])}/{formatMinutes(db.config.metas['29'])} em fevereiro. Férias e
               afastamentos descontam a carga proporcionalmente (cerca de 5h42 por dia, o fator 5,7 da NI ADM 033.2); cada EDT/RSP desconta{' '}
               {formatMinutes(db.config.edtMinutos)}. Serviço extraordinário (GSE) é contado à parte e sobreaviso conta 1/3. O turno
-              conta no mês em que começa.{' '}
+              que passa da meia-noite do último dia do mês é dividido entre os dois meses.{' '}
               {sincronizando
                 ? 'Dados salvos neste aparelho e sincronizados com a sua conta Google — continue fazendo backups.'
                 : 'Dados salvos apenas neste aparelho — faça backups.'}

@@ -50,6 +50,32 @@ export function minutosComputados(t: Turno): number {
   return t.minutes;
 }
 
+/**
+ * Minutos do turno que caem em cada dia: até a meia-noite no dia de início e o resto no dia seguinte.
+ * Ex.: 12h de 31/10 às 18h até 01/11 às 06h = 6h em 31/10 e 6h em 01/11.
+ */
+export function minutosPorDia(t: Turno): { date: string; minutes: number }[] {
+  const noPrimeiro = Math.min(t.minutes, 1440 - hmToMinutes(t.start));
+  const resto = t.minutes - noPrimeiro;
+  const partes = [{ date: t.date, minutes: noPrimeiro }];
+  if (resto > 0) partes.push({ date: addDays(t.date, 1), minutes: resto });
+  return partes;
+}
+
+/** Minutos do turno que caem dentro do mês `mes` (AAAA-MM). Turno que vira o mês é dividido. */
+export function minutosNoMes(t: Turno, mes: string): number {
+  return minutosPorDia(t).reduce((s, p) => (p.date.startsWith(mes) ? s + p.minutes : s), 0);
+}
+
+/** Como `minutosComputados`, mas só a parte do turno que cai em `mes`. */
+export function minutosComputadosNoMes(t: Turno, mes: string): number {
+  const m = minutosNoMes(t, mes);
+  const s = servicoDe(t);
+  if (s === 'gse') return 0;
+  if (s === 'sobreaviso') return Math.round(m / 3);
+  return m;
+}
+
 export function metaDoMes(mes: string, config: Config): number {
   const { year, month } = parseMonthKey(mes);
   const dias = String(daysInMonth(year, month)) as DiasNoMes;
@@ -64,7 +90,8 @@ export function calcularResumo(entries: Entry[], mes: string, config: Config): R
   const { year, month } = parseMonthKey(mes);
   const dias = daysInMonth(year, month);
   const metaBase = metaDoMes(mes, config);
-  const doMes = entriesDoMes(entries, mes);
+  // Turno que começa no último dia do mês anterior e termina neste também entra.
+  const doMes = entries.filter((e) => e.date.startsWith(mes) || (e.kind === 'turno' && minutosNoMes(e, mes) > 0));
 
   const ferias = new Set<string>();
   const afast = new Set<string>();
@@ -79,15 +106,18 @@ export function calcularResumo(entries: Entry[], mes: string, config: Config): R
 
   for (const e of doMes) {
     if (e.kind === 'turno') {
-      const computado = minutosComputados(e);
+      const noMes = minutosNoMes(e, mes);
+      if (noMes <= 0) continue;
+      const computado = minutosComputadosNoMes(e, mes);
+      const comecaNoMes = e.date.startsWith(mes);
       trabalhado += computado;
-      turnos++;
+      if (comecaNoMes) turnos++;
       const s = servicoDe(e);
       if (s === 'gse') {
-        gse += e.minutes;
-        turnosGse++;
+        gse += noMes;
+        if (comecaNoMes) turnosGse++;
       } else if (s === 'sobreaviso') {
-        sobreaviso += e.minutes;
+        sobreaviso += noMes;
         sobreavisoComputado += computado;
       }
     } else if (e.kind === 'ferias') ferias.add(e.date);
