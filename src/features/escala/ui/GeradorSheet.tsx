@@ -59,7 +59,7 @@ export function GeradorSheet({ open, onClose, mes, inicioSugerido }: { open: boo
   };
 
   const nomesSlot = (i: number, total: number) => {
-    if (presetId === '12x24-12x48') return i === 0 ? 'Turno do dia' : 'Turno da noite';
+    if (presetId === '12x24-12x48' || presetId === '12x24-12x72') return i === 0 ? 'Turno do dia' : 'Turno da noite';
     return total > 1 ? `Serviço ${i + 1}` : 'Serviço';
   };
 

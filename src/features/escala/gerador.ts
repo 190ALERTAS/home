@@ -39,6 +39,15 @@ export const PRESETS: Preset[] = [
     },
   },
   {
+    id: '12x24-12x72',
+    nome: '12x24 · 12x72',
+    desc: 'Um dia, uma noite e três folgas',
+    padrao: {
+      tipo: 'ciclo',
+      dias: [{ start: '07:00', end: '19:00' }, { start: '19:00', end: '07:00' }, null, null, null],
+    },
+  },
+  {
     id: '24x72',
     nome: '24x72',
     desc: '24h de serviço, 72h de folga',

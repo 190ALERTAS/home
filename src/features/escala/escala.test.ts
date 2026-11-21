@@ -310,6 +310,15 @@ describe('gerador de escala', () => {
     ]);
   });
 
+  it('12x24 / 12x72 alterna dia e noite com três folgas', () => {
+    const p = preverGerador([], preset('12x24-12x72'), opc);
+    expect(p.novos.slice(0, 3).map((t) => `${t.date} ${t.start}`)).toEqual([
+      '2026-10-01 07:00',
+      '2026-10-02 19:00',
+      '2026-10-06 07:00',
+    ]);
+  });
+
   it('dias da semana (seg a sex) em outubro/2026: 22 dias', () => {
     expect(preverGerador([], preset('semana'), opc).novos).toHaveLength(22);
   });
