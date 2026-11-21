@@ -46,7 +46,7 @@ export const NAV: Record<RouteId, NavEntry> = {
     id: 'croqui',
     label: 'Croqui',
     long: 'Croqui digital',
-    desc: 'Croqui de acidente sobre mapa ou em branco',
+    desc: 'Agora exclusivo do app QRV Multas',
     icon: PencilRuler,
   },
   taf: { id: 'taf', label: 'TAF', long: 'Calculadora TAF', desc: 'Pontuação do teste de aptidão física', icon: Dumbbell },
@@ -95,4 +95,4 @@ export function telasNoCaminho(de: RouteId | 'notfound', para: RouteId): RouteId
   return i < j ? ordem.slice(i + 1, j) : ordem.slice(j + 1, i).reverse();
 }
 
-export const APP_VERSION = '5.2.8';
+export const APP_VERSION = '5.3.0';

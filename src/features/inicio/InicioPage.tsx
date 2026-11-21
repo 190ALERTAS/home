@@ -153,7 +153,7 @@ export default function InicioPage() {
               <em>Seus registros anteriores foram mantidos.</em>
             </li>
             <li>
-              <b>Croqui</b> com as ruas reais do local em traçado plano (sem satélite), em escala real, com setas, medidas e legenda.
+              O <b>Croqui digital</b> agora é exclusivo do app <b>QRV Multas</b>, na Google Play.
             </li>
             <li>O módulo “Assuntos Correntes” foi descontinuado.</li>
           </ul>
@@ -193,7 +193,7 @@ export default function InicioPage() {
       <section className="privacidade">
         <Lock size={16} />
         <p>
-          Nada do que você digita nas ferramentas é enviado para servidores: rascunhos, escala e croquis ficam salvos só neste
+          Nada do que você digita nas ferramentas é enviado para servidores: rascunhos e escala ficam salvos só neste
           aparelho. A escala só vai para a nuvem se você ativar a sincronização com a sua conta Google.{' '}
           <a {...linkProps('termos')}>Termos e privacidade</a>
         </p>
