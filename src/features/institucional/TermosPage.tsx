@@ -20,11 +20,11 @@ export default function TermosPage() {
           </li>
           <li>
             <strong>Uso autorizado:</strong> a plataforma destina-se a integrantes das forças de segurança pública, especialmente praças,
-            como apoio na formatação de mensagens (release e alerta de veículo), na elaboração de croquis, no controle pessoal da escala
+            como apoio na formatação de mensagens (release e alerta de veículo), no controle pessoal da escala
             e no cálculo do TAF.
           </li>
           <li>
-            <strong>Ferramenta de apoio:</strong> os textos, croquis, cálculos e relatórios gerados não substituem documentos, sistemas ou
+            <strong>Ferramenta de apoio:</strong> os textos, cálculos e relatórios gerados não substituem documentos, sistemas ou
             procedimentos oficiais. Confira sempre as informações antes de divulgá-las.
           </li>
           <li>
@@ -51,8 +51,7 @@ export default function TermosPage() {
           </li>
           <li>
             <strong>Dados salvos no aparelho:</strong> para você não perder o trabalho, ficam salvos apenas no armazenamento local deste
-            aparelho/navegador: os rascunhos do release e do alerta (apagados automaticamente após 24 e 12 horas), a sua escala, o
-            croqui em andamento e o rascunho da página Sugestões, com o nome e o e-mail informados (apagado após 30 dias sem uso). Você pode apagá-los a qualquer momento pelos botões de limpar/apagar do próprio app ou limpando os dados
+            aparelho/navegador: os rascunhos do release e do alerta (apagados automaticamente após 24 e 12 horas), a sua escala e o rascunho da página Sugestões, com o nome e o e-mail informados (apagado após 30 dias sem uso). Você pode apagá-los a qualquer momento pelos botões de limpar/apagar do próprio app ou limpando os dados
             do navegador. Por padrão os dados da escala não saem do aparelho: faça backups pelo menu da escala.
           </li>
           <li>
@@ -66,9 +65,7 @@ export default function TermosPage() {
             informações sigilosas nas observações dos lançamentos.
           </li>
           <li>
-            <strong>Serviços de terceiros:</strong> no Croqui, o mapa e o traçado das ruas vêm do OpenStreetMap (servidores de mapas e
-            Overpass) e a busca de endereços usa o Nominatim (OpenStreetMap); esses serviços recebem a área do mapa exibida e o texto
-            pesquisado. O login e a sincronização opcional da escala usam o Google (Firebase Authentication e Cloud Firestore). O botão “WhatsApp” abre o WhatsApp com o texto gerado. As mensagens enviadas pela página Sugestões (nome,
+            <strong>Serviços de terceiros:</strong> o login e a sincronização opcional da escala usam o Google (Firebase Authentication e Cloud Firestore). O botão “WhatsApp” abre o WhatsApp com o texto gerado. As mensagens enviadas pela página Sugestões (nome,
             e-mail, tipo e texto, com a versão do app) são entregues por e-mail ao responsável pela plataforma por meio do serviço
             Web3Forms.
           </li>

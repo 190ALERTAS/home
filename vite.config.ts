@@ -21,7 +21,7 @@ export default defineConfig({
         name: '190 ALERTAS',
         short_name: '190 ALERTAS',
         description:
-          'Ferramentas de apoio operacional para a Brigada Militar: release, alerta de veículo, croqui, escala e TAF.',
+          'Ferramentas de apoio operacional para a Brigada Militar: release, alerta de veículo, escala e TAF.',
         lang: 'pt-BR',
         dir: 'ltr',
         start_url: base,
@@ -41,7 +41,6 @@ export default defineConfig({
           { name: 'Release', short_name: 'Release', url: `${base}release` },
           { name: 'Alerta de veículo', short_name: 'Alerta', url: `${base}veiculos` },
           { name: 'Minha escala', short_name: 'Escala', url: `${base}escala` },
-          { name: 'Croqui', short_name: 'Croqui', url: `${base}croqui` },
         ],
       },
       workbox: {
@@ -63,17 +62,6 @@ export default defineConfig({
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/tile\.openstreetmap\.org\//,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'mapa-ruas',
-              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 14 },
-              cacheableResponse: { statuses: [200] },
-            },
-          },
-        ],
       },
     }),
   ],

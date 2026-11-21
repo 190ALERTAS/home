@@ -7,7 +7,7 @@ Ferramentas de apoio operacional para a Brigada Militar (PMRS), feitas **de pra�
   horária pela NI ADM 033.2, gerador de escala, relatório em PDF e sincronização opcional entre aparelhos;
 - **Release** de ocorrência no padrão do batalhão (título com 🚔, 🦅 ou ⚡), pronto para o WhatsApp;
 - **Calculadora TAF** (NI nº 3.3/EMBM/2023, Anexo “E”);
-- **Croqui digital** com o traçado real das ruas do local (OpenStreetMap, em estilo plano) ou em branco, em escala real, com exportação em imagem;
+- **Croqui digital**: item exclusivo do app [QRV Multas](https://play.google.com/store/apps/details?id=qrv.multas); no 190 ALERTAS a aba Croqui apresenta o app;
 - **Alerta de Veículo** (furto/roubo) em segundos.
 
 No celular, a barra inferior traz, nessa ordem, Início, Release, Escala, TAF, Croqui, Alerta e Mais (Sugestões,
@@ -23,7 +23,7 @@ Idealizado e criado por **Sd Ferrão — 32º BPM**.
 
 - [TypeScript](https://www.typescriptlang.org/) + [React 19](https://react.dev/) + [Vite 8](https://vite.dev/)
 - PWA com [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox): cache offline e aviso de nova versão
-- [Leaflet](https://leafletjs.com/) (mapa do croqui), [jsPDF](https://github.com/parallax/jsPDF) (PDF da escala), [Lucide](https://lucide.dev/) (ícones)
+- [jsPDF](https://github.com/parallax/jsPDF) (PDF da escala), [Lucide](https://lucide.dev/) (ícones)
 - Fontes [IBM Plex Sans e IBM Plex Mono](https://www.ibm.com/plex/) (empacotadas com o app, funcionam offline)
 - Testes com [Vitest](https://vitest.dev/)
 
@@ -51,7 +51,7 @@ src/
     release/      formatador do release (format.ts), modelo de referência (Formato.txt) + tela
     veiculo/      alerta de veículo
     escala/       modelo, cálculo, migração, gerador, PDF e telas da escala
-    croqui/       editor vetorial, símbolos, captura do mapa e exportação
+    croqui/       página de divulgação do QRV Multas (o croqui digital saiu do app)
     taf/          tabela e cálculo do TAF
     inicio/, institucional/
   lib/            utilitários (datas, armazenamento, roteador, compartilhamento)
@@ -66,7 +66,7 @@ public/           ícones, imagem de compartilhamento e o sw.js antigo (desativa
   IBM Plex Mono (datas, horas, números e rótulos).
 - Emblema: escudo geométrico com o número 190, desenhado em vetor em `src/components/Emblema.tsx`.
   Os ícones do PWA, o `favicon.ico`, `public/icons/emblema.svg` e a imagem de compartilhamento
-  (`public/og.jpg`) são gerados a partir dele. O emblema também aparece no PDF da escala e na imagem do croqui.
+  (`public/og.jpg`) são gerados a partir dele. O emblema também aparece no PDF da escala.
 - As cores ficam em `src/styles/tokens.css` (tema escuro e claro).
 - Datas e horas usam seletores próprios (`src/components/pickers.tsx`), que abrem numa folha/janela
   sempre inteira na tela — os seletores nativos do navegador podiam abrir fora da tela.
@@ -201,6 +201,6 @@ sincronização — a migração nunca aparece como "alteração" a mesclar). Va
 
 ## Privacidade
 
-Nada do que é digitado nas ferramentas é enviado a servidores do projeto. Rascunhos, escala e croquis ficam somente no
-aparelho. A página Sugestões envia a mensagem (nome, e-mail, tipo e texto) por e-mail ao desenvolvedor via Web3Forms. O croqui usa o mapa e o traçado das ruas do OpenStreetMap (Overpass API); a busca de endereços usa o Nominatim.
+Nada do que é digitado nas ferramentas é enviado a servidores do projeto. Rascunhos e escala ficam somente no
+aparelho. A página Sugestões envia a mensagem (nome, e-mail, tipo e texto) por e-mail ao desenvolvedor via Web3Forms.
 Estatísticas anônimas de uso via Google Analytics. Veja os Termos de Uso no próprio app (`/home/termos`).
